@@ -1,21 +1,23 @@
 #include <iostream>
+#include "tokenClasses.h"
+#include "splitSpaces.h"
+#include "hashParser.h" // TODO: Rename
+#include "groupQuotes.h"
+#include "groupConnectors.h"
 
 using namespace std;
 
-class Token {
-	public:
-		Token(string);
-	private:
-		string data;
-}
+MultiToken* parse(string userInput) {
+	// 1. Split on spaces
+	vector<Token>& words;
+	splitSpaces(userInput, words);
+	// 2. Filter out #
+	hashParser(words); // TODO: Rename to removeComment
+	// 3. Group quotes into Tokens
+	words = groupQuotes(words);
+	// 4. Group bash connectors into MultiTokens
+	vector<MultiToken>& commands;
+	commands = groupConnectors(words);
 
-class MultiToken {
-	public:
-		MultiToken(vector<Token>&)
-	private:
-		vector<Token>& words;
-}
-
-MultiToken* parse(string) {
-;
+	// Do stuff with the parsed input
 }
