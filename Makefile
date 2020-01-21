@@ -48,10 +48,10 @@ RM = /usr/bin/cmake3 -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /class/classes/snore001/assn/assignment-oreo
+CMAKE_SOURCE_DIR = /home/csmajs/atheo003/assignment-oreo
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /class/classes/snore001/assn/assignment-oreo
+CMAKE_BINARY_DIR = /home/csmajs/atheo003/assignment-oreo
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -126,9 +126,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /class/classes/snore001/assn/assignment-oreo/CMakeFiles /class/classes/snore001/assn/assignment-oreo/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/csmajs/atheo003/assignment-oreo/CMakeFiles /home/csmajs/atheo003/assignment-oreo/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /class/classes/snore001/assn/assignment-oreo/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/csmajs/atheo003/assignment-oreo/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
