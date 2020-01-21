@@ -1,12 +1,18 @@
 #include <iostream>
 #include <string>
-
+#include <vector>
 using namespace std;
 
-string numParser (string &input)
+vector <string> hashParser (vector <string> input)
 {
-	size_t  hyphen = input.find('#');
-	input = input.substr(0,hyphen);
-	
-	return input; 
+        vector <string> result;
+        for (int i = 0; input[i] != "#"; i++)
+        {
+                result.push_back(input[i]);     
+                cout << result[i] << " ";   
+        }
+        cout << endl;
+
+        return result; 
 }
+

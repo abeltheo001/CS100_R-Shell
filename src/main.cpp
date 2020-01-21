@@ -1,5 +1,7 @@
 #include "hashParser.h"
 
-int main(int argv, char** argc) {
-    std::cout << echo(argv, argc);
+int main(int argv, char** argc)
+{
+	cout << numParser(argv,argc) << endl;
+
 }
