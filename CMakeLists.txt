@@ -4,8 +4,9 @@ ADD_SUBDIRECTORY(googletest)
 
 SET(CMAKE_CXX_STANDARD 11)
 
-ADD_EXECUTABLE(vectorize
-    src/vectorize.cpp src/vectorize.h
+
+ADD_EXECUTABLE(test
+	unit_tests/test.cpp
 )
 
 TARGET_LINK_LIBRARIES(test gtest)
