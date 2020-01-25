@@ -4,13 +4,7 @@
 #include <vector>
 #include <iostream>
 
- TEST (hashParseTest, FirstCheck)
  {
- 	vector <string> values;
- 	values.push_back("hamina");
- 	values.push_back("#");
-	values.push_back("hello");
-	vector<string> output;
 	output.push_back("hamina");	
  	EXPECT_EQ(output,hashParser(values));
  } 
