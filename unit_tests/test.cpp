@@ -1,16 +1,19 @@
 #include "gtest/gtest.h"
 #include "../src/splitSpaces.h"
-// #include "../src/hashParser.h"
+#include "../src/hashParser.h"
 #include <vector>
 #include <iostream>
 
-// TEST (hashParseTest, FirstCheck)
-// {
-// 	vector <string> values;
-// 	values.push_back("hamina");
-// 	values.push_back("#");	
-// 	EXPECT_EQ("hamina",hashParser(values));
-// } 
+ TEST (hashParseTest, FirstCheck)
+ {
+ 	vector <string> values;
+ 	values.push_back("hamina");
+ 	values.push_back("#");
+	values.push_back("hello");
+	vector<string> output;
+	output.push_back("hamina");	
+ 	EXPECT_EQ(output,hashParser(values));
+ } 
 
 TEST (splitSpaces, singleSpace) {
 	vector<string> values;
@@ -19,7 +22,11 @@ TEST (splitSpaces, singleSpace) {
 	vector<string> outputV = splitSpaces("abc 123");
 	EXPECT_EQ(values, outputV);
 }
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> abel
 TEST (splitSpaces, flankingSpaces) {
 	vector<string> values;
 	values.push_back("abc");

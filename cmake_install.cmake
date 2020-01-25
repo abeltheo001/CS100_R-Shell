@@ -1,4 +1,4 @@
-# Install script for directory: /class/classes/snore001/assn/assignment-oreo
+# Install script for directory: /home/csmajs/atheo003/assignment-oreo
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/class/classes/snore001/assn/assignment-oreo/googletest/cmake_install.cmake")
+  include("/home/csmajs/atheo003/assignment-oreo/googletest/cmake_install.cmake")
 
 endif()
 
@@ -51,5 +51,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/class/classes/snore001/assn/assignment-oreo/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/csmajs/atheo003/assignment-oreo/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
