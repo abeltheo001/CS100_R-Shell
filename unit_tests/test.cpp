@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "../src/splitSpaces.h"
-#include "../src/hashParser.h"
+#include "../header/splitSpaces.h"
+#include "../header/filterComments.h"
 #include <vector>
 #include <iostream>
 
@@ -12,7 +12,7 @@
 	values.push_back("hello");
 	vector<string> output;
 	output.push_back("hamina");	
- 	EXPECT_EQ(output,hashParser(values));
+ 	EXPECT_EQ(output, filterComments(values));
  } 
 
 TEST (splitSpaces, singleSpace) {
@@ -22,11 +22,7 @@ TEST (splitSpaces, singleSpace) {
 	vector<string> outputV = splitSpaces("abc 123");
 	EXPECT_EQ(values, outputV);
 }
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> abel
 TEST (splitSpaces, flankingSpaces) {
 	vector<string> values;
 	values.push_back("abc");
