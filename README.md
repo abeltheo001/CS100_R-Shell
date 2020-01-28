@@ -1,4 +1,4 @@
-# Design Document
+# CS100 R'Shell Project
 
 ### Project Information
 
