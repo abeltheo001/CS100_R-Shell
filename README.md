@@ -50,27 +50,83 @@ If the starting word in a Subcommand matches a special command name (e.g. exit),
 ![OMT Diagram (for Assignment 1)](/images/omt_diagram.png?token=AKNKATP2GGHDH6PX2FKEORK6HEU2O)
 ### Classes
 
-Create descriptions of each class and/or group of classes that you plan on developing. This can be as simple as a description of what each class accomplishes and how, or a pseudo-code level class definition. A class group would be a group of classes that all inherit from a single base class (composite classes are an example) and are therefore all closely related. For class, the group gives a description of the base class, as well as the differences between each child class. Make sure it is clear how these classes interact to perform the ingestion, transformations, and processing that is described at a high level in the introduction.
+Base class: Token
+- Stores word data as parts of commands.
+- Class variables
+    - vector<string> content (stores words)
+- Class functions
+    - Token()
+    - Token(vector<string>)
+    - vector<string> getContent()
+    - void setContent(vector<string>)
 
-string userInput() : Outputs a "$" then takes in and stores the user's input as a string.
+Inherited class: Subcommand : Token
+- Stores actual subcommand data. For example, {"echo", "a"}.
+- Class variables
+    - [None additional]
+- Class functions
+    - Subcommand(vector<string>)
 
-Commandtree parser(string) : Uses the user's string to form a vector of Tokens and then stored into a commandTree after having it parsed. 
+Inherited class: Operator : Token
+- Meant for storage of connectors like ||, &&, and ;. Used as a signal to the executor to keep previous success information available for connector logic. 
+- Class variables
+    - vector<Token*> children (No Operators should be leaf nodes of CommandTree, and Subcommands should always be leaf nodes, so only the Operator Token stores a vector<Token*> children class variable.)
+- Class functions
+    - Operator(vector<string>)
 
-- string filterComments(string): Takes in a string, identify if a "#" exists in it, and if so, return a substring that contains the string up until where the "#" previously existed.
-- vector <string> splitSpaces(string): Takes in a string and form a vector of strings by going through the string and creating divisions whenever a space is found between text, inputting, although a separate case will later be made in what to do if the command requires two words to be in one string.
-- vector<Token*> tokenize (vector<string>) : Takes in a vector of strings and convert it into a vector of Tokens. Iterate through the vector, store each value into a Token and push them into a new vector.
-- Commandtree constructExTree(vector <Token*>): Take in a vector of Tokens and produce a command Tree, inserting the values in the vector in inorder.
+Base class: CommandTree
+- CommandTree stores a Token* head of the execution tree. The executor uses inorder traversal to execute commands on the tree, and stops going down the tree as soon as a Subcommand* is encountered.
+- Class variables
+    - Token* head
+- Class functions
+    - CommandTree()
+    - void setHead(Token*)
+    - Token* getHead()
 
-int executor (Commandtree): Determines if there's been a failure, and if so, what kind of failure depending on the int returned. If the function returns a 0, there's been no error. 
+Our classes don't directly interact very often, so we decided to take this space to describe our intended functions as well.
 
-- Subcommand expandAlias(Subcommand): This function is used if and only if the current Token is also a Subcommand, Looks into a table to aliases and sees if there's a match to the inputted Subcommand. If so, it will replace the command alias with the matching Subcommand and return it along with the rest of the command input.
-- bool checkBuiltin(subCommand): Returns true if the subCommand has an intended location and if so, which function to use at that location.
+rshell (executable main)
+
+- string userInput() : Outputs a "$" then takes in and stores the user's input as a string.
+
+CommandTree parser(string) : Uses the user's string to form a vector of Tokens which is then converted into a CommandTree. 
+
+- vector<string> splitSpaces(string): Takes in a string and forms a vector of strings by going through the string and creating divisions whenever a space is found between text. This later needs to be modified to deal with quotes, which will be achieved by first separating out the quotes and then splitting each non-quote remainder string. The intermediate steps would look something like this: {"echo a || echo", "hello world"} - > {"echo", "a", "||", "echo", "hello world"}
+- vector<string> filterComments(vector<string>): Takes in the vector from the last step, identifies if a "#" exists in it, and returns a vector of all terms before the "#".
+- vector<Token*> tokenize (vector<string>) : Takes in a vector of strings and convert it into a vector of Tokens. Iterate through the vector, store each value into a Token child class and push them into a new vector. This function does detection of Operators (||, &&, ;) and Subcommands and tags them as such during object initialization.
+- CommandTree constructExTree(vector<Token*>): Take in a vector of Token*s and produce a CommandTree. This is achieved through conversion of the vector from inorder to preorder, which makes constructing a tree in a top down manner much easier.
+
+int executor (CommandTree): Determines if there's been a failure, and if so, what kind of failure depending on the int returned. If the function returns a 0, there's been no error. 
+
+- Subcommand expandAlias(Subcommand): This function is used if and only if the current Token is also a Subcommand. expandAlias checks if each of the words in the command are loaded into an unordered_set of aliases loaded at program start time. If there's a word match, it will replace the word with the matching group of words. For example, the alias file might read:
+alias i="sudo apt-get install"
+So if the Subcommand content was {"i", "cowsay", "&&", "cowsay", "hello world"}, then the expanded version would read:
+{"sudo", "apt-get", "install", "cowsay", "&&", "cowsay", "hello world"}
+- bool checkBuiltin(Subcommand): Returns true if the first word of the Subcommand matches a rshell function (eg exit).
 
 ### Prototypes/Research
 
-Since you are likely unfamiliar with how the functions waitpid(), execvp() and fork() function individually and together you should create a small prototype function to test how these functions can be used together to execute small commands in a separate thread. In addition to a prototype for the main system functions, you should create a small prototype for parsing user input into the different elements necessary for completing assignment 2. The parser does not need to be bug-free or fully complete (although it must compile) but should represent your investigation into determining which parsing method you want to use for your assignment and the basics of a full parser (I suggest counting the number of times different types of elements appear in a given input as the output of your prototype). You should include the coded prototype you used to do your testing in the prototype/ directory and describe your findings and how you plan on using it in your assignment in this section (note these prototypes do not need an associated CMake file to compile them). Additionally, you will likely have questions about how connectors act in different situations. You should perform some preliminary testing of these different situations against the normal shell and write put any notes about the results in this section.
+For error-tolerant execution of commands, the safest way is probably to fork a process and run execvp() in that fork. This allows for extraction of errors - if the child process fails, the parent process can monitor the return state of the child. The functionality of waitpid() and fork() are demonstrated in ~/prototype/prototype_waitpid.cpp and the functionality of execvp() is demonstrated in ~/prototype/prototype_execvp.cpp.
+
+For our parser, early functionality can be found in ~/src/parser.cpp, with the imported header files demonstrating functionality. Both ~/header/splitSpaces.h and ~/header/filterComments.h have tests in ~/unit_tests/test.cpp. 
+
+Early on, we were hoping that vector<Token*> would store inherited children of Token* (Subcommand*, Operator*) but apparently C++ dislikes doing this without special effort. In our assignment two, we will research using smart pointers to handle this functionality. If this does not work, our base classes will be modified. As a result, the tokenize function is not complete yet.
+
+For bash style connectors ( ||, &&, ; ), we found the following result in bash:
+
+$ echo a || echo b && echo c
+
+a
+
+c
+
+Ths implies "left precedence" which is essentially a reduce function that works from left to right. First "echo a || echo b" is executed. Since echo a succeeds, echo b is not run. As a group, "echo a || echo b" succeeded at least once, so "echo c" runs.
+
+This is straightforward to implement as it only requires the addition of an accumulator variable (in this case, a bool that stores whether the last command succeeded), but due to concerns about later extensibility, we decided to go with a tree structure instead for storing the command logic. For example, if there are parentheses, then the left to right ordering no longer applies.
 
 ### Development and Testing Roadmap
+
+============== ASSIGNMENT 1 ==============
 
 1. Finish the design document
     1. Classes
