@@ -30,7 +30,7 @@ This project implements a shell, which allows for execution of programs from a c
 
 Parsing of statements like "echo a || echo b && echo c" is done by first filtering out comments and then constructing an "expression tree" (which in our implementation is of class CommandTree).
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9d6f4bd3-bdfa-47b5-9deb-e3fc3facc26f/CommandTree_(1).png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9d6f4bd3-bdfa-47b5-9deb-e3fc3facc26f/CommandTree_(1).png)
+![Command Tree](/images/CommandTree.png)
 
 In this data structure, the lowest level operations have the highest precedence. When there are no parentheses, the tree is formatted for "left precedence", which means that a command like "echo a || echo b && echo c" will run as follows:
 "((echo a || echo b) && echo c)"
