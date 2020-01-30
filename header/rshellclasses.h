@@ -22,7 +22,7 @@ class Token {
 class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
-        int execute();
+        int execute(); // TODO: To be implemented
 };
 
 class Operator : public Token {
