@@ -2,7 +2,7 @@
 #include "../header/rshellclasses.h"
 #include "../header/splitSpaces.h"
 #include "../header/filterComments.h" // TODO: Rename
-// #include "groupQuotes.h"
+// #include "tokenize.h"
 // #include "groupConnectors.h"
 
 using namespace std;
@@ -14,14 +14,13 @@ CommandTree* parse(string userInput) {
 	// 2. Filter out #
 	words = filterComments(words);
 
-	// // 3. Group quotes into Tokens
+	// // 3. Group words into Tokens of type Subcommand or Operator.
 	// vector<Token*> tokens;
 	// tokens = tokenize(words);
 
-	// // 4. Group bash connectors into MultiTokens
-	// vector<MultiToken>& commands;
+	// // 4. Create a tree for execution in later steps
 	CommandTree* ctree;
-	// commands = groupConnectors(words);
+	// commands = constructExecutionTree(words);
 
 	return ctree;
 }
