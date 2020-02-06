@@ -25,4 +25,16 @@ int main() {
         cout << "Parent process complete" << endl;
     }
 
-}
+    if (pid >= 0)
+    {
+        char *argv[] = {"echo", "Hello", "World!", NULL};
+
+        if (argv[3] == NULL)
+        {
+            execvp("echo", argv);
+        }
+        else
+        {
+            return -1;
+        }
+    }
