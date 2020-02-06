@@ -144,35 +144,35 @@ This is straightforward to implement as it only requires the addition of an accu
 ============== ASSIGNMENT 2 ==============
 
 1. Create base classes
-    1. Token
-    2. Subcommand (inherits from Token)
-    3. Operator (inherits from Token, can have Token* children)
-    4. CommandTree (nodes are Token*)
+    1. [Token](#16)
+    2. [Subcommand (inherits from Token)](#17)
+    3. [Operator (inherits from Token, can have Token* children)](#18)
+    4. [CommandTree (nodes are Token*)](#19)
 2. Design AND TEST functions (any order):
     1. rshell
-        1. string userInput()
+        1. [string userInput()](#20) [test](#28)
     2. parser
-        1. string filterComments(string)
-        2. vector<string> splitSpaces(string)
-        3. vector<Token*> tokenize(vector<string>)
-        4. CommandTree constructExpressionTree(vector<Token*>)
+        1. [string filterComments(string)](#21) [test](#29)
+        2. [vector<string> splitSpaces(string)](#22) [test](#30)
+        3. [vector<Token*> tokenize(vector<string>)](#23) [test](#31)
+        4. [CommandTree constructExpressionTree(vector<Token*>)](#24) [test](#32)
     3. executor
-        1. Subcommand expandAliases(Subcommand)
-        2. bool checkBuiltin(Subcommand)
-        3. int executeSubcommand(Subcommand)
+        1. [Subcommand expandAliases(Subcommand)](#25) [test](#33)
+        2. [bool checkBuiltin(Subcommand)](#26) [test](#34)
+        3. [int executeSubcommand(Subcommand)](#27) [test](#35)
 3. Combine functions from previous step and make integration tests (any order):
-    1. rshell
+    1. [rshell](#36)
     string userInput()
     CommandTree parser(string)
     int executor(CommandTree)
-    2. CommandTree parser(string)
+    2. [CommandTree parser(string)](#37)
     string filterComments(string)
     vector<string> splitSpaces(string)
     vector<Token*> tokenize(vector<string>)
     CommandTree constructExpressionTree(vector<Token*>)
-    3. int executor(CommandTree)
+    3. [int executor(CommandTree)](#38)
     int executeInOrder(CommandTree)
         Subcommand expandAliases(Subcommand)
         bool checkBuiltin(Subcommand)
         int executeSubcommand(Subcommand)
-4. Do a complete integration test (rshell → parser → executor)
+4. [Do a complete integration test (rshell → parser → executor)](#39)
