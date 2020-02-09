@@ -1,9 +1,9 @@
 #include <iostream>
 #include "../header/rshellclasses.h"
 #include "../header/splitSpaces.h"
-#include "../header/filterComments.h" // TODO: Rename
-// #include "tokenize.h"
-// #include "groupConnectors.h"
+#include "../header/filterComments.h"
+#include "../header/tokenize.h"
+#include "../header/groupQuotes.h"
 
 using namespace std;
 
@@ -14,11 +14,13 @@ CommandTree* parse(string userInput) {
 	// 2. Filter out #
 	words = filterComments(words);
 
-	// // 3. Group words into Tokens of type Subcommand or Operator.
-	// vector<Token*> tokens;
-	// tokens = tokenize(words);
+	// 3. Make sure quotes get grouped together
+	words = groupQuotes(words)
 
-	// // 4. Create a tree for execution in later steps
+	// 4. Group words/quotes into Tokens of type Subcommand or Operator.
+	vector<Token*> tokens = tokenize(words);
+
+	// 5. Create a tree for execution in later steps
 	CommandTree* ctree;
 	// commands = constructExecutionTree(words);
 
