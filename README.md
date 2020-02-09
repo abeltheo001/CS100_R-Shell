@@ -126,21 +126,6 @@ This is straightforward to implement as it only requires the addition of an accu
 
 ### Development and Testing Roadmap
 
-============== ASSIGNMENT 1 ==============
-
-1. Finish the design document
-    1. Classes
-    2. OMT Diagram
-    3. Introduction polish
-2. Convert design document to markdown format
-3. Create prototypes for assignment 1
-    1. waitpid()
-    2. execvp()
-    3. fork()
-    4. a prototype parser that compiles (but does not necessarily complete all steps)
-4. Prototypes writeup
-5. After completion of the previous steps, check that compilation/testing works and clone it to a temporary directory for further work. This will ensure that the original directory compiles for the grader.
-
 ============== ASSIGNMENT 2 ==============
 
 1. Create base classes
