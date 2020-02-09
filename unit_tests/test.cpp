@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "splitSpacesTest.h"
 #include "filterCommentsTest.h"
+#include "tokenizeTest.h"
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

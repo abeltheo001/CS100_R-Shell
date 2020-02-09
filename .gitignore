@@ -38,6 +38,10 @@ test
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
+Makefile
 
 # Editor files
 .vscode
+
+# Temporary test files
+*.gch

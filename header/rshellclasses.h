@@ -18,6 +18,9 @@ class Token {
         void setLeft(Token* t) { leftChild = t; }
         void setRight(Token* t) { rightChild = t; }
         bool hasChildren() { return ((leftChild != nullptr) || (rightChild != nullptr)); }
+	bool operator==(Token const &rhs) {
+		return (this->content == rhs.content);
+	}
     protected:
         vector<string> content;
         Token* leftChild;
@@ -28,7 +31,9 @@ class Token {
 class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
-        int execute(); // TODO: To be implemented
+        int execute() { // TODO: To be implemented
+		return 0;
+	}
 };
 
 class Operator : public Token {
