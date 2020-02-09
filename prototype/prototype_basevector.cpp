@@ -19,4 +19,4 @@ int main() {
     cout << typeid(&o).name() << endl;
 
     return 0;
-}
+};
