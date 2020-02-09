@@ -9,9 +9,15 @@ using namespace std;
 class Token {
     public:
         Token() {};
+
         vector<string> getContent()          { return content; }
         void setContent(vector<string> V)    { content = V; }
+
         virtual int execute() = 0;
+
+        void setLeft(Token* t) { leftChild = t; }
+        void setRight(Token* t) { rightChild = t; }
+        bool hasChildren() { return ((leftChild != nullptr) || (rightChild != nullptr)); }
     protected:
         vector<string> content;
         Token* leftChild;
