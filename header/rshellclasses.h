@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <stack>
 
 using namespace std;
 
@@ -18,7 +19,10 @@ class Token {
         void setLeft(Token* t) { leftChild = t; }
         void setRight(Token* t) { rightChild = t; }
         bool hasChildren() { return ((leftChild != nullptr) || (rightChild != nullptr)); }
-    protected:
+		bool operator==(Token const &rhs) const {
+			return (this->content == rhs.content);
+		}
+
         vector<string> content;
         Token* leftChild;
         Token* rightChild;
@@ -28,7 +32,9 @@ class Token {
 class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
-        int execute(); // TODO: To be implemented
+        int execute() { // TODO: To be implemented
+		return 0;
+	}
 };
 
 class Operator : public Token {
@@ -72,7 +78,7 @@ class Operator : public Token {
 
 class CommandTree {
     public:
-        CommandTree();
+        CommandTree() : head(nullptr) {}
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
     protected:

@@ -1,3 +1,6 @@
+#ifndef TOKENIZE_H
+#define TOKENIZE_H
+
 #include "rshellclasses.h" // Includes vector and string
 #include <unordered_set>
 
@@ -15,25 +18,37 @@ vector<Token*> tokenize(vector<string> Vin) {
 
     unordered_set<string> recognized_operators = { "||", "&&", ";" };
     vector<string> buffer;
-    vector<shared_ptr<Token>> grouped;
+    vector<Token*> grouped;
     bool first = true;
     
     auto it = Vin.begin();
     while (it != Vin.end()) {
-        if (recognized_operators.count(*it) == 1) {
+        if (recognized_operators.count(*it) > 0) {
             if (buffer.size() > 0) {
-                auto subc = make_shared<Subcommand>(buffer);
+                Subcommand* subc = new Subcommand(buffer);
                 vector<string> oplist = {*it};
-                auto op = make_shared<Operator>(oplist);
-                // grouped.push_back(subc);
-                // grouped.push_back(op);
-            } else {
+                Operator* op = new Operator(oplist);
+                
+				grouped.push_back(subc);
+                grouped.push_back(op);
+            
+				buffer.clear();
+	    	} else {
                 // TODO: Implement error handling
             }
+        } else {
+            buffer.push_back(*it);
         }
         it++;
     }
 
+    // Remove remaining on buffer
+    if (buffer.size() > 0) {
+		Subcommand* subc = new Subcommand(buffer);
+		grouped.push_back(subc);
+    }
 
+    return grouped;
 }
 
+#endif

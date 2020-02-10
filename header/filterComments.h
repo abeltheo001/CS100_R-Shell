@@ -1,3 +1,6 @@
+#ifndef FILTERCOMMENTS_H
+#define FILTERCOMMENTS_H
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,3 +17,4 @@ vector <string> filterComments (vector <string> input)
         return result; 
 }
 
+#endif
