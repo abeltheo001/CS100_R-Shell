@@ -1,6 +1,6 @@
 #include <iostream>
 #include "../header/rshellclasses.h"
-#include "../header/splitSpaces.h"
+#include "../header/splitOnChar.h"
 #include "../header/filterComments.h"
 #include "../header/tokenize.h"
 #include "../header/groupQuotes.h"
@@ -9,7 +9,7 @@ using namespace std;
 
 CommandTree* parse(string userInput) {
 	// 1. Split on spaces
-	vector<string> words = splitSpaces(userInput);
+	vector<string> words = splitOnChar(userInput, ' ');
 
 	// 2. Filter out #
 	words = filterComments(words);

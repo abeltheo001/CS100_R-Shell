@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "splitSpacesTest.h"
+#include "splitOnCharTest.h"
 #include "filterCommentsTest.h"
 #include "groupQuotesTest.h"
 #include "tokenizeTest.h"

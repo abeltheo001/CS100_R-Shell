@@ -1,18 +1,18 @@
-#ifndef SPLITSPACES_H
-#define SPLITSPACES_H
+#ifndef SPLITONCHAR_H
+#define SPLITONCHAR_H
 
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
-vector<string> splitSpaces(string userInput) {
+vector<string> splitOnChar(string userInput, char sp) {
 	vector<char> buffer;
 	auto it = userInput.begin();
 	vector<string> outputV;
 	while (it != userInput.end()) {
 		char currChar = *it;
-		if (currChar != ' ') {
+		if (currChar != sp) {
 			buffer.push_back(currChar);
 		} else {
 			if (buffer.size() > 0) {

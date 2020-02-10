@@ -8,7 +8,7 @@
 // Input here is {"echo", "\"Hello", "World\""}. Want it to instead be {"echo", ""Hello world""}.
 // Edge case: echo "Hello || world"aaa prints "Hello || worldaaa". I suspect this means the execvp command
 //     was fed {"echo", ""Hello || world"aaa"}. As a result, quotes may be inside preexisting strings instead
-//	   of just at the start. splitSpaces would turn that statement into {"echo", "\"Hello", "||", "world\"aaa"} already,
+//	   of just at the start. splitOnChar would turn that statement into {"echo", "\"Hello", "||", "world\"aaa"} already,
 //	   so fortunately it's just a matter of merging strings between the open quote and close quote.
 
 using namespace std;

@@ -2,6 +2,7 @@
 #define __GROUPQUOTESTEST_H__
 
 #include "gtest/gtest.h"
+#include "../header/splitOnChar.h"
 #include "../header/groupQuotes.h"
 #include <vector>
 #include <string>
@@ -15,7 +16,7 @@ TEST (groupQuotes, noQuotes) {
 }
 
 TEST (groupQuotes, quotesHelloWorld) {
-	vector<string> sp = splitSpaces("echo \"Hello world\"");
+	vector<string> sp = splitOnChar("echo \"Hello world\"", ' ');
 	vector<string> grouped = groupQuotes(sp);
 
 	vector<string> expected = {"echo", "\"Hello world\""};
@@ -23,7 +24,7 @@ TEST (groupQuotes, quotesHelloWorld) {
 }
 
 TEST (groupQuotes, quotesHelloWorldFlanked) {
-	vector<string> sp = splitSpaces("echo aaa\"Hello world\"aaa");
+	vector<string> sp = splitOnChar("echo aaa\"Hello world\"aaa", ' ');
 	vector<string> grouped = groupQuotes(sp);
 
 	vector<string> expected = {"echo", "aaa\"Hello world\"aaa"};
