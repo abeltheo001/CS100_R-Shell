@@ -1,3 +1,6 @@
+#ifndef TOKENIZE_H
+#define TOKENIZE_H
+
 #include "rshellclasses.h" // Includes vector and string
 #include <unordered_set>
 
@@ -48,3 +51,4 @@ vector<Token*> tokenize(vector<string> Vin) {
     return grouped;
 }
 
+#endif

@@ -1,3 +1,6 @@
+#ifndef SPLITSPACES_H
+#define SPLITSPACES_H
+
 #include <iostream>
 #include <vector>
 
@@ -28,4 +31,4 @@ vector<string> splitSpaces(string userInput) {
 	return outputV;
 }
 
-
+#endif

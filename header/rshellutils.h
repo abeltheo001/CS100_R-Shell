@@ -1,3 +1,6 @@
+#ifndef RSHELLUTILS_H
+#define RSHELLUTILS_H
+
 #include <iostream>
 #include <vector>
 
@@ -9,3 +12,5 @@ void printVector(vector<T> V, string delimiter=" ") {
 		it++;
 	}
 }
+
+#endif

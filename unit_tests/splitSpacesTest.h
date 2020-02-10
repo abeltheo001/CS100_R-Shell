@@ -1,5 +1,5 @@
-#ifndef __SPLITSPACES_H__
-#define __SPLITSPACES_H__
+#ifndef __SPLITSPACESTEST_H__
+#define __SPLITSPACESTEST_H__
 
 #include "gtest/gtest.h"
 #include "../header/splitSpaces.h"

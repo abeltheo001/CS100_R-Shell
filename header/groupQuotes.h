@@ -1,3 +1,6 @@
+#ifndef GROUPQUOTES_H
+#define GROUPQUOTES_H
+
 #include <iostream>
 #include <vector>
 #include "rshellutils.h"
@@ -71,4 +74,4 @@ vector<string> groupQuotes(vector<string> Vin) {
 	return grouped;
 }
 
-
+#endif
