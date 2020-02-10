@@ -43,8 +43,11 @@ TEST (constructExpressionTreeTest, withBashConnectors_Head) {
 	vector<string> left = {"ls", "-al"};
 	vector<string> right = {"echo", "hello"};
 	vector<string> op = {"||"};
+	Token* opObj = new Operator(op);
+	Token* leftObj = new Subcommand(left);
+	Token* rightObj = new Subcommand(right);
 
-	EXPECT_EQ(*(ctree.getHead()), op);
+	EXPECT_EQ(*(ctree.getHead()), *opObj);
 }
 
 TEST (constructExpressionTreeTest, withBashConnectors_Left) {
@@ -64,8 +67,11 @@ TEST (constructExpressionTreeTest, withBashConnectors_Left) {
 	vector<string> left = {"ls", "-al"};
 	vector<string> right = {"echo", "hello"};
 	vector<string> op = {"||"};
-
-	EXPECT_EQ(*((ctree.getHead())->leftChild), left);
+	Token* opObj = new Operator(op);
+	Token* leftObj = new Subcommand(left);
+	Token* rightObj = new Subcommand(right);
+	
+	EXPECT_EQ(*((ctree.getHead())->leftChild), *leftObj);
 }
 
 TEST (constructExpressionTreeTest, withBashConnectors_Right) {
@@ -85,8 +91,11 @@ TEST (constructExpressionTreeTest, withBashConnectors_Right) {
 	vector<string> left = {"ls", "-al"};
 	vector<string> right = {"echo", "hello"};
 	vector<string> op = {"||"};
+	Token* opObj = new Operator(op);
+	Token* leftObj = new Subcommand(left);
+	Token* rightObj = new Subcommand(right);
 
-	EXPECT_EQ(*((ctree.getHead())->leftChild), right);
+	EXPECT_EQ(*((ctree.getHead())->rightChild), *rightObj);
 }
 
 #endif

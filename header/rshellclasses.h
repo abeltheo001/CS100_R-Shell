@@ -19,14 +19,10 @@ class Token {
         void setLeft(Token* t) { leftChild = t; }
         void setRight(Token* t) { rightChild = t; }
         bool hasChildren() { return ((leftChild != nullptr) || (rightChild != nullptr)); }
-		bool operator==(Token const &rhs) {
+		bool operator==(Token const &rhs) const {
 			return (this->content == rhs.content);
 		}
 
-		bool operator==(const vector<string> &rhs) {
-			return (this->content == rhs);
-		}
-	
         vector<string> content;
         Token* leftChild;
         Token* rightChild;
