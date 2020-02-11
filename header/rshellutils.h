@@ -13,4 +13,19 @@ void printVector(vector<T> V, string delimiter=" ") {
 	}
 }
 
+string joinVector(vector<string> V, char joiner) {
+	string concat;
+	bool first = true;
+	for (const string& substr : V) {
+		if (first) {
+			concat += substr;
+			first = false;
+		} else {
+			concat += joiner;
+			concat += substr;
+		}
+	}
+	return concat;
+}
+
 #endif

@@ -35,17 +35,7 @@ vector<string> groupQuotes(vector<string> Vin) {
 				//     for some discussion about concatting strings in C++.
 				state = 0;
 				buffer.push_back(*it);
-				string concat;
-				bool first = true;
-				for (const auto& substr : buffer) {
-					if (first) {
-						concat += substr;
-						first = false;
-					} else {
-						concat += " ";
-						concat += substr;
-					}
-				}
+				string concat = joinVector(buffer, ' ');
 				grouped.push_back(concat);
 				buffer.clear();
 			} else { 		// Startquote reached, switch state
