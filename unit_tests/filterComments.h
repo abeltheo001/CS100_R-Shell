@@ -24,4 +24,9 @@ TEST (filterCommentsTest, LetterthenComment)
 	EXPECT_EQ(output,filterComments(values));
 }
 
+TEST (filterCommentsTest, CommentthenLetter)
+{
+	vector <string> values = {"echo", "1", "2", "3#"};
+	EXPECT_EQ(values, filterComments(values));
+}
 #endif
