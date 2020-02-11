@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-TEST (hashParseTest, FirstCheck)
+TEST (filterCommentsTest, FirstCheck)
 {
     vector <string> values;
     values.push_back("hamina");
@@ -15,6 +15,13 @@ TEST (hashParseTest, FirstCheck)
     vector<string> output;
     output.push_back("hamina");	
     EXPECT_EQ(output, filterComments(values));
+}
+
+TEST (filterCommentsTest, LetterthenComment)
+{
+	vector <string> values = {"echo","a","#b","c","d"};
+	vector <string> output = {"echo","a"};
+	EXPECT_EQ(output,filterComments(values));
 }
 
 #endif
