@@ -41,7 +41,7 @@ Construction of the tree happens by converting the inorder input to preorder, an
 
 Execution consists of running a inorder traversal, wherein the left commands are executed first. When an Operator is reached, logic is used depending on the operator type on whether to execute the right Subcommand (eg || means "execute the right command only if a fails"). Success of the most recently executed Subcommand is passed up the tree so Operator logic works properly.
 
-If a word in a Subcommand is in .rshell_aliases.txt, then it will be expanded to the defined command (in the same syntax as bash: alias i="sudo apt-get install"). This requires additional Tokenization, which is achieved by calling the "splitSpaces" and "tokenize" function from parser.
+If a word in a Subcommand is in .rshell_aliases.txt, then it will be expanded to the defined command (in the same syntax as bash: alias i="sudo apt-get install"). This requires additional Tokenization, which is achieved by calling the "splitOnChar" and "tokenize" function from parser.
 
 If the starting word in a Subcommand matches a special command name (e.g. exit), a call will be made to the relevant ~/src/name file rather than running execvp().
 
@@ -91,7 +91,7 @@ rshell (executable main)
 
 CommandTree parser(string) : Uses the user's string to form a vector of Tokens which is then converted into a CommandTree. 
 
-- vector<string> splitSpaces(string): Takes in a string and forms a vector of strings by going through the string and creating divisions whenever a space is found between text. This later needs to be modified to deal with quotes, which will be achieved by first separating out the quotes and then splitting each non-quote remainder string. The intermediate steps would look something like this: {"echo a || echo", "hello world"} - > {"echo", "a", "||", "echo", "hello world"}
+- vector<string> splitOnChar(string, char): Takes in a string and forms a vector of strings by going through the string and creating divisions whenever an input char (eg space) is found between text. This later needs to be modified to deal with quotes, which will be achieved by first separating out the quotes and then splitting each non-quote remainder string. The intermediate steps would look something like this: {"echo a || echo", "hello world"} - > {"echo", "a", "||", "echo", "hello world"}
 - vector<string> filterComments(vector<string>): Takes in the vector from the last step, identifies if a "#" exists in it, and returns a vector of all terms before the "#".
 - vector<Token*> tokenize (vector<string>) : Takes in a vector of strings and convert it into a vector of Tokens. Iterate through the vector, store each value into a Token child class and push them into a new vector. This function does detection of Operators (||, &&, ;) and Subcommands and tags them as such during object initialization.
 - CommandTree constructExTree(vector<Token*>): Take in a vector of Token*s and produce a CommandTree. This is achieved through conversion of the vector from inorder to preorder, which makes constructing a tree in a top down manner much easier.

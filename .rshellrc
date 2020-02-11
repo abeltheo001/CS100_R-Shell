@@ -1,0 +1,7 @@
+# Format: # are comments (this allows reuse of the # functionality)
+# Alias format:
+# alias i=sudo apt-get install
+# ("i" is expanded to "sudo apt-get install")
+
+alias welcome=cowsay Hello programmer! Good luck with dev!
+
