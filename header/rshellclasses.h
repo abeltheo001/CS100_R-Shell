@@ -28,7 +28,7 @@ class Token {
         vector<string> content;
         Token* leftChild;
         Token* rightChild;
-        int status = -1; // Current exit status of Token
+        int status = -2; // Current exit status of Token. -2 is "hasn't run yet"
 };
 
 class Subcommand : public Token {
@@ -43,20 +43,22 @@ class Operator : public Token {
     public:
         Operator(vector<string> V) { content = V; }
         void makeStatus(int a, int b) {
-            if (b == -1) { // The right subcommand didn't run (eg a || b when a succeeds).
+            if (b == -2) { // The right subcommand didn't run 
+                // Either:
+                // a succeeded in a || b (overall success)
+                // a failed in    a && b (overall failure)
                 if (a == 0) {
                     this->status = 0;
                 } else {
                     this->status = 1;
                 }
-            } else { // If any failed, pass up 1 (fail).
-				// TODO: This is incorrect.
-				// Counterexample: 
-				// 1. echo a && false && echo b
-				//    (works as expected; only a is printed)
-				// 2. echo a || false && echo b
-				//    (does not work as expected; prints a and b. this is because it is an OR statement.)
-                if ((a == 0) || (b == 0)) {
+            } else { // Both Subcommands ran
+                // Either:
+                // a failed and b ? in  a || b (pass b up)
+                // a succeed and b ? in a && b (pass b up)
+                // a ? and b ? in       a ;  b (pass b up)
+                // All cases mean passing b success up, so just return 0 if b=0, 1 otherwise.
+                if (b == 0) {
                     this->status = 0;
                 } else {
                     this->status = 1;
@@ -87,27 +89,9 @@ class Operator : public Token {
 class CommandTree {
     public:
         CommandTree() : head(nullptr) {}
-//        ~CommandTree() {
-//            // Delete nodes using BFS
-//            if (head != nullptr) {
-//                stack<Token*> s;
-//                s.push(head);
-//                while (!(s.empty())) {
-//                    Token* currNode = s.top();
-//                    s.pop();
-//                    if (currNode->leftChild != nullptr) {
-//                        s.push(currNode->leftChild);
-//                    }
-//                    if (currNode->rightChild != nullptr) {
-//                        s.push(currNode->rightChild);
-//                    }
-//                    delete currNode;
-//                }
-//            }
-//        }
-//
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
+        
         string stringify() {
             // Initialize stack
             stack<pair<Token*,int>> s; // Stores token and number of spaces
@@ -185,7 +169,12 @@ class CommandTree {
                 rights.pop();
 
                 if (!(*currLeft == *currRight)) {
-                    cout << "Failed on " << endl << currLeft->stringify() << endl << currRight->stringify() << endl;
+                    cout << "Failed on " 
+                         << endl 
+                         << currLeft->stringify() 
+                         << endl 
+                         << currRight->stringify() 
+                         << endl;
                     return false;
                 }
 
