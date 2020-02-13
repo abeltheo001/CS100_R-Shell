@@ -79,8 +79,26 @@ class Operator : public Token {
 class CommandTree {
     public:
         CommandTree() : head(nullptr) {}
+        ~CommandTree() {
+            // Delete nodes using BFS
+            stack s;
+            s.push_back(head);
+            while (!(s.empty())) {
+                Token* currNode = s.top();
+                s.pop();
+                if (currNode->leftChild != nullptr) {
+                    s.push_back(currNode->leftChild);
+                }
+                if (currNode->rightChild != nullptr) {
+                    s.push_back(currNode->rightChild);
+                }
+                delete currNode;
+            }
+        }
+
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
+        
     protected:
         Token* head;
 };
