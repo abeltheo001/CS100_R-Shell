@@ -144,7 +144,7 @@ TEST (constructExpressionTreeTest, twoTallTree) {
         succeeded = false;
     }
 
-    EXPECT_EQ(succeeded, false);
+    EXPECT_EQ(succeeded, true);
 }
 
 #endif

@@ -111,6 +111,11 @@ class CommandTree {
             startelt.first = head;
             startelt.second = 0;
             s.push(startelt);
+
+            bool lastPrint = 0; // Indicates whether the last thing printed was a leaf or not
+                                // 0: Last print was a  Subcommand
+                                // 1: Last print was an Operator
+
             while (!(s.empty()) ) {
                 // Get top element
                 pair<Token*, int> topelt = s.top();
@@ -140,16 +145,20 @@ class CommandTree {
                         s.push(add_to_stack);
                     }
                     
+                    lastPrint = 1;
                 } else {
                     output.push_back(spaces);
                     output.push_back(curr->stringify());
-                    output.push_back("\n");
-                    if (numSpaces >= 2) {
-                        numSpaces -= 2;
+                    if (lastPrint == 0) {
+                        output.push_back("\n");
+                        if (numSpaces >= 2) {
+                            numSpaces -= 2;
+                        }
+                        string lessSpaces(numSpaces, ' ');
+                        output.push_back(lessSpaces);
+                        output.push_back("}");
                     }
-                    string lessSpaces(numSpaces, ' ');
-                    output.push_back(lessSpaces);
-                    output.push_back("}");
+                    lastPrint = 0;
                 }
                 output.push_back("\n");
             }
