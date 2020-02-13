@@ -1,16 +1,21 @@
 #include <iostream>
 #include "parser.h"
-#include "../header/initConfig.h"
+// #include "../header/initConfig.h"
+#include "executor.h"
 
 using namespace std;
 
 int main() {
-	unordered_map<string, bool> config = initConfig("../.rshellrc");
+	// unordered_map<string, bool> config = initConfig("../.rshellrc");
 
 	string currInput = "";
 	while (currInput != "exit") {
 		cout << "$ ";
-		getline(cin, currInput);
-		
+		getline(cin, currInput);		
+        CommandTree ctree = parse(currInput);
+        int returnval = executor(ctree);
+        cout << returnval << endl;
 	}
+
+
 }

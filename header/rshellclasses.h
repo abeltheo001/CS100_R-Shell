@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include "rshellutils.h"
+#include "executeSubcommand.h"
 
 using namespace std;
 
@@ -34,8 +36,8 @@ class Token {
 class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
-        int execute() { // TODO: To be implemented
-			return 0;
+        int execute() { 
+			return executeSubcommand(content);
 		}
 };
 

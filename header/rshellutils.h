@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+using namespace std;
+
 template <class T>
 void printVector(vector<T> V, string delimiter=" ") {
 	auto it = V.begin();
