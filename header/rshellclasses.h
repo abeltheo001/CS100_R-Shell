@@ -164,6 +164,49 @@ class CommandTree {
             }
             return joinVector(output);
         }
+		bool operator==(CommandTree &rct) {
+            // Method: Use DFS to compare each node in place in trees.
+            // Set up stacks
+            stack<Token*> lefts;
+            stack<Token*> rights;
+            lefts.push(head);
+            rights.push(rct.getHead());
+
+            // DFS
+            while (!(lefts.empty() || rights.empty())) {
+                Token* currLeft = lefts.top();
+                Token* currRight = rights.top();
+                lefts.pop();
+                rights.pop();
+
+                if (!(*currLeft == *currRight)) {
+                    cout << "Failed on " << endl << currLeft->stringify() << endl << currRight->stringify() << endl;
+                    return false;
+                }
+
+                if (currLeft->leftChild != nullptr) {
+                    lefts.push(currLeft->leftChild);
+                }
+                if (currLeft->rightChild != nullptr) {
+                    lefts.push(currLeft->rightChild);
+                }
+
+                if (currRight->leftChild != nullptr) {
+                    rights.push(currRight->leftChild);
+                }
+                if (currRight->leftChild != nullptr) {
+                    rights.push(currRight->rightChild);
+                }
+            }
+
+            // Trees should be of same size
+            if (!(lefts.empty() && rights.empty())) {
+                cout << "Failed when trees were not same size." << endl;
+                return false;
+            }
+
+            return true;
+		}
     protected:
         Token* head;
 };
