@@ -5,7 +5,7 @@
 #include "../header/filterComments.h"
 #include "../header/tokenize.h"
 #include "../header/constructExpressionTree.h"
-
+#include "../header/evaluateSubcommand.h"
 using namespace std;
 
 CommandTree parse(string userInput) {
