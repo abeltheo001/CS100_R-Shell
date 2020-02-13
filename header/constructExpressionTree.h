@@ -15,11 +15,20 @@
 using namespace std;
 
 void constructSubTree(vector<Token*>& allNodes, int currPos) {
-	if (currPos == 0) {
-		return;
-	} else {
+    // Constructs a three subgroup, then recurses
+    //         ...
+    //       B
+    //     A   C
+    // ...  ...
+    // currPos refers to C in the three subgroup
+	if (currPos == 2) { 
 		allNodes[currPos-1]->rightChild = allNodes[currPos];
 		allNodes[currPos-1]->leftChild = allNodes[currPos-2];
+		return;
+	} else {
+        // allNodes[currPos-1] is the operator
+		allNodes[currPos-1]->rightChild = allNodes[currPos];
+		allNodes[currPos-1]->leftChild = allNodes[currPos-3];
 		constructSubTree(allNodes, currPos-2);
 	}
 }

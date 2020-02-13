@@ -7,6 +7,7 @@
 
 using namespace std;
 
+
 class Token {
     public:
         Token() {};
@@ -22,7 +23,9 @@ class Token {
 		bool operator==(Token const &rhs) const {
 			return (this->content == rhs.content);
 		}
+        string stringify() { return joinVector(content, ' '); }
 
+        // Member variables
         vector<string> content;
         Token* leftChild;
         Token* rightChild;
@@ -79,8 +82,88 @@ class Operator : public Token {
 class CommandTree {
     public:
         CommandTree() : head(nullptr) {}
+//        ~CommandTree() {
+//            // Delete nodes using BFS
+//            if (head != nullptr) {
+//                stack<Token*> s;
+//                s.push(head);
+//                while (!(s.empty())) {
+//                    Token* currNode = s.top();
+//                    s.pop();
+//                    if (currNode->leftChild != nullptr) {
+//                        s.push(currNode->leftChild);
+//                    }
+//                    if (currNode->rightChild != nullptr) {
+//                        s.push(currNode->rightChild);
+//                    }
+//                    delete currNode;
+//                }
+//            }
+//        }
+//
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
+        string stringify() {
+            // Initialize stack
+            stack<pair<Token*,int>> s; // Stores token and number of spaces
+            vector<string> output;
+            pair<Token*, int> startelt;
+            startelt.first = head;
+            startelt.second = 0;
+            s.push(startelt);
+
+            bool lastPrint = 0; // Indicates whether the last thing printed was a leaf or not
+                                // 0: Last print was a  Subcommand
+                                // 1: Last print was an Operator
+
+            while (!(s.empty()) ) {
+                // Get top element
+                pair<Token*, int> topelt = s.top();
+                Token* curr = topelt.first;
+                int numSpaces = topelt.second;
+                s.pop();
+
+                string spaces(numSpaces, ' ');
+                if (curr->hasChildren()) {
+                    output.push_back(spaces);
+                    output.push_back(curr->stringify());
+                    output.push_back(" : {");
+                    
+                    // add right, then left so stack order prints properly
+
+                    if (curr->rightChild != nullptr) {
+                        pair<Token*, int> add_to_stack;
+                        add_to_stack.first = curr->rightChild;
+                        add_to_stack.second = numSpaces + 2;
+                        s.push(add_to_stack);
+                    }
+                    
+                    if (curr->leftChild != nullptr) {
+                        pair<Token*, int> add_to_stack;
+                        add_to_stack.first = curr->leftChild;
+                        add_to_stack.second = numSpaces + 2;
+                        s.push(add_to_stack);
+                    }
+                    
+                    lastPrint = 1;
+                } else {
+                    output.push_back(spaces);
+                    output.push_back(curr->stringify());
+                    if (lastPrint == 0) {
+                        output.push_back("\n");
+                        if (numSpaces >= 2) {
+                            numSpaces -= 2;
+                        }
+                        string lessSpaces(numSpaces, ' ');
+                        output.push_back(lessSpaces);
+                        output.push_back("}");
+                    }
+                    lastPrint = 0;
+                }
+                output.push_back("\n");
+            }
+            return joinVector(output);
+        }
     protected:
         Token* head;
 };
