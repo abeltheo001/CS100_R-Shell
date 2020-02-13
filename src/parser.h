@@ -1,18 +1,19 @@
 #include <iostream>
 #include "../header/rshellclasses.h"
 #include "../header/splitOnChar.h"
+#include "../header/groupQuotes.h"
 #include "../header/filterComments.h"
 #include "../header/tokenize.h"
-#include "../header/groupQuotes.h"
-
+#include "../header/constructExpressionTree.h"
+#include "../header/evaluateSubcommand.h"
 using namespace std;
 
-CommandTree* parse(string userInput) {
+CommandTree parse(string userInput) {
 	// 1. Split on spaces
 	vector<string> words = splitOnChar(userInput, ' ');
 
 	// 2. Make sure quotes get grouped together
-	words = groupQuotes(words)
+	words = groupQuotes(words);
 
 	// 3. Filter out #
 	words = filterComments(words);
@@ -21,8 +22,7 @@ CommandTree* parse(string userInput) {
 	vector<Token*> tokens = tokenize(words);
 
 	// 5. Create a tree for execution in later steps
-	CommandTree* ctree;
-	// commands = constructExecutionTree(words);
+	CommandTree ctree = constructExpressionTree(tokens);
 
 	return ctree;
 }

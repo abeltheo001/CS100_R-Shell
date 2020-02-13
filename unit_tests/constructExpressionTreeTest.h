@@ -16,6 +16,8 @@ TEST (constructExpressionTreeTest, noBashConnectors) {
 	vector<Token*> tokens = tokenize(values);
 
 	CommandTree ctree = constructExpressionTree(tokens);
+    
+    cout << ctree.stringify();
 
 	bool testsuccess = true;
 
@@ -32,8 +34,6 @@ TEST (constructExpressionTreeTest, withBashConnectors_Head) {
 	vector<Token*> tokens = tokenize(values);
 
 	CommandTree ctree = constructExpressionTree(tokens);
-
-	bool testsuccess = true;
 
 	// Tree should look like the following:
 	//                  ||
@@ -57,8 +57,6 @@ TEST (constructExpressionTreeTest, withBashConnectors_Left) {
 
 	CommandTree ctree = constructExpressionTree(tokens);
 
-	bool testsuccess = true;
-
 	// Tree should look like the following:
 	//                  ||
 	//				/        \
@@ -81,12 +79,12 @@ TEST (constructExpressionTreeTest, withBashConnectors_Right) {
 
 	CommandTree ctree = constructExpressionTree(tokens);
 
-	bool testsuccess = true;
-
 	// Tree should look like the following:
 	//                  ||
 	//				/        \
 	//           ls -al    echo hello
+
+    cout << ctree.stringify();
 
 	vector<string> left = {"ls", "-al"};
 	vector<string> right = {"echo", "hello"};
@@ -96,6 +94,57 @@ TEST (constructExpressionTreeTest, withBashConnectors_Right) {
 	Token* rightObj = new Subcommand(right);
 
 	EXPECT_EQ(*((ctree.getHead())->rightChild), *rightObj);
+}
+
+TEST (constructExpressionTreeTest, twoTallTree) {
+	// For convenience's sake, I'm going to use tokenize()
+	vector<string> values = {"ls", "-al", "||", "echo", "hello", "&&", "echo", "world"};
+	vector<Token*> tokens = tokenize(values);
+
+	CommandTree ctree = constructExpressionTree(tokens);
+
+	// Tree should look like the following:
+	//                        &&
+	//				      /        \
+	//                  ||       echo world
+	//				/        \
+	//           ls -al    echo hello
+
+	vector<string> leftBottom = {"ls", "-al"};
+	vector<string> rightBottom = {"echo", "hello"};
+	vector<string> opLeft = {"||"};
+    vector<string> opTop = {"&&"};
+    vector<string> rightTop = {"echo", "world"};
+	Token* opLeftObj = new Operator(opLeft);
+	Token* opTopObj = new Operator(opTop);
+	Token* leftBottomObj = new Subcommand(leftBottom);
+	Token* rightBottomObj = new Subcommand(rightBottom);
+	Token* rightTopObj = new Subcommand(rightTop);
+  
+    cout << ctree.stringify();
+
+    bool succeeded = true;
+
+    Token* t = ctree.getHead();
+    if (!(*t == *opTopObj)) {
+        succeeded = false;
+    }
+    if (!(*(t->rightChild) == *rightTopObj)) {
+        succeeded = false;
+    }
+    
+    Token* left_t = t->leftChild;
+    if (!(*left_t == *opLeftObj)) {
+        succeeded = false;
+    }
+    if (!(*(left_t->leftChild) == *leftBottomObj)) {
+        succeeded = false;
+    }
+    if (!(*(left_t->rightChild) == *rightBottomObj)) {
+        succeeded = false;
+    }
+
+    EXPECT_EQ(succeeded, true);
 }
 
 #endif

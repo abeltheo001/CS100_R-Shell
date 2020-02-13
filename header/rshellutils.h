@@ -28,4 +28,18 @@ string joinVector(vector<string> V, char joiner) {
 	return concat;
 }
 
+string joinVector(vector<string> V) {
+	string concat;
+	bool first = true;
+	for (const string& substr : V) {
+		if (first) {
+			concat += substr;
+			first = false;
+		} else {
+			concat += substr;
+		}
+	}
+	return concat;
+}
+
 #endif
