@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 class Token {
     public:
         Token() {};
@@ -36,21 +35,27 @@ class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
         int execute() { // TODO: To be implemented
-		return 0;
-	}
+			return 0;
+		}
 };
 
 class Operator : public Token {
     public:
         Operator(vector<string> V) { content = V; }
         void makeStatus(int a, int b) {
-            if (b == -1) {
+            if (b == -1) { // The right subcommand didn't run (eg a || b when a succeeds).
                 if (a == 0) {
                     this->status = 0;
                 } else {
                     this->status = 1;
                 }
-            } else {
+            } else { // If any failed, pass up 1 (fail).
+				// TODO: This is incorrect.
+				// Counterexample: 
+				// 1. echo a && false && echo b
+				//    (works as expected; only a is printed)
+				// 2. echo a || false && echo b
+				//    (does not work as expected; prints a and b. this is because it is an OR statement.)
                 if ((a == 0) || (b == 0)) {
                     this->status = 0;
                 } else {
