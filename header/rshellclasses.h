@@ -37,7 +37,8 @@ class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
         int execute() { 
-			return executeSubcommand(content);
+            status = executeSubcommand(content);
+			return status;
 		}
 };
 
@@ -68,7 +69,7 @@ class Operator : public Token {
             }
         }
         int execute() {
-            int statusLeft, statusRight = -1;
+            int statusLeft, statusRight = -2;
             statusLeft = leftChild->execute();
             
             // Always run ;
@@ -118,6 +119,9 @@ class CommandTree {
                 if (curr->hasChildren()) {
                     output.push_back(spaces);
                     output.push_back(curr->stringify());
+                    output.push_back(" (");
+                    output.push_back(to_string(curr->status));
+                    output.push_back(")");
                     output.push_back(" : {");
                     
                     // add right, then left so stack order prints properly
@@ -140,6 +144,11 @@ class CommandTree {
                 } else {
                     output.push_back(spaces);
                     output.push_back(curr->stringify());
+                    // For some arcane reason, uncommenting these lines of code causes the test to segfault.
+                    // What the heck??
+//                    output.push_back(" (");
+//                    output.push_back(to_string(curr->status));
+//                    output.push_back(")");
                     if (lastPrint == 0) {
                         output.push_back("\n");
                         if (numSpaces >= 2) {
