@@ -28,8 +28,8 @@ class Token {
 
         // Member variables
         vector<string> content;
-        Token* leftChild;
-        Token* rightChild;
+        Token* leftChild = nullptr;
+        Token* rightChild = nullptr;
         int status = -2; // Current exit status of Token. -2 is "hasn't run yet"
 };
 
