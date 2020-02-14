@@ -146,9 +146,9 @@ class CommandTree {
                     output.push_back(curr->stringify());
                     // For some arcane reason, uncommenting these lines of code causes the test to segfault.
                     // What the heck??
-//                    output.push_back(" (");
-//                    output.push_back(to_string(curr->status));
-//                    output.push_back(")");
+                    output.push_back(" (");
+                    output.push_back(to_string(curr->status));
+                    output.push_back(")");
                     if (lastPrint == 0) {
                         output.push_back("\n");
                         if (numSpaces >= 2) {

@@ -6,23 +6,28 @@
 #include <vector>
 #include <string>
 
-TEST (executeSubcommandTest, NULLending)
+TEST (executeSubcommandTest, validCommand)
 {
-	vector <string> values;
-	values.push_back("echo");
-	values.push_back("Hello");
-	values.push_back("World!");
+	vector <string> values = {"echo", "Hello", "World!"};
 
-	EXPECT_EQ(0, executeSubcommand(values));
+	EXPECT_EQ(0, executeSubcommand(values)); // Exit status for valid echo command
 }
 
-TEST (executeSubcommandTest, NoNULLending)
+TEST (executeSubcommandTest, invalidCommand)
+{
+	vector <string> input;
+	input.push_back("tjijamoifecjoeamvoifjmaf");
+	
+	EXPECT_EQ(-1, executeSubcommand(input)); // Command doesn't exist
+}
+
+TEST (executeSubcommandTest, validButFails)
 {
 	vector <string> input;
 	input.push_back("ls");
 	input.push_back("-j");
 	
-	EXPECT_EQ(-1, executeSubcommand(input));	
+	EXPECT_EQ(512, executeSubcommand(input)); // Exit status for ls-j
 }
 
 
