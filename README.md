@@ -47,7 +47,7 @@ If the starting word in a Subcommand matches a special command name (e.g. cd), a
 
 ### Diagram
 
-[OMT Diagram (for Assignment 1)](/images/omt_diagram.png?token=AKNKATP2GGHDH6PX2FKEORK6HEU2O)
+[OMT Diagram (for Assignment 1)](/images/omt_diagram_2.png)
 ### Classes
 
 Base class: Token
