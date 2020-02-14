@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-TEST (builtinTest, nonNULLending)
+TEST (builtinTest, NULLending)
 {
 	vector <string> values;
 	values.push_back("echo");
@@ -14,7 +14,7 @@ TEST (builtinTest, nonNULLending)
 	EXPECT_EQ(false, checkBuiltin(values));
 }
 
-TEST (builtinTest, NULLending)
+TEST (builtinTest, nonNULLending)
 {
 	vector <string> input;
 	input.push_back("exit");
