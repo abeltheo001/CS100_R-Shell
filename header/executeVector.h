@@ -15,7 +15,7 @@ int executeVector(vector<string> input)
 {
         // Generate char pointer vector (needed for execvp)
         vector <char*> V;
-        for (vector <string>::iterator it = input.begin(); it!=input.end();++it)
+        for (auto it = input.begin(); it!=input.end();++it)
                 V.push_back(const_cast<char*>(it->c_str()));
         
         V.push_back(nullptr);   // execvp char pointer array must end with nullptr 

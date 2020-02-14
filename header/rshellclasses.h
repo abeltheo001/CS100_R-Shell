@@ -36,7 +36,10 @@ class Token {
 class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
-        int execute() { 
+		bool operator==(Subcommand const rhs) const {
+			return (this->content == rhs.content);
+		}
+        virtual int execute() { 
             if (content[0] == "exit") {
                 exit(0);
             }
@@ -48,6 +51,9 @@ class Subcommand : public Token {
 class Operator : public Token {
     public:
         Operator(vector<string> V) { content = V; }
+		bool operator==(Operator const rhs) const {
+			return (this->content == rhs.content);
+		}
         void makeStatus(int a, int b) {
             if (b == -2) { // The right subcommand didn't run 
                 // Either:
@@ -71,7 +77,7 @@ class Operator : public Token {
                 }
             }
         }
-        int execute() {
+        virtual int execute() {
             int statusLeft, statusRight = -2;
             statusLeft = leftChild->execute();
             
