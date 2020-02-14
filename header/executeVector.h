@@ -1,5 +1,5 @@
-#ifndef EXECUTESUBCOMMAND_CPP
-#define EXECUTESUBCOMMAND_CPP
+#ifndef EXECUTEVECTOR_H
+#define EXECUTEVECTOR_H
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -11,7 +11,7 @@
 
 using namespace std;
 
-int executeSubcommand(vector<string> input)
+int executeVector(vector<string> input)
 {
         // Generate char pointer vector (needed for execvp)
         vector <char*> V;
@@ -33,8 +33,8 @@ int executeSubcommand(vector<string> input)
             // Child process
             // Akin to *argv[0], the first argument is the name of the thing it's being called inside
             execvp(results[0], results);
-            // If it returns, the command is unknown
-            return 1;
+            // If it returns, the results[0] is unknown
+            return 2;
         }
         else 
         {
@@ -44,7 +44,7 @@ int executeSubcommand(vector<string> input)
             if (WIFEXITED(*status) != 0) {
                 return WEXITSTATUS(*status);
             } else {
-                return 1; // Called program segfaulted or something similar
+                return 3; // Called program segfaulted or something similar
             }
         }
 }

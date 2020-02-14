@@ -1,11 +1,15 @@
 #include "../header/rshellclasses.h"
 // #include "../header/expandAliases.h"
 // #include "../header/checkBuiltin.h"
-#include "../header/executeSubcommand.h"
 
 using namespace std;
 
 int executor(CommandTree ctree) {
-	(ctree.getHead())->execute();
-	return (ctree.getHead())->status;
+	Token* head = (ctree.getHead());
+	if (head != nullptr) {
+		head->execute();
+		return (ctree.getHead())->status;
+	} else {
+		return 0;
+	}
 }

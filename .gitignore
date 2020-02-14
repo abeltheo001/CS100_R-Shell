@@ -45,3 +45,4 @@ Makefile
 
 # Temporary test files
 *.gch
+*.swp

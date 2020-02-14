@@ -36,11 +36,13 @@ void constructSubTree(vector<Token*>& allNodes, int currPos) {
 CommandTree constructExpressionTree(vector<Token*> objs) {
 	CommandTree tree;
 
-	if (objs.size() == 1) { 		// Trivial case
-		tree.setHead(objs[0]);
-	} else {						// Constructed directly from inorder using left precedence
-		tree.setHead(objs[objs.size()-2]);
-		constructSubTree(objs, objs.size()-1);
+	if (objs.size() != 0) {
+			if (objs.size() == 1) {	 		// Trivial case
+				tree.setHead(objs[0]);
+			} else {						// Constructed directly from inorder using left precedence
+				tree.setHead(objs[objs.size()-2]);
+				constructSubTree(objs, objs.size()-1);
+			}
 	}
 
 	return tree;

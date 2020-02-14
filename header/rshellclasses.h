@@ -5,7 +5,7 @@
 #include <string>
 #include <stack>
 #include "rshellutils.h"
-#include "executeSubcommand.h"
+#include "executeVector.h"
 
 using namespace std;
 
@@ -40,7 +40,7 @@ class Subcommand : public Token {
             if (content[0] == "exit") {
                 exit(0);
             }
-            status = executeSubcommand(content);
+            status = executeVector(content);
 			return status;
 		}
 };
