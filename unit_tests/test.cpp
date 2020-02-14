@@ -4,8 +4,8 @@
 #include "groupQuotesTest.h"
 #include "tokenizeTest.h"
 #include "constructExpressionTreeTest.h"
-#include "executeSubcommandTest.h"
 #include "../integration_tests/parserTest.h"
+#include "executeSubcommandTest.h"
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

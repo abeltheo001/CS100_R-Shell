@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include "rshellutils.h"
+#include "executeSubcommand.h"
 
 using namespace std;
 
@@ -28,14 +30,15 @@ class Token {
         vector<string> content;
         Token* leftChild;
         Token* rightChild;
-        int status = -1; // Current exit status of Token
+        int status = -2; // Current exit status of Token. -2 is "hasn't run yet"
 };
 
 class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
-        int execute() { // TODO: To be implemented
-			return 0;
+        int execute() { 
+            status = executeSubcommand(content);
+			return status;
 		}
 };
 
@@ -43,20 +46,22 @@ class Operator : public Token {
     public:
         Operator(vector<string> V) { content = V; }
         void makeStatus(int a, int b) {
-            if (b == -1) { // The right subcommand didn't run (eg a || b when a succeeds).
+            if (b == -2) { // The right subcommand didn't run 
+                // Either:
+                // a succeeded in a || b (overall success)
+                // a failed in    a && b (overall failure)
                 if (a == 0) {
                     this->status = 0;
                 } else {
                     this->status = 1;
                 }
-            } else { // If any failed, pass up 1 (fail).
-				// TODO: This is incorrect.
-				// Counterexample: 
-				// 1. echo a && false && echo b
-				//    (works as expected; only a is printed)
-				// 2. echo a || false && echo b
-				//    (does not work as expected; prints a and b. this is because it is an OR statement.)
-                if ((a == 0) || (b == 0)) {
+            } else { // Both Subcommands ran
+                // Either:
+                // a failed and b ? in  a || b (pass b up)
+                // a succeed and b ? in a && b (pass b up)
+                // a ? and b ? in       a ;  b (pass b up)
+                // All cases mean passing b success up, so just return 0 if b=0, 1 otherwise.
+                if (b == 0) {
                     this->status = 0;
                 } else {
                     this->status = 1;
@@ -64,7 +69,7 @@ class Operator : public Token {
             }
         }
         int execute() {
-            int statusLeft, statusRight = -1;
+            int statusLeft, statusRight = -2;
             statusLeft = leftChild->execute();
             
             // Always run ;
@@ -87,27 +92,9 @@ class Operator : public Token {
 class CommandTree {
     public:
         CommandTree() : head(nullptr) {}
-//        ~CommandTree() {
-//            // Delete nodes using BFS
-//            if (head != nullptr) {
-//                stack<Token*> s;
-//                s.push(head);
-//                while (!(s.empty())) {
-//                    Token* currNode = s.top();
-//                    s.pop();
-//                    if (currNode->leftChild != nullptr) {
-//                        s.push(currNode->leftChild);
-//                    }
-//                    if (currNode->rightChild != nullptr) {
-//                        s.push(currNode->rightChild);
-//                    }
-//                    delete currNode;
-//                }
-//            }
-//        }
-//
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
+        
         string stringify() {
             // Initialize stack
             stack<pair<Token*,int>> s; // Stores token and number of spaces
@@ -132,6 +119,9 @@ class CommandTree {
                 if (curr->hasChildren()) {
                     output.push_back(spaces);
                     output.push_back(curr->stringify());
+                    output.push_back(" (");
+                    output.push_back(to_string(curr->status));
+                    output.push_back(")");
                     output.push_back(" : {");
                     
                     // add right, then left so stack order prints properly
@@ -154,6 +144,11 @@ class CommandTree {
                 } else {
                     output.push_back(spaces);
                     output.push_back(curr->stringify());
+                    // For some arcane reason, uncommenting these lines of code causes the test to segfault.
+                    // What the heck??
+//                    output.push_back(" (");
+//                    output.push_back(to_string(curr->status));
+//                    output.push_back(")");
                     if (lastPrint == 0) {
                         output.push_back("\n");
                         if (numSpaces >= 2) {
@@ -185,7 +180,12 @@ class CommandTree {
                 rights.pop();
 
                 if (!(*currLeft == *currRight)) {
-                    cout << "Failed on " << endl << currLeft->stringify() << endl << currRight->stringify() << endl;
+                    cout << "Failed on " 
+                         << endl 
+                         << currLeft->stringify() 
+                         << endl 
+                         << currRight->stringify() 
+                         << endl;
                     return false;
                 }
 
