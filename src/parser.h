@@ -5,10 +5,15 @@
 #include "../header/filterComments.h"
 #include "../header/tokenize.h"
 #include "../header/constructExpressionTree.h"
+#include "../header/rshellutils.h"
 
 using namespace std;
 
 CommandTree parse(string userInput) {
+	//Correcting semicolon issue
+	vector<string> test = splitOnChar(userInput,';');
+	userInput = joinVector(test," ;"); 
+
 	// 1. Split on spaces
 	vector<string> words = splitOnChar(userInput, ' ');
 
