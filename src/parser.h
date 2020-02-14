@@ -12,7 +12,7 @@ using namespace std;
 CommandTree parse(string userInput) {
 	//Correcting semicolon issue
 	vector<string> test = splitOnChar(userInput,';');
-	joinVector(test," ;"); 
+	userInput = joinVector(test," ;"); 
 
 	// 1. Split on spaces
 	vector<string> words = splitOnChar(userInput, ' ');
