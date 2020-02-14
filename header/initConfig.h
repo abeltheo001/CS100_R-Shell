@@ -4,6 +4,8 @@
 #include <fstream>
 #include "splitOnChar.h"
 
+// NOT CURRENTLY USED; ASSIGNMENT 3 SKETCH WORK
+
 using namespace std;
 
 unordered_map<string, bool> initConfig(string filename) {

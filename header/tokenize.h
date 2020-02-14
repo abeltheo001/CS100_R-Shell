@@ -3,6 +3,7 @@
 
 #include "rshellclasses.h" // Includes vector and string
 #include <unordered_set>
+#include <cstdio>
 
 using namespace std;
 
@@ -34,7 +35,9 @@ vector<Token*> tokenize(vector<string> Vin) {
             
 				buffer.clear();
 	    	} else {
-                // TODO: Implement error handling
+                string s = "No end quote in quote grouping.";
+                const char* errormsg = s.c_str();
+                perror(errormsg);
             }
         } else {
             buffer.push_back(*it);

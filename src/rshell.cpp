@@ -14,7 +14,7 @@ int main() {
 		getline(cin, currInput);		
         CommandTree ctree = parse(currInput);
         int returnval = executor(ctree);
-        cout << returnval << endl;
+        // cout << returnval << endl; // Debug
 	}
 
 

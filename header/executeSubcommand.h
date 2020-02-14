@@ -24,25 +24,27 @@ int executeSubcommand(vector<string> input)
         pid_t pid = fork();
         if (pid < 0)
         {
-            cout << """*** ERROR: forking child process failed" << endl;
-            exit(1);
+            string s = "ERROR: forking child process failed.";
+            const char* errormsg = s.c_str();
+            perror(errormsg);
         }
         else if (pid == 0)
         {
+            // Child process
             // Akin to *argv[0], the first argument is the name of the thing it's being called inside
             execvp(results[0], results);
             // If it returns, the command is unknown
-            return -1;
+            return 1;
         }
         else 
         {
-            // Child process 
-            int status;
-            waitpid(pid, &status, 0);
-            if (WIFEXITED(status)) {
-                return WEXITSTATUS(status);
+            // Parent process
+            int* status = new int(-1);
+            waitpid(pid, status, 0);
+            if (WIFEXITED(*status) != 0) {
+                return WEXITSTATUS(*status);
             } else {
-                return 1;
+                return 1; // Called program segfaulted or something similar
             }
         }
 }

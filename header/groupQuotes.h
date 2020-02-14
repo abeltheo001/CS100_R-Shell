@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "rshellutils.h"
+#include <cstdio>
 
 // Input here is {"echo", "\"Hello", "World\""}. Want it to instead be {"echo", ""Hello world""}.
 // Edge case: echo "Hello || world"aaa prints "Hello || worldaaa". I suspect this means the execvp command
@@ -54,11 +55,9 @@ vector<string> groupQuotes(vector<string> Vin) {
 
 	// If there's still stuff on the buffer, something is wrong
 	if (buffer.size() > 0) {
-		cout << "Error with quote grouping. Current grouped vector:" << endl;
-		printVector(grouped, "|\n");
-		cout << "Current buffer:" << endl;
-		printVector(buffer, "|\n");
-		throw 1;
+        string s = "No end quote in quote grouping.";
+        const char* errormsg = s.c_str();
+        perror(errormsg);
 	}
 
 	return grouped;

@@ -16,8 +16,10 @@ TEST (executeSubcommandTest, validCommand)
 TEST (executeSubcommandTest, invalidCommand)
 {
 	vector<string> input = {"eabmoinmeoaimvpoapom3vap"};
-	
-	EXPECT_EQ(-1, executeSubcommand(input)); // Command doesn't exist
+    
+    int returnval = executeSubcommand(input);
+    
+	EXPECT_EQ(-1, returnval); // Command doesn't exist
 }
 
 TEST (executeSubcommandTest, validButFails)
