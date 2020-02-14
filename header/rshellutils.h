@@ -15,7 +15,7 @@ void printVector(vector<T> V, string delimiter=" ") {
 	}
 }
 
-string joinVector(vector<string> V, char joiner) {
+string joinVector(vector<string> V, string joiner) {
 	string concat;
 	bool first = true;
 	for (const string& substr : V) {
