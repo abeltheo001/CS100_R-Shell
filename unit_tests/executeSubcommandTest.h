@@ -15,8 +15,7 @@ TEST (executeSubcommandTest, validCommand)
 
 TEST (executeSubcommandTest, invalidCommand)
 {
-	vector <string> input;
-	input.push_back("tjijamoifecjoeamvoifjmaf");
+	vector<string> input = {"eabmoinmeoaimvpoapom3vap"};
 	
 	EXPECT_EQ(-1, executeSubcommand(input)); // Command doesn't exist
 }
@@ -27,7 +26,7 @@ TEST (executeSubcommandTest, validButFails)
 	input.push_back("ls");
 	input.push_back("-j");
 	
-	EXPECT_EQ(512, executeSubcommand(input)); // Exit status for ls-j
+	EXPECT_EQ(2, executeSubcommand(input)); // Exit status for ls -j
 }
 
 

@@ -39,7 +39,11 @@ int executeSubcommand(vector<string> input)
             // Child process 
             int status;
             waitpid(pid, &status, 0);
-            return status;
+            if (WIFEXITED(status)) {
+                return WEXITSTATUS(status);
+            } else {
+                return 1;
+            }
         }
 }
 #endif

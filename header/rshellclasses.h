@@ -37,6 +37,9 @@ class Subcommand : public Token {
     public:
         Subcommand(vector<string> V) { content = V; }
         int execute() { 
+            if (content[0] == "exit") {
+                exit(0);
+            }
             status = executeSubcommand(content);
 			return status;
 		}
