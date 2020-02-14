@@ -39,10 +39,10 @@ int executeVector(vector<string> input)
         else 
         {
             // Parent process
-            int* status = new int(-1);
-            waitpid(pid, status, 0);
-            if (WIFEXITED(*status) != 0) {
-                return WEXITSTATUS(*status);
+            int status = -1;
+            waitpid(pid, &status, 0);
+            if (WIFEXITED(status) != 0) {
+                return WEXITSTATUS(status);
             } else {
                 return 3; // Called program segfaulted or something similar
             }
