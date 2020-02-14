@@ -14,7 +14,7 @@ TEST (builtinTest, notBuiltin)
 	EXPECT_EQ(false, checkBuiltin(values));
 }
 
-TEST (builtinTest, Builti)
+TEST (builtinTest, Builtin)
 {
 	vector <string> input;
 	input.push_back("exit");
