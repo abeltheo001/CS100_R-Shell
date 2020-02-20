@@ -14,7 +14,7 @@
 
 using namespace std;
 
-void constructSubTree(vector<Token*>& allNodes, int currPos) {
+void constructSubTree(const vector<Token*>& allNodes, int currPos) {
     // Constructs a three subgroup, then recurses
     //         ...
     //       B

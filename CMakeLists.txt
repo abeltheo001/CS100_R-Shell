@@ -12,6 +12,10 @@ ADD_EXECUTABLE(rshell
     src/rshell.cpp
 )
 
+ADD_EXECUTABLE(sandbox
+    src/sandbox.cpp
+)
+
 ADD_EXECUTABLE(test
 	test.cpp
 )

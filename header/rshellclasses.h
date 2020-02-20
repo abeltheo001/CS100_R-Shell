@@ -103,33 +103,34 @@ class CommandTree {
         CommandTree() : head(nullptr) {}
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
-		~CommandTree() {
-            // Delete nodes using BFS
-            stack<Token*> s;
-            s.push(head);
-            while (!(s.empty())) {
-                Token* currNode = s.top();
-                s.pop();
-                if (currNode->leftChild != nullptr) {
-                    s.push(currNode->leftChild);
-                }
-                if (currNode->rightChild != nullptr) {
-                    s.push(currNode->rightChild);
-                }
-                delete currNode;
-            }
-        }
+	// 	~CommandTree() {
+    //        // Delete nodes using BFS
+    //        stack<Token*> s;
+    //        s.push(head);
+    //        while (!(s.empty())) {
+    //            Token* currNode = s.top();
+    //            s.pop();
+    //            if (currNode->leftChild != nullptr) {
+    //                s.push(currNode->leftChild);
+    //            }
+    //            if (currNode->rightChild != nullptr) {
+    //                s.push(currNode->rightChild);
+    //            }
+    //            delete currNode;
+    //        }
+    //    }
         string stringify() {
             // Initialize stack
             stack<pair<Token*,int>> s; // Stores token and number of spaces
             vector<string> output;
+            
             pair<Token*, int> startelt;
             startelt.first = head;
             startelt.second = 0;
             s.push(startelt);
 
             bool lastPrint = 0; // Indicates whether the last thing printed was a leaf or not
-                                // 0: Last print was a  Subcommand
+                                // 0: Last print was a Subcommand
                                 // 1: Last print was an Operator
 
             while (!(s.empty()) ) {
@@ -140,7 +141,7 @@ class CommandTree {
                 s.pop();
 
                 string spaces(numSpaces, ' ');
-                if (curr->hasChildren()) {
+                if (curr->hasChildren()) { // ie an Operator
                     output.push_back(spaces);
                     output.push_back(curr->stringify());
                     output.push_back(" (");
@@ -165,7 +166,7 @@ class CommandTree {
                     }
                     
                     lastPrint = 1;
-                } else {
+                } else {                // ie a Subcommand
                     output.push_back(spaces);
                     output.push_back(curr->stringify());
                     output.push_back(" (");
