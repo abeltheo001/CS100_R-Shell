@@ -11,20 +11,16 @@ using namespace std;
 
 class Token {
     public:
-        Token() {};
-
-        vector<string> getContent()          { return content; }
-        void setContent(vector<string> V)    { content = V; }
+        Token() {}
+        virtual ~Token() {}
 
         virtual int execute() = 0;
+        virtual string stringify() { return joinVector(content, ' '); }
 
-        void setLeft(Token* t) { leftChild = t; }
-        void setRight(Token* t) { rightChild = t; }
-        bool hasChildren() { return ((leftChild != nullptr) || (rightChild != nullptr)); }
+        virtual bool hasChildren() { return ((leftChild != nullptr) || (rightChild != nullptr)); }
 		bool operator==(Token const &rhs) const {
 			return (this->content == rhs.content);
 		}
-        string stringify() { return joinVector(content, ' '); }
 
         // Member variables
         vector<string> content;
@@ -50,11 +46,11 @@ class Subcommand : public Token {
 
 class Operator : public Token {
     public:
-        Operator(vector<string> V) { content = V; }
+        virtual Operator(vector<string> V) { content = V; }
 		bool operator==(Operator const rhs) const {
 			return (this->content == rhs.content);
 		}
-        void makeStatus(int a, int b) {
+        virtual void makeStatus(int a, int b) {
             if (b == -2) { // The right subcommand didn't run 
                 // Either:
                 // a succeeded in a || b (overall success)
@@ -119,7 +115,7 @@ class CommandTree {
                 delete currNode;
             }
         }
-        string stringify() {
+        virtual string stringify() {
             // Initialize stack
             stack<pair<Token*,int>> s; // Stores token and number of spaces
             vector<string> output;
