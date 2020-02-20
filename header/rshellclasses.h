@@ -103,22 +103,22 @@ class CommandTree {
         CommandTree() : head(nullptr) {}
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
-	// 	~CommandTree() {
-    //        // Delete nodes using BFS
-    //        stack<Token*> s;
-    //        s.push(head);
-    //        while (!(s.empty())) {
-    //            Token* currNode = s.top();
-    //            s.pop();
-    //            if (currNode->leftChild != nullptr) {
-    //                s.push(currNode->leftChild);
-    //            }
-    //            if (currNode->rightChild != nullptr) {
-    //                s.push(currNode->rightChild);
-    //            }
-    //            delete currNode;
-    //        }
-    //    }
+	 	~CommandTree() {
+            // Delete nodes using BFS
+            stack<Token*> s;
+            s.push(head);
+            while (!(s.empty())) {
+                Token* currNode = s.top();
+                s.pop();
+                if (currNode->leftChild != nullptr) {
+                    s.push(currNode->leftChild);
+                }
+                if (currNode->rightChild != nullptr) {
+                    s.push(currNode->rightChild);
+                }
+                delete currNode;
+            }
+        }
         string stringify() {
             // Initialize stack
             stack<pair<Token*,int>> s; // Stores token and number of spaces
