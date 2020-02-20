@@ -11,16 +11,8 @@
 
 using namespace std;
 
-int executeVector(vector<string> input)
+int executeCharArray(char** charIn)
 {
-        // Generate char pointer vector (needed for execvp)
-        vector <char*> V;
-        for (auto it = input.begin(); it!=input.end();++it)
-                V.push_back(const_cast<char*>(it->c_str()));
-        
-        V.push_back(nullptr);   // execvp char pointer array must end with nullptr 
-        char** results = &V[0]; // convert char pointer vector to char pointer array
-
         pid_t pid = fork();
         if (pid < 0)
         {
@@ -32,8 +24,8 @@ int executeVector(vector<string> input)
         {
             // Child process
             // Akin to *argv[0], the first argument is the name of the thing it's being called inside
-            execvp(results[0], results);
-            // If it returns, the results[0] is unknown
+            execvp(charIn[0], charIn);
+            // If it returns, the charIn[0] is unknown
             return 2;
         }
         else 

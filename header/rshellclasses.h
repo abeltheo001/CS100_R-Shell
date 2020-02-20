@@ -6,6 +6,7 @@
 #include <stack>
 #include "rshellutils.h"
 #include "executeVector.h"
+#include "convertVectorToCharArray.h"
 
 using namespace std;
 
@@ -31,6 +32,7 @@ class Token {
 
 class Subcommand : public Token {
     public:
+        virtual ~Subcommand() {}
         Subcommand(vector<string> V) { content = V; }
 		bool operator==(Subcommand const rhs) const {
 			return (this->content == rhs.content);
@@ -39,14 +41,22 @@ class Subcommand : public Token {
             if (content[0] == "exit") {
                 exit(0);
             }
-            status = executeVector(content);
+            
+            char** chararr = convertVectorToCharArray(content);
+            status = executeCharArray(chararr);
+            
+            for (int i = 0; i < content.size(); i++) {
+                delete[] chararr[i];
+            }
+            delete[] chararr;
+
 			return status;
 		}
 };
 
 class Operator : public Token {
     public:
-        virtual Operator(vector<string> V) { content = V; }
+        Operator(vector<string> V) { content = V; }
 		bool operator==(Operator const rhs) const {
 			return (this->content == rhs.content);
 		}
@@ -100,88 +110,95 @@ class CommandTree {
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
 	 	~CommandTree() {
-            // Delete nodes using BFS
-            stack<Token*> s;
-            s.push(head);
-            while (!(s.empty())) {
-                Token* currNode = s.top();
-                s.pop();
-                if (currNode->leftChild != nullptr) {
-                    s.push(currNode->leftChild);
+            // Delete nodes using DFS
+            if (head != nullptr) {
+                stack<Token*> s;
+                s.push(head);
+                while (!(s.empty())) {
+                    Token* currNode = s.top();
+                    s.pop();
+                    //printVector(currNode->content);
+                    if (currNode->leftChild != nullptr) {
+                        s.push(currNode->leftChild);
+                    }
+                    if (currNode->rightChild != nullptr) {
+                        s.push(currNode->rightChild);
+                    }
+                    delete currNode;
                 }
-                if (currNode->rightChild != nullptr) {
-                    s.push(currNode->rightChild);
-                }
-                delete currNode;
             }
         }
         virtual string stringify() {
             // Initialize stack
-            stack<pair<Token*,int>> s; // Stores token and number of spaces
-            vector<string> output;
+            if (head != nullptr) {
             
-            pair<Token*, int> startelt;
-            startelt.first = head;
-            startelt.second = 0;
-            s.push(startelt);
+                stack<pair<Token*,int>> s; // Stores token and number of spaces
+                vector<string> output;
+                
+                pair<Token*, int> startelt;
+                startelt.first = head;
+                startelt.second = 0;
+                s.push(startelt);
 
-            bool lastPrint = 0; // Indicates whether the last thing printed was a leaf or not
-                                // 0: Last print was a Subcommand
-                                // 1: Last print was an Operator
+                bool lastPrint = 0; // Indicates whether the last thing printed was a leaf or not
+                                    // 0: Last print was a Subcommand
+                                    // 1: Last print was an Operator
 
-            while (!(s.empty()) ) {
-                // Get top element
-                pair<Token*, int> topelt = s.top();
-                Token* curr = topelt.first;
-                int numSpaces = topelt.second;
-                s.pop();
+                while (!(s.empty()) ) {
+                    // Get top element
+                    pair<Token*, int> topelt = s.top();
+                    Token* curr = topelt.first;
+                    int numSpaces = topelt.second;
+                    s.pop();
 
-                string spaces(numSpaces, ' ');
-                if (curr->hasChildren()) { // ie an Operator
-                    output.push_back(spaces);
-                    output.push_back(curr->stringify());
-                    output.push_back(" (");
-                    output.push_back(to_string(curr->status));
-                    output.push_back(")");
-                    output.push_back(" : {");
-                    
-                    // add right, then left so stack order prints properly
+                    string spaces(numSpaces, ' ');
+                    if (curr->hasChildren()) { // ie an Operator
+                        output.push_back(spaces);
+                        output.push_back(curr->stringify());
+                        output.push_back(" (");
+                        output.push_back(to_string(curr->status));
+                        output.push_back(")");
+                        output.push_back(" : {");
+                        
+                        // add right, then left so stack order prints properly
 
-                    if (curr->rightChild != nullptr) {
-                        pair<Token*, int> add_to_stack;
-                        add_to_stack.first = curr->rightChild;
-                        add_to_stack.second = numSpaces + 2;
-                        s.push(add_to_stack);
-                    }
-                    
-                    if (curr->leftChild != nullptr) {
-                        pair<Token*, int> add_to_stack;
-                        add_to_stack.first = curr->leftChild;
-                        add_to_stack.second = numSpaces + 2;
-                        s.push(add_to_stack);
-                    }
-                    
-                    lastPrint = 1;
-                } else {                // ie a Subcommand
-                    output.push_back(spaces);
-                    output.push_back(curr->stringify());
-                    output.push_back(" (");
-                    output.push_back(to_string(curr->status));
-                    output.push_back(")");
-                    if (lastPrint == 0) {
-                        output.push_back("\n");
-                        if (numSpaces >= 2) {
-                            numSpaces -= 2;
+                        if (curr->rightChild != nullptr) {
+                            pair<Token*, int> add_to_stack;
+                            add_to_stack.first = curr->rightChild;
+                            add_to_stack.second = numSpaces + 2;
+                            s.push(add_to_stack);
                         }
-                        string lessSpaces(numSpaces, ' ');
-                        output.push_back(lessSpaces);
-                        output.push_back("}");
+                        
+                        if (curr->leftChild != nullptr) {
+                            pair<Token*, int> add_to_stack;
+                            add_to_stack.first = curr->leftChild;
+                            add_to_stack.second = numSpaces + 2;
+                            s.push(add_to_stack);
+                        }
+                        
+                        lastPrint = 1;
+                    } else {                // ie a Subcommand
+                        output.push_back(spaces);
+                        output.push_back(curr->stringify());
+                        output.push_back(" (");
+                        output.push_back(to_string(curr->status));
+                        output.push_back(")");
+                        if (lastPrint == 0) {
+                            output.push_back("\n");
+                            if (numSpaces >= 2) {
+                                numSpaces -= 2;
+                            }
+                            string lessSpaces(numSpaces, ' ');
+                            output.push_back(lessSpaces);
+                            output.push_back("}");
+                        }
+                        lastPrint = 0;
                     }
-                    lastPrint = 0;
+                    output.push_back("\n");
                 }
-                output.push_back("\n");
+                return joinVector(output);
             }
-            return joinVector(output);
+            return "";
         }
 		bool operator==(CommandTree &rct) {
             // Method: Use DFS to compare each node in place in trees.
