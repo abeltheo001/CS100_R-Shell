@@ -118,8 +118,10 @@ class CommandTree {
             delChildren(head);
             // delete head;    // TODO: code this to delete children
             // head = nullptr;
-            assert(head == nullptr);
-            // // Delete nodes using DFS
+			
+			// Keeping this for now; am curious what might have been causing the issue.
+		
+			// // Delete nodes using DFS
             // if (head != nullptr) {
             //     std::queue<Token*> s;
             //     s.push(head);
@@ -137,37 +139,8 @@ class CommandTree {
             //         delete currNode;
             //     }
             // }
-
-            // std::cout << "Got out of CommandTree::~CommandTree()" << std::endl;
         }
 
-        // preorder, bc why not
-        void delChildren(Token*& root) {
-
-            // BC: root is nullptr
-            if (root == nullptr) return;
-
-            // BC: root has no children
-            if (root->leftChild == nullptr && root->rightChild == nullptr) {
-
-                delete root;
-                root = nullptr;
-                return;
-            }
-
-            // Else, call this on root's left and root's right
-            if (root->leftChild != nullptr)
-                delChildren(root->leftChild);
-            if (root->rightChild != nullptr)
-                delChildren(root->rightChild);
-
-            // With all of root's children gone, delete it and return
-            delete root;
-            root = nullptr;
-
-            return;
-
-        }
 
         virtual string stringify() {
             // Initialize stack
@@ -289,6 +262,34 @@ class CommandTree {
 
             return true;
 		}
+	private:
+        // preorder, bc why not
+        void delChildren(Token*& root) {
+
+            // BC: root is nullptr
+            if (root == nullptr) return;
+
+            // BC: root has no children
+            if (!root->hasChildren()) {
+                delete root;
+                root = nullptr;
+                return;
+            }
+
+            // Else, call this on root's left and root's right
+            if (root->leftChild != nullptr)
+                delChildren(root->leftChild);
+            if (root->rightChild != nullptr)
+                delChildren(root->rightChild);
+
+            // With all of root's children gone, delete it and return
+            delete root;
+            root = nullptr;
+
+            return;
+
+        }
+
     protected:
         Token* head;
 };
