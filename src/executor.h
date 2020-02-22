@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int executor(CommandTree ctree) {
+int executor(CommandTree& ctree) { // Pass by reference
 	Token* head = (ctree.getHead());
 	if (head != nullptr) {
 		head->execute();

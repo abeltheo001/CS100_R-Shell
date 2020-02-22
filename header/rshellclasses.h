@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include <queue>
+#include <cassert>
 #include "rshellutils.h"
 #include "executeVector.h"
 #include "convertVectorToCharArray.h"
@@ -110,24 +112,63 @@ class CommandTree {
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
 	 	~CommandTree() {
-            // Delete nodes using DFS
-            if (head != nullptr) {
-                stack<Token*> s;
-                s.push(head);
-                while (!(s.empty())) {
-                    Token* currNode = s.top();
-                    s.pop();
-                    //printVector(currNode->content);
-                    if (currNode->leftChild != nullptr) {
-                        s.push(currNode->leftChild);
-                    }
-                    if (currNode->rightChild != nullptr) {
-                        s.push(currNode->rightChild);
-                    }
-                    delete currNode;
-                }
-            }
+
+            // std::cout << "In CommandTree::~CommandTree()" << std::endl;
+
+            delChildren(head);
+            // delete head;    // TODO: code this to delete children
+            // head = nullptr;
+            assert(head == nullptr);
+            // // Delete nodes using DFS
+            // if (head != nullptr) {
+            //     std::queue<Token*> s;
+            //     s.push(head);
+            //     while (!(s.empty())) {
+            //         Token* currNode = s.back();
+            //         s.pop();
+            //         //printVector(currNode->content);
+            //         if (currNode->leftChild != nullptr) {
+            //             s.push(currNode->leftChild);
+            //         }
+            //         if (currNode->rightChild != nullptr) {
+            //             s.push(currNode->rightChild);
+            //         }
+
+            //         delete currNode;
+            //     }
+            // }
+
+            // std::cout << "Got out of CommandTree::~CommandTree()" << std::endl;
         }
+
+        // preorder, bc why not
+        void delChildren(Token*& root) {
+
+            // BC: root is nullptr
+            if (root == nullptr) return;
+
+            // BC: root has no children
+            if (root->leftChild == nullptr && root->rightChild == nullptr) {
+
+                delete root;
+                root = nullptr;
+                return;
+            }
+
+            // Else, call this on root's left and root's right
+            if (root->leftChild != nullptr)
+                delChildren(root->leftChild);
+            if (root->rightChild != nullptr)
+                delChildren(root->rightChild);
+
+            // With all of root's children gone, delete it and return
+            delete root;
+            root = nullptr;
+
+            return;
+
+        }
+
         virtual string stringify() {
             // Initialize stack
             if (head != nullptr) {

@@ -4,21 +4,38 @@
 
 using namespace std;
 
-int main() {
-    CommandTree ct;
-    
-	vector<string> left = {"ls", "-al"};
-	// vector<string> right = {"echo", "hello"};
-	// vector<string> op = {"||"};
-	// Operator opObj = Operator(op);
-	Token* leftObj = new Subcommand(left);
-	// Subcommand rightObj = Subcommand(right);
+void testLeaf() {
 
-    ct.setHead(leftObj);
+    vector<string> left = {"echo", "hello", "world"};
+
+    CommandTree ct;
+    ct.setHead(new Subcommand(left)); // gets deleted in ct's dtor
 
     int retval = executor(ct);
+}
 
-    delete leftObj;
+void testConnector() {
+
+    vector<string> left_v = {"echo", "Pog"};
+    vector<string> right_v = { "echo", "Champ" };
+    vector<string> op_v = { "||" };
+
+    Token* op = new Operator(op_v);
+    op->leftChild = new Subcommand(left_v);
+    op->rightChild = new Subcommand(right_v);
+
+    CommandTree ct;
+    ct.setHead(op);
+
+    executor(ct);
+
+}
+
+int main() {
+
+    // testLeaf(); // works, no mem leak
+
+    testConnector();
 
     return 0;
 }
