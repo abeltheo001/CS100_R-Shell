@@ -16,7 +16,10 @@ class Rshell {
 
     public:
 	Rshell() {}
-	Rshell(string input) {}
+	Rshell(string input) 
+	{
+		
+	}
 	virtual ~Rshell() {}
 	void makeCommandTree(string input) {}
 	int executeCommandTree() {}
@@ -25,6 +28,16 @@ class Rshell {
 	CommandTree* currentTree = nullptr;
 	unordered_map <string, string> configData;
 	bool DEBUG = true;
+   
+   private: 
+	bool checkBuiltin(vector<string>);
+	void constructSubTree(const vector<Token*>&, int);
+	vector<string> groupQuotes(vector<string>);
+	vector <string> filterComments (vector <string>);
+	vector<Token*> tokenize(vector<string>);
+	friend class CommandTree;
+	friend class Token;
+	
 };
 
 class Token {
