@@ -6,11 +6,26 @@
 #include <stack>
 #include <queue>
 #include <cassert>
+#include <unordered_map>
 #include "rshellutils.h"
 #include "executeVector.h"
 #include "convertVectorToCharArray.h"
-
 using namespace std;
+
+class Rshell {
+
+    public:
+	Rshell() {}
+	Rshell(string input) {}
+	virtual ~Rshell() {}
+	void makeCommandTree(string input) {}
+	int executeCommandTree() {}
+	
+	//Member variables;
+	CommandTree* currentTree = nullptr;
+	unordered_map <string, string> configData;
+	bool DEBUG = true;
+};
 
 class Token {
     public:
