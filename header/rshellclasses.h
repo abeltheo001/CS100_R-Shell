@@ -18,10 +18,10 @@ class Rshell {
 	Rshell() {}
 	Rshell(string input) 
 	{
-		
+		intitialVal = input;
 	}
 	virtual ~Rshell() {}
-	void makeCommandTree(string input) {}
+	void makeCommandTree(string initialVal) {}
 	int executeCommandTree() {}
 	
 	//Member variables;
@@ -30,13 +30,12 @@ class Rshell {
 	bool DEBUG = true;
    
    private: 
+	string initialVal;
 	bool checkBuiltin(vector<string>);
 	void constructSubTree(const vector<Token*>&, int);
 	vector<string> groupQuotes(vector<string>);
 	vector <string> filterComments (vector <string>);
-	vector<Token*> tokenize(vector<string>);
-	friend class CommandTree;
-	friend class Token;
+	vector<Token*> tokenize(vector<string>)
 	
 };
 

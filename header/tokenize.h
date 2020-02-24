@@ -7,7 +7,7 @@
 
 using namespace std;
 
-vector<Token*> tokenize(vector<string> Vin) {
+vector<Token*> Rshell::tokenize(vector<string> Vin) {
     // This function does the following:
     // While doing a single pass through the input vector string,
     //   store encountered words in a vector<string> buffer. When a
