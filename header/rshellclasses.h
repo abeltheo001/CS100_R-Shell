@@ -17,9 +17,7 @@ class Rshell {
     public:
 	Rshell() {}
 	Rshell(string input) 
-	{
-		
-	}
+	{}
 	virtual ~Rshell() {}
 	void makeCommandTree(string input) {}
 	int executeCommandTree() {}
@@ -34,9 +32,7 @@ class Rshell {
 	void constructSubTree(const vector<Token*>&, int);
 	vector<string> groupQuotes(vector<string>);
 	vector <string> filterComments (vector <string>);
-	vector<Token*> tokenize(vector<string>);
-	friend class CommandTree;
-	friend class Token;
+	vector<Token*> tokenize(vector<string>)
 	
 };
 

@@ -4,9 +4,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "rshellclasses.h"
 using namespace std;
 
-vector <string> filterComments (vector <string> input)
+vector <string> Rshell::filterComments (vector <string> input)
 {
         vector <string> result;
         for (vector<string>::iterator it = input.begin(); it != input.end(); ++it)
