@@ -17,11 +17,9 @@ class Rshell {
     public:
 	Rshell() {}
 	Rshell(string input) 
-	{
-		intitialVal = input;
-	}
+	{}
 	virtual ~Rshell() {}
-	void makeCommandTree(string initialVal) {}
+	void makeCommandTree(string input) {}
 	int executeCommandTree() {}
 	
 	//Member variables;
@@ -30,7 +28,6 @@ class Rshell {
 	bool DEBUG = true;
    
    private: 
-	string initialVal;
 	bool checkBuiltin(vector<string>);
 	void constructSubTree(const vector<Token*>&, int);
 	vector<string> groupQuotes(vector<string>);
