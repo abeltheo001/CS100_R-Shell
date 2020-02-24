@@ -1,7 +1,5 @@
 #include <iostream>
-#include "parser.h"
 // #include "../header/initConfig.h"
-#include "executor.h"
 #include "rshellclasses.h"
 using namespace std;
 
