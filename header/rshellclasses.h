@@ -10,30 +10,35 @@
 #include "rshellutils.h"
 #include "executeVector.h"
 #include "convertVectorToCharArray.h"
+
 using namespace std;
 
 class RShell {
-
     public:
-	RShell() {}
-	RShell(string input) 
-	{}
-	virtual ~RShell() {}
-	void makeCommandTree(string input) {}
-	int executeCommandTree() {}
-	
-	//Member variables;
-	CommandTree* currentTree = nullptr;
-	unordered_map <string, string> configData;
-	bool DEBUG = true;
+		RShell() {}
+		RShell(string filename) {
+			// TODO: Make this take in .rshellrc and set up configData accordingly
+		}
+		virtual ~RShell() {
+			if (currentTree != nullptr) {
+				delete currentTree;
+			}
+		}
+
+		void makeCommandTree(string);
+		int executeCommandTree();
+		
+		//Member variables;
+		CommandTree* currentTree = nullptr;
+		unordered_map <string, string> configData;
+		bool DEBUG = true;
    
-   private: 
-	bool checkBuiltin(vector<string>);
-	void constructSubTree(const vector<Token*>&, int);
-	vector<string> groupQuotes(vector<string>);
-	vector <string> filterComments (vector <string>);
-	vector<Token*> tokenize(vector<string>)
-	
+  	private: 
+		bool checkBuiltin(vector<string>);
+		void constructSubTree(const vector<Token*>&, int);
+		vector<string> groupQuotes(vector<string>);
+		vector <string> filterComments (vector <string>);
+		vector<Token*> tokenize(vector<string>)	
 };
 
 class Token {
