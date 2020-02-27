@@ -8,7 +8,7 @@
 #include <cassert>
 #include <unordered_map>
 #include "rshellutils.h"
-#include "executeVector.h"
+#include "executeCharArray.h"
 #include "convertVectorToCharArray.h"
 
 using namespace std;
@@ -104,6 +104,8 @@ class Operator : public Token {
             }
 
             makeStatus(statusLeft, statusRight);
+
+			return this->status;
         }
 };
 
@@ -167,37 +169,34 @@ class CommandTree {
                     s.pop();
 
                     string spaces(numSpaces, ' ');
-                    if (curr->hasChildren()) { // ie an Operator
-                        output.push_back(spaces);
-                        output.push_back(curr->stringify());
-                        output.push_back(" (");
-                        output.push_back(to_string(curr->status));
-                        output.push_back(")");
+					output.push_back(spaces);
+					output.push_back(curr->stringify());
+					output.push_back(" (");
+					output.push_back(to_string(curr->status));
+					output.push_back(")");
+                    
+					if (curr->hasChildren()) { // ie an Operator
                         output.push_back(" : {");
                         
                         // add right, then left so stack order prints properly
 
+                        
                         if (curr->rightChild != nullptr) {
                             pair<Token*, int> add_to_stack;
                             add_to_stack.first = curr->rightChild;
                             add_to_stack.second = numSpaces + 2;
                             s.push(add_to_stack);
                         }
-                        
+
                         if (curr->leftChild != nullptr) {
                             pair<Token*, int> add_to_stack;
                             add_to_stack.first = curr->leftChild;
                             add_to_stack.second = numSpaces + 2;
                             s.push(add_to_stack);
                         }
-                        
+
                         lastPrint = 1;
                     } else {                // ie a Subcommand
-                        output.push_back(spaces);
-                        output.push_back(curr->stringify());
-                        output.push_back(" (");
-                        output.push_back(to_string(curr->status));
-                        output.push_back(")");
                         if (lastPrint == 0) {
                             output.push_back("\n");
                             if (numSpaces >= 2) {

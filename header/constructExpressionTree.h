@@ -34,39 +34,8 @@ void RShell::constructSubTree(const vector<Token*>& allNodes, int currPos) {
 }
 
 void RShell::constructExpressionTree(vector<string> Vin) {
-    unordered_set<string> recognized_operators = { "||", "&&", ";" };
-    vector<string> buffer;
-    vector<Token*> objs;
-    bool first = true;
-    
-    auto it = Vin.begin();
-    while (it != Vin.end()) {
-        if (recognized_operators.count(*it) > 0) {
-            if (buffer.size() > 0) {
-                Subcommand* subc = new Subcommand(buffer);
-                vector<string> oplist = {*it};
-                Operator* op = new Operator(oplist);
-                
-				objs.push_back(subc);
-                objs.push_back(op);
-            
-				buffer.clear();
-	    	} else {
-                string s = "No end quote in quote grouping.";
-                const char* errormsg = s.c_str();
-                perror(errormsg);
-            }
-        } else {
-            buffer.push_back(*it);
-        }
-        it++;
-    }
 
-    // Remove remaining on buffer
-    if (buffer.size() > 0) {
-		Subcommand* subc = new Subcommand(buffer);
-		objs.push_back(subc);
-    }
+	vector<Token*> objs = tokenize(Vin);
 
 	currentTree = new CommandTree();
 

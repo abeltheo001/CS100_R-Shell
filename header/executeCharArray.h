@@ -1,5 +1,5 @@
-#ifndef EXECUTEVECTOR_H
-#define EXECUTEVECTOR_H
+#ifndef EXECUTECHARARRAY_H
+#define EXECUTECHARARRAY_H
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -26,7 +26,7 @@ int executeCharArray(char** charIn)
             // Akin to *argv[0], the first argument is the name of the thing it's being called inside
             execvp(charIn[0], charIn);
             // If it returns, the charIn[0] is unknown
-            return 2;
+            return -1;
         }
         else 
         {
@@ -36,7 +36,7 @@ int executeCharArray(char** charIn)
             if (WIFEXITED(status) != 0) {
                 return WEXITSTATUS(status);
             } else {
-                return 3; // Called program segfaulted or something similar
+                return -3; // Called program segfaulted or something similar
             }
         }
 }
