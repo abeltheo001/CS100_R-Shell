@@ -57,16 +57,16 @@ void RShell::makeCommandTree(string userInput)
 
 	// TODO: Merge tokenize and constructExpressionTree so all the new's are in one place
 
-	// Sanity check
-	if (currentTree != nullptr) {
-		delete currentTree;
-	}
+//	// Sanity check
+//	if (currentTree != nullptr) {
+//		delete currentTree;
+//	}
 
 	// 4. Group words/quotes into Tokens, and merge them into a CommandTree.
 	constructExpressionTree(words); // No returns since it constructs into our currentTree member variable
 	if (DEBUG) {
 		cout << "CommandTree construction complete! CommandTree pre-execution:" << endl;
-		cout << currentTree->stringify() << endl;
+		cout << currentTree->stringify();
 	}
 
 //	// 4. Group words/quotes into Tokens of type Subcommand or Operator.
@@ -85,7 +85,13 @@ int RShell::executeCommandTree()
 			cout << "Execution complete! CommandTree post-execution:" << endl;
 			cout << currentTree->stringify() << endl;
 		}
-		return (currentTree->getHead())->status;
+
+		int retstatus = (currentTree->getHead())->status;
+
+		delete currentTree;
+		currentTree = nullptr;
+
+		return retstatus;
 	} else {
 		if (DEBUG) {
 			cout << "CommandTree was empty, so nothing to run." << endl;
@@ -93,7 +99,6 @@ int RShell::executeCommandTree()
 		return 0;
 	}
 
-	delete currentTree;
 }
 
 #endif

@@ -47,7 +47,11 @@ class Subcommand : public Token {
             
             char** chararr = convertVectorToCharArray(content);
             status = executeCharArray(chararr);
-            
+			
+			if (status == -1) {
+				cout << "RSHELL: Command not found!" << endl;
+			}
+
             for (int i = 0; i < content.size(); i++) {
                 delete[] chararr[i];
             }

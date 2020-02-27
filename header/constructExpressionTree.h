@@ -37,6 +37,15 @@ void RShell::constructExpressionTree(vector<string> Vin) {
 
 	vector<Token*> objs = tokenize(Vin);
 
+	// Sanity check
+	if (currentTree != nullptr) {
+		if (DEBUG) {
+			cout << "Somehow the deletion of currentTree was missed..." << endl;
+		}
+		delete currentTree;
+		currentTree = nullptr;
+	}
+
 	currentTree = new CommandTree();
 
 	if (objs.size() != 0) {
