@@ -13,34 +13,6 @@
 
 using namespace std;
 
-class RShell {
-    public:
-		RShell() {}
-		RShell(string filename) {
-			// TODO: Make this take in .rshellrc and set up configData accordingly
-		}
-		virtual ~RShell() {
-			if (currentTree != nullptr) {
-				delete currentTree;
-			}
-		}
-
-		void makeCommandTree(string);
-		int executeCommandTree();
-		
-		//Member variables;
-		CommandTree* currentTree = nullptr;
-		unordered_map <string, string> configData;
-		bool DEBUG = true;
-   
-  	private: 
-		bool checkBuiltin(vector<string>);
-		void constructSubTree(const vector<Token*>&, int);
-		vector<string> groupQuotes(vector<string>);
-		vector <string> filterComments (vector <string>);
-		vector<Token*> tokenize(vector<string>)	
-};
-
 class Token {
     public:
         Token() {}
@@ -322,5 +294,35 @@ class CommandTree {
     protected:
         Token* head;
 };
+
+class RShell {
+    public:
+		RShell() {}
+		RShell(string filename) {
+			// TODO: Make this take in .rshellrc and set up configData accordingly
+		}
+		virtual ~RShell() {
+			if (currentTree != nullptr) {
+				delete currentTree;
+			}
+		}
+
+		void makeCommandTree(string);
+		int executeCommandTree();
+		
+		//Member variables;
+		CommandTree* currentTree = nullptr;
+		unordered_map <string, string> configData;
+		bool DEBUG = true;
+   
+  	private: 
+		bool checkBuiltin(vector<string>);
+		void constructSubTree(const vector<Token*>&, int);
+		vector<string> groupQuotes(vector<string>);
+		vector <string> filterComments (vector <string>);
+		vector<Token*> tokenize(vector<string>);
+		void constructExpressionTree(vector<string>);
+};
+
 
 #endif

@@ -9,10 +9,12 @@ using namespace std;
 template <class T>
 void printVector(vector<T> V, string delimiter=" ") {
 	auto it = V.begin();
+	cout << '{';
 	while (it != V.end()) {
 		cout << *it << delimiter;
 		it++;
 	}
+	cout << '}' << endl;
 }
 
 template <class T>

@@ -33,19 +33,51 @@ void RShell::constructSubTree(const vector<Token*>& allNodes, int currPos) {
 	}
 }
 
-CommandTree constructExpressionTree(vector<Token*> objs) {
-	CommandTree tree;
+void RShell::constructExpressionTree(vector<string> Vin) {
+    unordered_set<string> recognized_operators = { "||", "&&", ";" };
+    vector<string> buffer;
+    vector<Token*> objs;
+    bool first = true;
+    
+    auto it = Vin.begin();
+    while (it != Vin.end()) {
+        if (recognized_operators.count(*it) > 0) {
+            if (buffer.size() > 0) {
+                Subcommand* subc = new Subcommand(buffer);
+                vector<string> oplist = {*it};
+                Operator* op = new Operator(oplist);
+                
+				objs.push_back(subc);
+                objs.push_back(op);
+            
+				buffer.clear();
+	    	} else {
+                string s = "No end quote in quote grouping.";
+                const char* errormsg = s.c_str();
+                perror(errormsg);
+            }
+        } else {
+            buffer.push_back(*it);
+        }
+        it++;
+    }
+
+    // Remove remaining on buffer
+    if (buffer.size() > 0) {
+		Subcommand* subc = new Subcommand(buffer);
+		objs.push_back(subc);
+    }
+
+	currentTree = new CommandTree();
 
 	if (objs.size() != 0) {
 			if (objs.size() == 1) {	 		// Trivial case
-				tree.setHead(objs[0]);
+				currentTree->setHead(objs[0]);
 			} else {						// Constructed directly from inorder using left precedence
-				tree.setHead(objs[objs.size()-2]);
+				currentTree->setHead(objs[objs.size()-2]);
 				constructSubTree(objs, objs.size()-1);
 			}
 	}
-
-	return tree;
 }
 
 #endif

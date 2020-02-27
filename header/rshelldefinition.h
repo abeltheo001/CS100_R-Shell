@@ -1,14 +1,16 @@
+#ifndef RSHELLDEFINITION_H
+#define RSHELLDEFINITION_H
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <stack>
-#include <cassert>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+
 #include "rshellclasses.h"
-#include "rshellutils"
-#include "rshellclasses.h"
+#include "rshellutils.h"
 #include "splitOnChar.h"
 #include "groupQuotes.h"
 #include "filterComments.h"
@@ -16,13 +18,6 @@
 #include "constructExpressionTree.h"
 
 using namespace std;
-
-/*
- * RShell::RShell(string input)
-	{//Push into command Tree}
-
-  virtual RShell::~RShell() {}
-*/
 
 void RShell::makeCommandTree(string userInput)
 {
@@ -43,27 +38,36 @@ void RShell::makeCommandTree(string userInput)
 	vector<string> words = splitOnChar(userInput, ' ');
 	if (DEBUG) {
 		cout << "Split on spaces. Current working string/vector:" << endl;
-		printVector(words);
+		printVector(words,";");
 	}
 
  	// 2. Make sure quotes get grouped together
 	words = groupQuotes(words);
 	if (DEBUG) {
 		cout << "Grouped quotes together. Current working string/vector:" << endl;
-		cout << userInput << endl;
+		printVector(words, ";");
 	}
 
 	// 3. Filter out stuff after #
 	words = filterComments(words);
 	if (DEBUG) {
 		cout << "Comments filtered out. Current working string/vector:" << endl;
-		cout << words << endl;
+		printVector(words, ";");
 	}
 
 	// TODO: Merge tokenize and constructExpressionTree so all the new's are in one place
 
+	// Sanity check
+	if (currentTree != nullptr) {
+		delete currentTree;
+	}
+
 	// 4. Group words/quotes into Tokens, and merge them into a CommandTree.
 	constructExpressionTree(words); // No returns since it constructs into our currentTree member variable
+	if (DEBUG) {
+		cout << "CommandTree construction complete! CommandTree pre-execution:" << endl;
+		cout << currentTree->stringify() << endl;
+	}
 
 //	// 4. Group words/quotes into Tokens of type Subcommand or Operator.
 //	vector<Token*> tokens = tokenize(words);
@@ -78,7 +82,7 @@ int RShell::executeCommandTree()
 	if (head != nullptr) {
 		head->execute();
 		if (DEBUG) {
-			cout << "Execution complete! CommandTree post execution:" << endl;
+			cout << "Execution complete! CommandTree post-execution:" << endl;
 			cout << currentTree->stringify() << endl;
 		}
 		return (currentTree->getHead())->status;
@@ -92,3 +96,4 @@ int RShell::executeCommandTree()
 	delete currentTree;
 }
 
+#endif
