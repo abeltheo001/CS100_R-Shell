@@ -14,7 +14,7 @@
 
 using namespace std;
 
-void Rshell::constructSubTree(const vector<Token*>& allNodes, int currPos) {
+void RShell::constructSubTree(const vector<Token*>& allNodes, int currPos) {
     // Constructs a three subgroup, then recurses
     //         ...
     //       B

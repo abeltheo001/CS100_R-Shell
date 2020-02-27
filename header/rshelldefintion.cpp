@@ -18,13 +18,13 @@
 using namespace std;
 
 /*
- * Rshell::Rshell(string input)
+ * RShell::RShell(string input)
 	{//Push into command Tree}
 
-  virtual Rshell::~Rshell() {}
+  virtual RShell::~RShell() {}
 */
 
-void Rshell::makeCommandTree(string userInput)
+void RShell::makeCommandTree(string userInput)
 {
 	vector<string> test = splitOnChar(userInput,';');
 	userInput = joinVector(test," ;"); 
@@ -44,7 +44,7 @@ void Rshell::makeCommandTree(string userInput)
 		currentTree = constructExpressionTree(tokens);
 }
 
-int Rshell::executeCommand(CommandTree& currentTree)
+int RShell::executeCommand(CommandTree& currentTree)
 {
 	Token* head = currentTree.getHead();
 	if (head != nullptr) {

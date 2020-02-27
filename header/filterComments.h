@@ -7,7 +7,7 @@
 #include "rshellclasses.h"
 using namespace std;
 
-vector <string> Rshell::filterComments (vector <string> input)
+vector <string> RShell::filterComments (vector <string> input)
 {
         vector <string> result;
         for (vector<string>::iterator it = input.begin(); it != input.end(); ++it)

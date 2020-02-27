@@ -14,7 +14,7 @@
 
 using namespace std;
 
-vector<string> Rshell::groupQuotes(vector<string> Vin) {
+vector<string> RShell::groupQuotes(vector<string> Vin) {
 	vector<string> grouped;
 	vector<string> buffer;	
 	bool state = 0; // 0 = normal mode. passes words from Vin to grouped

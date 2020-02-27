@@ -12,13 +12,13 @@
 #include "convertVectorToCharArray.h"
 using namespace std;
 
-class Rshell {
+class RShell {
 
     public:
-	Rshell() {}
-	Rshell(string input) 
+	RShell() {}
+	RShell(string input) 
 	{}
-	virtual ~Rshell() {}
+	virtual ~RShell() {}
 	void makeCommandTree(string input) {}
 	int executeCommandTree() {}
 	
