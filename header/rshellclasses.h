@@ -13,6 +13,11 @@
 
 using namespace std;
 
+int GLOBAL_EXIT_STATUS = 0; // When set to 1, stop program execution.
+						    // This is used for proper handling of exit() -
+							// wasn't sure how to handle it otherwise since
+							// Tokens have no access to RShell, and we're using composite pattern.
+
 class Token {
     public:
         Token() {}
@@ -40,24 +45,30 @@ class Subcommand : public Token {
 		bool operator==(Subcommand const rhs) const {
 			return (this->content == rhs.content);
 		}
-        virtual int execute() { 
-            if (content[0] == "exit") {
-                exit(0);
-            }
-            
-            char** chararr = convertVectorToCharArray(content);
-            status = executeCharArray(chararr);
-			
-			if (status == -1) {
-				cout << "RSHELL: Command not found!" << endl;
+        virtual int execute() {
+			if (GLOBAL_EXIT_STATUS == 1) {
+				// Do nothing
+				return -2;
 			}
+            else if (content[0] == "exit") {
+				GLOBAL_EXIT_STATUS = 1;
+				status = 0;
+				return status;
+            } else { 
+				char** chararr = convertVectorToCharArray(content);
+				status = executeCharArray(chararr);
+				
+				if (status == -1) {
+					cout << "RSHELL: Command not found!" << endl;
+				}
 
-            for (int i = 0; i < content.size(); i++) {
-                delete[] chararr[i];
-            }
-            delete[] chararr;
+				for (int i = 0; i < content.size()+1; i++) {
+					delete[] chararr[i];
+				}
+				delete[] chararr;
 
-			return status;
+				return status;
+			}
 		}
 };
 
@@ -301,12 +312,16 @@ class CommandTree {
 class RShell {
     public:
 		RShell() {}
+		RShell(bool b) {
+			DEBUG = b;
+		}
 		RShell(string filename) {
 			// TODO: Make this take in .rshellrc and set up configData accordingly
 		}
 		virtual ~RShell() {
 			if (currentTree != nullptr) {
 				delete currentTree;
+				cout << "Deleted currentTree" << endl;
 			}
 		}
 
@@ -326,6 +341,5 @@ class RShell {
 		vector<Token*> tokenize(vector<string>);
 		void constructExpressionTree(vector<string>);
 };
-
 
 #endif

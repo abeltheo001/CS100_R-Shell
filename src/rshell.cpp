@@ -6,7 +6,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
 	// unordered_map<string, bool> config = initConfig("../.rshellrc");
 	
-	RShell shellobj;
+	RShell shellobj = RShell();
 
 	if (argc == 1) {
 			string currInput = "";
@@ -15,6 +15,9 @@ int main(int argc, char *argv[]) {
 				getline(cin, currInput);	
 				shellobj.makeCommandTree(currInput);
 				shellobj.executeCommandTree();
+				if (GLOBAL_EXIT_STATUS == 1) {
+					exit(0);
+				}
 				// cout << returnval << endl; // Debug
 			}
 	} else {

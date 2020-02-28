@@ -55,13 +55,6 @@ void RShell::makeCommandTree(string userInput)
 		printVector(words, ";");
 	}
 
-	// TODO: Merge tokenize and constructExpressionTree so all the new's are in one place
-
-//	// Sanity check
-//	if (currentTree != nullptr) {
-//		delete currentTree;
-//	}
-
 	// 4. Group words/quotes into Tokens, and merge them into a CommandTree.
 	constructExpressionTree(words); // No returns since it constructs into our currentTree member variable
 	if (DEBUG) {
@@ -69,36 +62,35 @@ void RShell::makeCommandTree(string userInput)
 		cout << currentTree->stringify();
 	}
 
-//	// 4. Group words/quotes into Tokens of type Subcommand or Operator.
-//	vector<Token*> tokens = tokenize(words);
-//
-//	// 5. Create a tree for execution in later steps
-//	constructExpressionTree(tokens);
 }
 
 int RShell::executeCommandTree()
 {
-	Token* head = currentTree->getHead();
-	if (head != nullptr) {
-		head->execute();
-		if (DEBUG) {
-			cout << "Execution complete! CommandTree post-execution:" << endl;
-			cout << currentTree->stringify() << endl;
-		}
-
-		int retstatus = (currentTree->getHead())->status;
-
-		delete currentTree;
-		currentTree = nullptr;
-
-		return retstatus;
+	if (currentTree == nullptr) {
+		cout << "RSHELL: CommandTree is a nullptr! This is not good! Inform the developer." << endl; 
 	} else {
-		if (DEBUG) {
-			cout << "CommandTree was empty, so nothing to run." << endl;
-		}
-		return 0;
-	}
+		Token* head = currentTree->getHead();
+		if (head == nullptr) {
+			if (DEBUG) {
+				cout << "CommandTree was empty, so nothing to run." << endl;
+			}
+			return 0;
+		} else {	
+			head->execute(); // Will recursively call children if needed
+			
+			if (DEBUG) {
+				cout << "Execution complete! CommandTree post-execution:" << endl;
+				cout << currentTree->stringify() << endl;
+			}
 
+			int retstatus = (currentTree->getHead())->status;
+
+			delete currentTree;
+			currentTree = nullptr;
+
+			return retstatus;
+		}
+	}
 }
 
 #endif
