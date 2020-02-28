@@ -327,5 +327,3 @@ class RShell {
 		void constructExpressionTree(vector<string>);
 };
 
-
-#endif
