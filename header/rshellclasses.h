@@ -7,6 +7,7 @@
 #include <queue>
 #include <cassert>
 #include <unordered_map>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include "rshellutils.h"
 #include "executeCharArray.h"
@@ -45,7 +46,8 @@ class Subcommand : public Token {
         virtual int execute() {
  
 		if (content[0] == "exit") {
-			exit(0);
+			status = 0;
+			exit(status);
 		 }
 		
 		else if (content[0] == "test")	
@@ -83,7 +85,7 @@ class Subcommand : public Token {
 	{
 		if (content[1] == "-e")
 		{
-			struct stat check;
+
 			return (stat(content[2].c_str(), &check) == 0);
 			//checks if the file/directory exists
 		}
@@ -121,7 +123,7 @@ class Subcommand : public Token {
 		else 
 		{
 			struct stat check;
-			return (stat(content[2].c_str(), &check) == 0);
+			return (stat(content[1].c_str(), &check) == 0);
 			//checks if the file/directory exists
 		 
 		}
