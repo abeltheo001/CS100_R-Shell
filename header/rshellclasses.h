@@ -85,7 +85,7 @@ class Subcommand : public Token {
 	{
 		if (content[1] == "-e")
 		{
-
+			struct stat check;
 			return (stat(content[2].c_str(), &check) == 0);
 			//checks if the file/directory exists
 		}
@@ -132,58 +132,89 @@ class Subcommand : public Token {
 	}
 };
 
-class Operator : public Token {
-    public:
-        Operator(vector<string> V) { content = V; }
-		bool operator==(Operator const rhs) const {
+class AndToken: public Token {
+public: 
+	    
+	AndToken(vector<string> V) { content = V; }
+
+	bool operator==(AndToken const rhs) const {
 			return (this->content == rhs.content);
 		}
-        virtual void makeStatus(int a, int b) {
-            if (b == -2) { // The right subcommand didn't run 
-                // Either:
-                // a succeeded in a || b (overall success)
-                // a failed in    a && b (overall failure)
-                if (a == 0) {
-                    this->status = 0;
-                } else {
-                    this->status = 1;
-                }
-            } else { // Both Subcommands ran
-                // Either:
-                // a failed and b ? in  a || b (pass b up)
-                // a succeed and b ? in a && b (pass b up)
-                // a ? and b ? in       a ;  b (pass b up)
-                // All cases mean passing b success up, so just return 0 if b=0, 1 otherwise.
-                if (b == 0) {
-                    this->status = 0;
-                } else {
-                    this->status = 1;
-                }
-            }
-        }
+
         virtual int execute() {
             int statusLeft, statusRight = -2;
             statusLeft = leftChild->execute();
             
-            // Always run ;
-            if (content[0] == ";") {
+            if (statusLeft == 0) {
                 statusRight = rightChild->execute();
+		if (statusRight == 0)
+		{
+			this->status = 0;
+		}
+		else 
+		{ this->status = 1;}
             }
-            
-            // Conditionally run && and ||
-            if ((statusLeft == 0) && (content[0] == "&&")) {
-                statusRight = rightChild->execute();
-            }
-            if ((statusLeft != 0) && (content[0] == "||")) {
-                statusRight = rightChild->execute();
-            }
+	    else {
+  	     this->status = 1;}
 
-            makeStatus(statusLeft, statusRight);
-
-			return this->status;
+	    return this->status; 
         }
+
 };
 
+class OrToken: public Token {
+public: 
+	OrToken(vector<string> V) { content = V; }
+
+	bool operator==(OrToken const rhs) const {
+			return (this->content == rhs.content);
+		}
+
+        virtual int execute() {
+            int statusLeft, statusRight = -2;
+            statusLeft = leftChild->execute();
+            
+            if (statusLeft != 0) {
+                statusRight = rightChild->execute();
+		if (statusRight == 0)
+		{
+			this->status = 0;
+		}
+		else 
+		{ this->status = 1;}
+            }
+	    else {
+  	     this->status = 1;}
+
+	    return this->status; 
+        }
+
+};
+
+class SemiToken: public Token {
+public:
+	SemiToken(vector<string V) {content = V; }
+	
+	bool operator==(SemiToken const rhs) const {
+		return (this->content == rhs.content); }
+
+	virtual int execute() { 
+		int statusLeft, statusRight = -2;
+		statusLeft = leftChild-> execute();
+
+		if (content[0] == ";") {
+			statusRight = rightChild->execute();
+			if (statusRight == 0) {
+			this->status = 0;
+			}
+		else 
+		{ this->status = 1;}
+            }
+	else { this->status = 1;}
+	
+	return this->status;
+	}
+};
 //Create AND, OR, SEMICOLOR TOKENS. 
 //
 
