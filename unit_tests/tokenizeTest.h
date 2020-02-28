@@ -8,18 +8,13 @@
 #include <string>
 
 TEST (tokenizeTest, withOperator) {
-	vector<string> values;
-	values.push_back("ls");
-	values.push_back("-al");
-	values.push_back("||");
-	values.push_back("echo");
-	values.push_back("a");
+	vector<string> values = {"ls", "-al", "||", "echo", "a"};
 	vector<Token*> outputV = tokenize(values);
 	
-	Subcommand* lsal = new Subcommand({"ls", "-al"});
-	Operator* op = new Operator({"||"});
-	Subcommand* echoa = new Subcommand({"echo", "a"});
-	vector<Token*> expected = {lsal, op, echoa};
+	Subcommand lsal = Subcommand({"ls", "-al"});
+	Operator op = Operator({"||"});
+	Subcommand echoa = Subcommand({"echo", "a"});
+	vector<Token*> expected = {&lsal, &op, &echoa};
 
 	bool equal = true;
 	for (int i = 0; i < outputV.size(); i++) {
@@ -38,12 +33,11 @@ TEST (tokenizeTest, withoutOperator) {
 	values.push_back("-al");
 	vector<Token*> outputV = tokenize(values);
 	
-	Subcommand* lsal = new Subcommand({"ls", "-al"});
-	vector<Token*> expected = {lsal};
+	Subcommand a = Subcommand({"ls", "-al"});
 
 	bool equal = true;
 	for (int i = 0; i < outputV.size(); i++) {
-		if (!( (*outputV[i]) == (*expected[i]) ) ) {
+		if (!( (*outputV[i]) == a ) ) {
 			equal = false;
 			break;
 		}

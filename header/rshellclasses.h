@@ -4,27 +4,27 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include <queue>
+#include <cassert>
+#include <unordered_map>
 #include "rshellutils.h"
-#include "executeVector.h"
+#include "executeCharArray.h"
+#include "convertVectorToCharArray.h"
 
 using namespace std;
 
 class Token {
     public:
-        Token() {};
-
-        vector<string> getContent()          { return content; }
-        void setContent(vector<string> V)    { content = V; }
+        Token() {}
+        virtual ~Token() {}
 
         virtual int execute() = 0;
+        virtual string stringify() { return joinVector(content, ' '); }
 
-        void setLeft(Token* t) { leftChild = t; }
-        void setRight(Token* t) { rightChild = t; }
-        bool hasChildren() { return ((leftChild != nullptr) || (rightChild != nullptr)); }
+        virtual bool hasChildren() { return ((leftChild != nullptr) || (rightChild != nullptr)); }
 		bool operator==(Token const &rhs) const {
 			return (this->content == rhs.content);
 		}
-        string stringify() { return joinVector(content, ' '); }
 
         // Member variables
         vector<string> content;
@@ -35,12 +35,28 @@ class Token {
 
 class Subcommand : public Token {
     public:
+        virtual ~Subcommand() {}
         Subcommand(vector<string> V) { content = V; }
-        int execute() { 
+		bool operator==(Subcommand const rhs) const {
+			return (this->content == rhs.content);
+		}
+        virtual int execute() { 
             if (content[0] == "exit") {
                 exit(0);
             }
-            status = executeVector(content);
+            
+            char** chararr = convertVectorToCharArray(content);
+            status = executeCharArray(chararr);
+			
+			if (status == -1) {
+				cout << "RSHELL: Command not found!" << endl;
+			}
+
+            for (int i = 0; i < content.size(); i++) {
+                delete[] chararr[i];
+            }
+            delete[] chararr;
+
 			return status;
 		}
 };
@@ -48,7 +64,10 @@ class Subcommand : public Token {
 class Operator : public Token {
     public:
         Operator(vector<string> V) { content = V; }
-        void makeStatus(int a, int b) {
+		bool operator==(Operator const rhs) const {
+			return (this->content == rhs.content);
+		}
+        virtual void makeStatus(int a, int b) {
             if (b == -2) { // The right subcommand didn't run 
                 // Either:
                 // a succeeded in a || b (overall success)
@@ -71,7 +90,7 @@ class Operator : public Token {
                 }
             }
         }
-        int execute() {
+        virtual int execute() {
             int statusLeft, statusRight = -2;
             statusLeft = leftChild->execute();
             
@@ -89,6 +108,8 @@ class Operator : public Token {
             }
 
             makeStatus(statusLeft, statusRight);
+
+			return this->status;
         }
 };
 
@@ -97,71 +118,105 @@ class CommandTree {
         CommandTree() : head(nullptr) {}
         void setHead(Token* t) { head = t; }
         Token* getHead() { return head; }
+	 	~CommandTree() {
+
+            // std::cout << "In CommandTree::~CommandTree()" << std::endl;
+
+            delChildren(head);
+            // delete head;    // TODO: code this to delete children
+            // head = nullptr;
+			
+			// Keeping this for now; am curious what might have been causing the issue.
+		
+			// // Delete nodes using DFS
+            // if (head != nullptr) {
+            //     std::queue<Token*> s;
+            //     s.push(head);
+            //     while (!(s.empty())) {
+            //         Token* currNode = s.back();
+            //         s.pop();
+            //         //printVector(currNode->content);
+            //         if (currNode->leftChild != nullptr) {
+            //             s.push(currNode->leftChild);
+            //         }
+            //         if (currNode->rightChild != nullptr) {
+            //             s.push(currNode->rightChild);
+            //         }
+
+            //         delete currNode;
+            //     }
+            // }
+        }
+
+
+        virtual string stringify() {
             // Initialize stack
-            stack<pair<Token*,int>> s; // Stores token and number of spaces
-            vector<string> output;
-            pair<Token*, int> startelt;
-            startelt.first = head;
-            startelt.second = 0;
-            s.push(startelt);
+            if (head != nullptr) {
+            
+                stack<pair<Token*,int>> s; // Stores token and number of spaces
+                vector<string> output;
+                
+                pair<Token*, int> startelt;
+                startelt.first = head;
+                startelt.second = 0;
+                s.push(startelt);
 
-            bool lastPrint = 0; // Indicates whether the last thing printed was a leaf or not
-                                // 0: Last print was a  Subcommand
-                                // 1: Last print was an Operator
+                bool lastPrint = 0; // Indicates whether the last thing printed was a leaf or not
+                                    // 0: Last print was a Subcommand
+                                    // 1: Last print was an Operator
 
-            while (!(s.empty()) ) {
-                // Get top element
-                pair<Token*, int> topelt = s.top();
-                Token* curr = topelt.first;
-                int numSpaces = topelt.second;
-                s.pop();
+                while (!(s.empty()) ) {
+                    // Get top element
+                    pair<Token*, int> topelt = s.top();
+                    Token* curr = topelt.first;
+                    int numSpaces = topelt.second;
+                    s.pop();
 
-                string spaces(numSpaces, ' ');
-                if (curr->hasChildren()) {
-                    output.push_back(spaces);
-                    output.push_back(curr->stringify());
-                    output.push_back(" (");
-                    output.push_back(to_string(curr->status));
-                    output.push_back(")");
-                    output.push_back(" : {");
+                    string spaces(numSpaces, ' ');
+					output.push_back(spaces);
+					output.push_back(curr->stringify());
+					output.push_back(" (");
+					output.push_back(to_string(curr->status));
+					output.push_back(")");
                     
-                    // add right, then left so stack order prints properly
+					if (curr->hasChildren()) { // ie an Operator
+                        output.push_back(" : {");
+                        
+                        // add right, then left so stack order prints properly
 
-                    if (curr->rightChild != nullptr) {
-                        pair<Token*, int> add_to_stack;
-                        add_to_stack.first = curr->rightChild;
-                        add_to_stack.second = numSpaces + 2;
-                        s.push(add_to_stack);
-                    }
-                    
-                    if (curr->leftChild != nullptr) {
-                        pair<Token*, int> add_to_stack;
-                        add_to_stack.first = curr->leftChild;
-                        add_to_stack.second = numSpaces + 2;
-                        s.push(add_to_stack);
-                    }
-                    
-                    lastPrint = 1;
-                } else {
-                    output.push_back(spaces);
-                    output.push_back(curr->stringify());
-                    output.push_back(" (");
-                    output.push_back(to_string(curr->status));
-                    output.push_back(")");
-                    if (lastPrint == 0) {
-                        output.push_back("\n");
-                        if (numSpaces >= 2) {
-                            numSpaces -= 2;
+                        
+                        if (curr->rightChild != nullptr) {
+                            pair<Token*, int> add_to_stack;
+                            add_to_stack.first = curr->rightChild;
+                            add_to_stack.second = numSpaces + 2;
+                            s.push(add_to_stack);
                         }
-                        string lessSpaces(numSpaces, ' ');
-                        output.push_back(lessSpaces);
-                        output.push_back("}");
+
+                        if (curr->leftChild != nullptr) {
+                            pair<Token*, int> add_to_stack;
+                            add_to_stack.first = curr->leftChild;
+                            add_to_stack.second = numSpaces + 2;
+                            s.push(add_to_stack);
+                        }
+
+                        lastPrint = 1;
+                    } else {                // ie a Subcommand
+                        if (lastPrint == 0) {
+                            output.push_back("\n");
+                            if (numSpaces >= 2) {
+                                numSpaces -= 2;
+                            }
+                            string lessSpaces(numSpaces, ' ');
+                            output.push_back(lessSpaces);
+                            output.push_back("}");
+                        }
+                        lastPrint = 0;
                     }
-                    lastPrint = 0;
+                    output.push_back("\n");
                 }
-                output.push_back("\n");
+                return joinVector(output);
             }
-            return joinVector(output);
+            return "";
         }
 		bool operator==(CommandTree &rct) {
             // Method: Use DFS to compare each node in place in trees.
@@ -211,8 +266,64 @@ class CommandTree {
 
             return true;
 		}
+	private:
+        // preorder, bc why not
+        void delChildren(Token*& root) {
+
+            // BC: root is nullptr
+            if (root == nullptr) return;
+
+            // BC: root has no children
+            if (!root->hasChildren()) {
+                delete root;
+                root = nullptr;
+                return;
+            }
+
+            // Else, call this on root's left and root's right
+            if (root->leftChild != nullptr)
+                delChildren(root->leftChild);
+            if (root->rightChild != nullptr)
+                delChildren(root->rightChild);
+
+            // With all of root's children gone, delete it and return
+            delete root;
+            root = nullptr;
+
+            return;
+
+        }
+
     protected:
         Token* head;
 };
 
-#endif
+class RShell {
+    public:
+		RShell() {}
+		RShell(string filename) {
+			// TODO: Make this take in .rshellrc and set up configData accordingly
+		}
+		virtual ~RShell() {
+			if (currentTree != nullptr) {
+				delete currentTree;
+			}
+		}
+
+		void makeCommandTree(string);
+		int executeCommandTree();
+		
+		//Member variables;
+		CommandTree* currentTree = nullptr;
+		unordered_map <string, string> configData;
+		bool DEBUG = true;
+   
+  	private: 
+		bool checkBuiltin(vector<string>);
+		void constructSubTree(const vector<Token*>&, int);
+		vector<string> groupQuotes(vector<string>);
+		vector <string> filterComments (vector <string>);
+		vector<Token*> tokenize(vector<string>);
+		void constructExpressionTree(vector<string>);
+};
+

@@ -14,7 +14,7 @@
 
 using namespace std;
 
-void constructSubTree(vector<Token*>& allNodes, int currPos) {
+void RShell::constructSubTree(const vector<Token*>& allNodes, int currPos) {
     // Constructs a three subgroup, then recurses
     //         ...
     //       B
@@ -33,19 +33,29 @@ void constructSubTree(vector<Token*>& allNodes, int currPos) {
 	}
 }
 
-CommandTree constructExpressionTree(vector<Token*> objs) {
-	CommandTree tree;
+void RShell::constructExpressionTree(vector<string> Vin) {
+
+	vector<Token*> objs = tokenize(Vin);
+
+	// Sanity check
+	if (currentTree != nullptr) {
+		if (DEBUG) {
+			cout << "Somehow the deletion of currentTree was missed..." << endl;
+		}
+		delete currentTree;
+		currentTree = nullptr;
+	}
+
+	currentTree = new CommandTree();
 
 	if (objs.size() != 0) {
 			if (objs.size() == 1) {	 		// Trivial case
-				tree.setHead(objs[0]);
+				currentTree->setHead(objs[0]);
 			} else {						// Constructed directly from inorder using left precedence
-				tree.setHead(objs[objs.size()-2]);
+				currentTree->setHead(objs[objs.size()-2]);
 				constructSubTree(objs, objs.size()-1);
 			}
 	}
-
-	return tree;
 }
 
 #endif

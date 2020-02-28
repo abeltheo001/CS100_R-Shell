@@ -5,7 +5,7 @@
 #include <vector>
 #include "rshellutils.h"
 #include <cstdio>
-
+#include "rshellclasses.h"
 // Input here is {"echo", "\"Hello", "World\""}. Want it to instead be {"echo", ""Hello world""}.
 // Edge case: echo "Hello || world"aaa prints "Hello || worldaaa". I suspect this means the execvp command
 //     was fed {"echo", ""Hello || world"aaa"}. As a result, quotes may be inside preexisting strings instead
@@ -14,7 +14,7 @@
 
 using namespace std;
 
-vector<string> groupQuotes(vector<string> Vin) {
+vector<string> RShell::groupQuotes(vector<string> Vin) {
 	vector<string> grouped;
 	vector<string> buffer;	
 	bool state = 0; // 0 = normal mode. passes words from Vin to grouped
