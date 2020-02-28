@@ -63,7 +63,8 @@ class Subcommand : public Token {
 				status = 1;
 			}
 			
-		}    
+		} 
+		else {
 
 		char** chararr = convertVectorToCharArray(content);
 		status = executeCharArray(chararr);
@@ -77,6 +78,7 @@ class Subcommand : public Token {
 		    }
 
 		delete[] chararr;
+		}
 
 		return status;
 	}	
