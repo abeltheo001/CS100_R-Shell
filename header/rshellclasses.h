@@ -123,7 +123,7 @@ class Subcommand : public Token {
 		else 
 		{
 			struct stat check;
-			return (stat(content[2].c_str(), &check) == 0);
+			return (stat(content[1].c_str(), &check) == 0);
 			//checks if the file/directory exists
 		 
 		}
