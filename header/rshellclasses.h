@@ -7,6 +7,7 @@
 #include <queue>
 #include <cassert>
 #include <unordered_map>
+#include <sys/stat.h>
 #include "rshellutils.h"
 #include "executeCharArray.h"
 #include "convertVectorToCharArray.h"
@@ -40,25 +41,93 @@ class Subcommand : public Token {
 		bool operator==(Subcommand const rhs) const {
 			return (this->content == rhs.content);
 		}
-        virtual int execute() { 
-            if (content[0] == "exit") {
-                exit(0);
-            }
-            
-            char** chararr = convertVectorToCharArray(content);
-            status = executeCharArray(chararr);
+
+        virtual int execute() {
+ 
+		if (content[0] == "exit") {
+			exit(0);
+		 }
+		
+		else if (content[0] == "test")	
+		{
+			if (test() == true)
+			{ 
+				cout << "(True)" << endl;
+				status = 0;
+			}
+			else
+			{ 
+				cout << "(False)" << endl;
+				status = 1;
+			}
 			
-			if (status == -1) {
-				cout << "RSHELL: Command not found!" << endl;
+		}    
+
+		char** chararr = convertVectorToCharArray(content);
+		status = executeCharArray(chararr);
+				
+		if (status == -1) {
+			cout << "RSHELL: Command not found!" << endl;
 			}
 
-            for (int i = 0; i < content.size(); i++) {
-                delete[] chararr[i];
-            }
-            delete[] chararr;
+		    for (int i = 0; i < content.size(); i++) {
+			delete[] chararr[i];
+		    }
 
-			return status;
+		delete[] chararr;
+
+		return status;
+	}	
+
+	bool test()
+	{
+		if (content[1] == "-e")
+		{
+			struct stat check;
+			return (stat(content[2].c_str(), &check) == 0);
+			//checks if the file/directory exists
 		}
+		else if (content[1] == "-f")
+		{
+			//checks if the file/directory exists and is a regular file
+			struct stat check;
+			if (stat(content[2].c_str(), &check) == 0)
+			{
+				if (check.st_mode & S_IFREG)
+				{
+					return true; 
+				}
+				else{
+					return false;}
+			}
+
+	
+		}
+		else if (content[1] == "-d")
+		{
+			struct stat check;
+			if (stat(content[2].c_str(),&check) == 0)
+			{
+				if (check.st_mode & S_IFDIR)
+				{
+					return true; 
+				}
+				else{
+					return false;}
+
+			}
+			//checks if the file/directory exists and is a directory
+		}
+		else 
+		{
+			struct stat check;
+			return (stat(content[2].c_str(), &check) == 0);
+			//checks if the file/directory exists
+		 
+		}
+
+
+	}
 };
 
 class Operator : public Token {
@@ -112,6 +181,9 @@ class Operator : public Token {
 			return this->status;
         }
 };
+
+//Create AND, OR, SEMICOLOR TOKENS. 
+//
 
 class CommandTree {
     public:
@@ -326,4 +398,4 @@ class RShell {
 		vector<Token*> tokenize(vector<string>);
 		void constructExpressionTree(vector<string>);
 };
-
+#endif
