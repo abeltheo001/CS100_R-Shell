@@ -58,7 +58,6 @@ void RShell::makeCommandTree(string userInput)
 	// 4. Group words/quotes into Tokens, and merge them into a CommandTree.
 	constructExpressionTree(words); // No returns since it constructs into our currentTree member variable
 	if (DEBUG) {
-		cout << "CommandTree construction complete! CommandTree pre-execution:" << endl;
 		cout << currentTree->stringify();
 	}
 

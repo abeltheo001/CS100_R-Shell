@@ -56,7 +56,7 @@ class Subcommand : public Token {
             else if (content[0] == "exit") {
 				GLOBAL_EXIT_STATUS = 1;
 				status = 0;
-				return status;
+				return status;}
 			else if (content[0] == "test")	{
 				if (test() == true) { 
 					cout << "(True)" << endl;
@@ -223,15 +223,84 @@ class ParenthesisToken : public Token {
 		this->status = leftChild->execute();
 		return this->status;
 	}
-}
+};
 
 class TestToken : public Token {
+	public: 
 	// Holds stuff from [   ]
 	// So this->content = {"-e", "path/to/file"} or something similar.
+	TestToken(vector<string> V) { 	
+		content = V;
+	}
 	
+	/*bool operator==(TestToken const rhs) const {
+		return (this->content = rhs.content);
+	}*/
 	
+	virtual int execute() {
+		if (content[0] == "-e")
+		{
+			struct stat check;
+			if (stat(content[0].c_str(), &check) == 0) {
+				return this->status = 0;
+			}
+			else 
+			{
+				return this->status = 1;
+			}
+			//checks if the file/directory exists
+		}
+		else if (content[0] == "-f")
+		{
+			//checks if the file/directory exists and is a regular file
+			struct stat check;
+			if (stat(content[1].c_str(), &check) == 0)
+			{
+				if (check.st_mode & S_IFREG)
+				{
+					return this->status = 0; 
+				}
+				else {
+					return this->status = 1;
+				}
+			}
+
 	
-}
+		}
+		else if (content[0] == "-d")
+		{
+			struct stat check;
+			if (stat(content[1].c_str(),&check) == 0)
+			{
+				if (check.st_mode & S_IFDIR)
+				{
+					return this->status = 0; 
+				}
+				else 
+				{
+					return this->status = 1;
+				}
+
+			}
+			//checks if the file/directory exists and is a directory
+		}
+		else 
+		{
+			struct stat check;
+			if (stat(content[0].c_str(), &check) == 0) {
+				return this->status = 0;
+			}
+			else 
+			{
+				return this->status = 1;
+			}
+			//checks if the file/directory exists
+		 
+		}
+
+	}
+	
+};
 
 
 class CommandTree {
