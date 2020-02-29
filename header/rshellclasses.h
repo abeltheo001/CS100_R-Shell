@@ -37,7 +37,13 @@ class Token {
         vector<string> content;
         Token* leftChild = nullptr;
         Token* rightChild = nullptr;
-        int status = -2; // Current exit status of Token. -2 is "hasn't run yet"
+        int status = -2; // Current exit status of Token.
+		// Meanings of status:
+		// -3: Subcommand segfaulted when we tried to run it with execvp
+		// -2: Token has not run
+		// -1: Subcommand not found
+		// 0: Subcommand ran successfully
+		// anything else: Subcommand failed
 		bool isOperator;
 };
 
