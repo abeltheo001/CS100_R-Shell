@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <stack>
-#include <queue>
+#include <deque>
 #include <cassert>
 #include <unordered_map>
 #include <stdlib.h>
@@ -37,51 +37,30 @@ class Token {
         vector<string> content;
         Token* leftChild = nullptr;
         Token* rightChild = nullptr;
-        int status = -2; // Current exit status of Token. -2 is "hasn't run yet"
+        int status = -2; // Current exit status of Token.
+		// Meanings of status:
+		// -3: Subcommand segfaulted when we tried to run it with execvp
+		// -2: Token has not run
+		// -1: Subcommand not found
+		// 0: Subcommand ran successfully
+		// anything else: Subcommand failed
+		bool isOperator;
 };
 
 class Subcommand : public Token {
     public:
         virtual ~Subcommand() {}
-        Subcommand(vector<string> V) { content = V; }
+        Subcommand(vector<string> V) { 
+			content = V; 
+			isOperator = false;
+		}
+
+        virtual string stringify() { return "Subcommand: " + joinVector(content, ' '); }
+
 		bool operator==(Subcommand const rhs) const {
 			return (this->content == rhs.content);
 		}
         
-		virtual int execute() {
-			if (GLOBAL_EXIT_STATUS == 1) {
-				// Do nothing
-				return -2;
-			}
-            else if (content[0] == "exit") {
-				GLOBAL_EXIT_STATUS = 1;
-				status = 0;
-				return status;
-			else if (content[0] == "test")	{
-				if (test() == true) { 
-					cout << "(True)" << endl;
-					status = 0;
-				} else { 
-					cout << "(False)" << endl;
-					status = 1;
-				}	
-			} else { 
-				char** chararr = convertVectorToCharArray(content);
-				status = executeCharArray(chararr);
-				
-				if (status == -1) {
-					cout << "RSHELL: Command not found!" << endl;
-				}
-
-				for (int i = 0; i < content.size()+1; i++) {
-					delete[] chararr[i];
-				}
-				delete[] chararr;
-
-				return status;
-			}
-		}
-
 		bool test()
 		{
 			if (content[1] == "-e")
@@ -129,12 +108,52 @@ class Subcommand : public Token {
 			 
 			}
 		}
+
+		virtual int execute() {
+			if (GLOBAL_EXIT_STATUS == 1) {
+				// Do nothing
+				return -2;
+			}
+            else if (content[0] == "exit") {
+				GLOBAL_EXIT_STATUS = 1;
+				status = 0;
+				return status;
+			} else if (content[0] == "test") {
+				if (test() == true) { 
+					cout << "(True)" << endl;
+					status = 0;
+				} else { 
+					cout << "(False)" << endl;
+					status = 1;
+				}	
+			} else { 
+				char** chararr = convertVectorToCharArray(content);
+				status = executeCharArray(chararr);
+				
+				if (status == -1) {
+					cout << "RSHELL: Command not found!" << endl;
+				}
+
+				for (int i = 0; i < content.size()+1; i++) {
+					delete[] chararr[i];
+				}
+				delete[] chararr;
+
+				return status;
+			}
+		}
+
 };
 
 class AndToken: public Token {
 	public: 
 			
-		AndToken(vector<string> V) { content = V; }
+		AndToken(vector<string> V) { 
+			content = V; 
+			isOperator = true;
+		}
+
+        virtual string stringify() { return "AndToken: " + joinVector(content, ' '); }
 
 		bool operator==(AndToken const rhs) const {
 			return (this->content == rhs.content);
@@ -167,7 +186,12 @@ class AndToken: public Token {
 
 class OrToken: public Token {
 	public: 
-		OrToken(vector<string> V) { content = V; }
+		OrToken(vector<string> V) { 
+			content = V; 
+			isOperator = true;
+		}
+
+        virtual string stringify() { return "OrToken: " + joinVector(content, ' '); }
 
 		bool operator==(OrToken const rhs) const {
 			return (this->content == rhs.content);
@@ -200,8 +224,13 @@ class OrToken: public Token {
 
 class SemiToken: public Token {
 	public:
-		SemiToken(vector<string> V) {content = V; }
+		SemiToken(vector<string> V) {
+			content = V; 
+			isOperator = true;
+		}
 		
+        virtual string stringify() { return "SemiToken: " + joinVector(content, ' '); }
+
 		bool operator==(SemiToken const rhs) const {
 			return (this->content == rhs.content); 
 		}
@@ -214,24 +243,60 @@ class SemiToken: public Token {
 };
 
 class ParenthesisToken : public Token {
-	// Acts like a decorator
-	ParenthesisToken(Token* c) {
-		leftChild = c;
-	}
+	public:
+		// Acts like a decorator
+		ParenthesisToken(deque<Token*> inside) {
+			interior = inside;
+			isOperator = false;
+		}
 
-	virtual int execute() {
-		this->status = leftChild->execute();
-		return this->status;
-	}
-}
+        virtual string stringify(int currDepth=0) { 
+			vector<string> outputV;
+			if (currDepth != 0) {
+				string preindent(currDepth, ' ');
+				outputV.push_back(preindent + "ParenthesisToken:");
+			} else {	
+				outputV.push_back("ParenthesisToken:");
+			}
+			string indent(currDepth+4, ' ');
+
+			for (Token* t : interior) {
+				ParenthesisToken* check = dynamic_cast<ParenthesisToken*>(t);
+				if (check != nullptr) {
+					outputV.push_back(indent + check->stringify(currDepth+4));
+				} else {
+					outputV.push_back(indent + t->stringify());
+				}
+			}
+			return joinVector(outputV, "\n");
+		}
+
+		virtual int execute() { // Placeholder
+			return 0;
+		}
+
+	//	virtual int execute() {
+	//		shuntingExecute(interior);
+	//	}
+
+		deque<Token*> interior;
+};
 
 class TestToken : public Token {
-	// Holds stuff from [   ]
-	// So this->content = {"-e", "path/to/file"} or something similar.
-	
-	
-	
-}
+	public:
+		// Holds stuff from [   ]
+		// So this->content = {"-e", "path/to/file"} or something similar.
+		
+		TestToken(vector<string> V) {
+			content = V;
+			isOperator = false;
+		}
+
+        virtual string stringify() { return "TestToken: " + joinVector(content, ' '); }
+
+		// is not an operator	
+		
+};
 
 
 class CommandTree {
