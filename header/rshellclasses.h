@@ -45,130 +45,133 @@ class Subcommand : public Token {
 
         virtual int execute() {
  
-		if (content[0] == "exit") {
-			status = 0;
-			exit(status);
-		 }
-		
-		else if (content[0] == "test")	
-		{
-			if (test() == true)
-			{ 
-				cout << "(True)" << endl;
+			// Builtins
+			if (content[0] == "exit") {
 				status = 0;
-			}
-			else
-			{ 
-				cout << "(False)" << endl;
-				status = 1;
-			}
+				exit(status);
+			 }
 			
-		} 
-		else {
-
-		char** chararr = convertVectorToCharArray(content);
-		status = executeCharArray(chararr);
+			else if (content[0] == "test")	
+			{
+				if (test() == true)
+				{ 
+					cout << "(True)" << endl;
+					status = 0;
+				}
+				else
+				{ 
+					cout << "(False)" << endl;
+					status = 1;
+				}
 				
-		if (status == -1) {
-			cout << "RSHELL: Command not found!" << endl;
-			}
+			} 
+			else {
 
-		    for (int i = 0; i < content.size(); i++) {
-			delete[] chararr[i];
-		    }
-
-		delete[] chararr;
-		}
-
-		return status;
-	}	
-
-	bool test()
-	{
-		if (content[1] == "-e")
-		{
-			struct stat check;
-			return (stat(content[2].c_str(), &check) == 0);
-			//checks if the file/directory exists
-		}
-		else if (content[1] == "-f")
-		{
-			//checks if the file/directory exists and is a regular file
-			struct stat check;
-			if (stat(content[2].c_str(), &check) == 0)
-			{
-				if (check.st_mode & S_IFREG)
-				{
-					return true; 
+			char** chararr = convertVectorToCharArray(content);
+			status = executeCharArray(chararr);
+					
+			if (status == -1) {
+				cout << "RSHELL: Command not found!" << endl;
 				}
-				else{
-					return false;}
-			}
 
-	
-		}
-		else if (content[1] == "-d")
-		{
-			struct stat check;
-			if (stat(content[2].c_str(),&check) == 0)
-			{
-				if (check.st_mode & S_IFDIR)
-				{
-					return true; 
+				for (int i = 0; i < content.size(); i++) {
+				delete[] chararr[i];
 				}
-				else{
-					return false;}
 
+			delete[] chararr;
 			}
-			//checks if the file/directory exists and is a directory
+
+			return status;
 		}
-		else 
+
+		bool test()
 		{
-			struct stat check;
-			return (stat(content[1].c_str(), &check) == 0);
-			//checks if the file/directory exists
-		 
+			if (content[1] == "-e")
+			{
+				struct stat check;
+				return (stat(content[2].c_str(), &check) == 0);
+				//checks if the file/directory exists
+			}
+			else if (content[1] == "-f")
+			{
+				//checks if the file/directory exists and is a regular file
+				struct stat check;
+				if (stat(content[2].c_str(), &check) == 0)
+				{
+					if (check.st_mode & S_IFREG)
+					{
+						return true; 
+					}
+					else{
+						return false;}
+				}
+
+		
+			}
+			else if (content[1] == "-d")
+			{
+				struct stat check;
+				if (stat(content[2].c_str(),&check) == 0)
+				{
+					if (check.st_mode & S_IFDIR)
+					{
+						return true; 
+					}
+					else{
+						return false;}
+
+				}
+				//checks if the file/directory exists and is a directory
+			}
+			else 
+			{
+				struct stat check;
+				return (stat(content[1].c_str(), &check) == 0);
+				//checks if the file/directory exists
+			 
+			}
 		}
-
-
-	}
 };
 
 class AndToken: public Token {
-public: 
-	    
-	AndToken(vector<string> V) { content = V; }
+	public: 
+			
+		AndToken(vector<string> V) { content = V; }
 
-	bool operator==(AndToken const rhs) const {
+		bool operator==(AndToken const rhs) const {
 			return (this->content == rhs.content);
 		}
 
-        virtual int execute() {
-            int statusLeft, statusRight = -2;
-            statusLeft = leftChild->execute();
-            
-            if (statusLeft == 0) {
-                statusRight = rightChild->execute();
-		if (statusRight == 0)
-		{
-			this->status = 0;
-		}
-		else 
-		{ this->status = 1;}
-            }
-	    else {
-  	     this->status = 1;}
+		virtual int execute() {
+			int statusLeft, statusRight = -2;
+			statusLeft = leftChild->execute();
+			
+			if (statusLeft == 0) {
+				statusRight = rightChild->execute();
+				if (statusRight == 0)
+				{
+					this->status = 0;
+				}
+				else 
+				{ 
+					this->status = 1;
+				}
+			}
+			else 
+			{
+				this->status = 1;
+			}
 
-	    return this->status; 
-        }
+			return this->status; 
+		}
 
 };
 
 class OrToken: public Token {
-public: 
-	OrToken(vector<string> V) { content = V; }
+	public: 
+		OrToken(vector<string> V) { content = V; }
 
-	bool operator==(OrToken const rhs) const {
+		bool operator==(OrToken const rhs) const {
 			return (this->content == rhs.content);
 		}
 
@@ -176,49 +179,40 @@ public:
             int statusLeft, statusRight = -2;
             statusLeft = leftChild->execute();
             
-            if (statusLeft != 0) {
+            if (statusLeft != 0) 
+			{
                 statusRight = rightChild->execute();
-		if (statusRight == 0)
-		{
-			this->status = 0;
+				if (statusRight == 0)
+				{
+					this->status = 0;
+				}
+				else 
+				{ 
+					this->status = 1;
+				}
+			}
+			else 
+			{
+				this->status = 0;
+			}
+
+			return this->status; 
 		}
-		else 
-		{ this->status = 1;}
-            }
-	    else {
-  	     this->status = 1;}
-
-	    return this->status; 
-        }
-
 };
 
 class SemiToken: public Token {
-public:
-	SemiToken(vector<string V) {content = V; }
-	
-	bool operator==(SemiToken const rhs) const {
-		return (this->content == rhs.content); }
+	public:
+		SemiToken(vector<string> V) {content = V; }
+		
+		bool operator==(SemiToken const rhs) const {
+			return (this->content == rhs.content); 
+		}
 
-	virtual int execute() { 
-		int statusLeft, statusRight = -2;
-		statusLeft = leftChild-> execute();
-
-		if (content[0] == ";") {
-			statusRight = rightChild->execute();
-			if (statusRight == 0) {
-			this->status = 0;
-			}
-		else 
-		{ this->status = 1;}
-            }
-	else { this->status = 1;}
-	
-	return this->status;
-	}
+		virtual int execute() { 
+			leftChild->execute();
+			this->status = rightChild->execute();
+		}
 };
-//Create AND, OR, SEMICOLOR TOKENS. 
-//
 
 class CommandTree {
     public:

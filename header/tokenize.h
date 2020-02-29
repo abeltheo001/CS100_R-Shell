@@ -28,8 +28,9 @@ vector<Token*> RShell::tokenize(vector<string> Vin) {
             if (buffer.size() > 0) {
                 Subcommand* subc = new Subcommand(buffer);
                 vector<string> oplist = {*it};
-		//Check for specific operator and create said operator if found.
-                Operator* op = new Operator(oplist);
+                
+				
+				Operator* op = new Operator(oplist);
                 
 				grouped.push_back(subc);
                 grouped.push_back(op);
