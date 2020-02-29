@@ -54,35 +54,7 @@ class Subcommand : public Token {
 			content = V; 
 			isOperator = false;
 		}
-<<<<<<< HEAD
-        
-		virtual int execute() {
-			if (GLOBAL_EXIT_STATUS == 1) {
-				// Do nothing
-				return -2;
-			}
-            else if (content[0] == "exit") {
-				GLOBAL_EXIT_STATUS = 1;
-				status = 0;
-				return status;}
-			else if (content[0] == "test")	{
-				if (test() == true) { 
-					cout << "(True)" << endl;
-					status = 0;
-				} else { 
-					cout << "(False)" << endl;
-					status = 1;
-				}	
-			} else { 
-				char** chararr = convertVectorToCharArray(content);
-				status = executeCharArray(chararr);
-				
-				if (status == -1) {
-					cout << "RSHELL: Command not found!" << endl;
-				}
-=======
->>>>>>> master
-
+:x
         virtual string stringify() { return "Subcommand: " + joinVector(content, ' '); }
 
 		bool operator==(Subcommand const rhs) const {
