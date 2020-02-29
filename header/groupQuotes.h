@@ -60,7 +60,7 @@ vector<string> RShell::groupQuotes(vector<string> Vin) {
        		perror(errormsg);
 	}
 
-	if (grouped.front() == '"' || grouped.back == '"') {
+	if (grouped.front() == "\"" || grouped.back() == "\"") {
 		grouped.erase(grouped.begin());
 		grouped.erase(grouped.end());
 	}
@@ -68,4 +68,3 @@ vector<string> RShell::groupQuotes(vector<string> Vin) {
 	return grouped;
 }
 
-#endif
