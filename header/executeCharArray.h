@@ -31,7 +31,7 @@ int executeCharArray(char** charIn)
         else 
         {
             // Parent process
-            int status = -1;
+            int status = 0;
             waitpid(pid, &status, 0);
             if (WIFEXITED(status) != 0) {
                 return WEXITSTATUS(status);
