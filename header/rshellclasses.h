@@ -209,8 +209,30 @@ class SemiToken: public Token {
 		virtual int execute() { 
 			leftChild->execute();
 			this->status = rightChild->execute();
+			return this->status;
 		}
 };
+
+class ParenthesisToken : public Token {
+	// Acts like a decorator
+	ParenthesisToken(Token* c) {
+		leftChild = c;
+	}
+
+	virtual int execute() {
+		this->status = leftChild->execute();
+		return this->status;
+	}
+}
+
+class TestToken : public Token {
+	// Holds stuff from [   ]
+	// So this->content = {"-e", "path/to/file"} or something similar.
+	
+	
+	
+}
+
 
 class CommandTree {
     public:
