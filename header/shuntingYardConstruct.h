@@ -12,6 +12,8 @@
 #include "rshellutils.h"
 #include "splitOnChar.h"
 
+bool DEBUG = true;
+
 int findClose(const string& targetString, int start, char targetClose) {
 	// Given this:
 	//              |
@@ -73,21 +75,36 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 		if (backlog.size() > maxbacklog) {
 			backlog.pop_front();
 		}
-		string accepted = " ";
 
+		string accepted = " ";
+		int matchsize = -1;
 		for (int i : allowed_lengths) {
 			string query(backlog.begin()+(maxbacklog-i), backlog.end());
 			if (operators.count(query) > 0) {
 				accepted = query;
+				matchsize = i;
+				if (DEBUG == true) {
+					cout << "backlog queue matched with: \"" << accepted << "\"" << endl;
+				}
 				break;
 			}
 		}
 
 		if (accepted != " ") {
 			// Will need to double check whether this kind of pointer arithmetic is valid
-			string subcstring(buffer.begin(), buffer.end());
+			string subcstring(buffer.begin(), buffer.end()-matchsize+1);
+
+			if (DEBUG == true) {
+				cout << "generated subcommand string:" << subcstring << endl;
+			}
+
 			buffer.clear();
 			vector<string> subcvect = splitOnChar(subcstring, ' '); // strip() and split(' ')!
+
+			if (DEBUG == true) {
+				cout << "generated subcommand vector:" << endl;
+				printVector(subcvect,"; ");
+			}
 
 			lastFlushed = currPos + 1;
 
@@ -105,6 +122,10 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 
 			outputQueue.push_back(subcobj);
 
+			if (DEBUG == true) {
+				cout << "generated operator:" << myToken->stringify() << endl;
+			}
+
 			// In shunting yard, pop operators when a new one is added.
 			while (shuntingSouth.size() > 0) {
 				Token* myOp = shuntingSouth.top();
@@ -113,11 +134,12 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 			}
 			shuntingSouth.push(myToken);
 
-		} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ]
-			if (c == '[') {
-				int closepos = findClose(commandString, currPos, openToClose[c]);
-				string teststring(commandString.begin()+currPos+1, commandString.begin()+closepos);
+		} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ]	
+			int closepos = findClose(commandString, currPos, openToClose[c]);
+			string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
 			
+			if (c == '[') {
+				// TODO: Write test implementation
 			
 			} else if (c == '(') {
 
@@ -135,19 +157,45 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 				// [echo a, [echo b, echo c, &&], ||]
 				// This WILL be properly handled during execution, as opposed to the other deque.
 
-				int closepos = findClose(commandString, currPos, openToClose[c]);
-				string substring(commandString.begin()+currPos+1, commandString.begin()+closepos);
-
-				deque<Token*> retq = shuntingYardConstruct(substring);
+				deque<Token*> retq = shuntingYardConstruct(pairedstring);
 				ParenthesisToken* stuffInside = new ParenthesisToken(retq);
 
 				outputQueue.push_back(stuffInside);
 			}
+
+			// Now have to move iterator past the parenthesis end
+			it += closepos-currPos;
+			currPos += closepos-currPos;
+
 		} else {
 			buffer.push_back(c);
 		}
 		currPos += 1;
 	}
+
+	// Clear out leftover subcommand stuff
+	if (buffer.size() > 0) {
+		bool allspaces = true;
+		for (char c : buffer) {
+			if ((c != ' ') && (c != '\t')) {
+				allspaces = false;
+				break;
+			}
+		}
+		if (!(allspaces)) {
+			string finsubcstring(buffer.begin(), buffer.end());
+			vector<string> finsubcvect = splitOnChar(finsubcstring, ' ');
+			Subcommand* finsubcobj = new Subcommand(finsubcvect);
+			outputQueue.push_back(finsubcobj);
+		}
+	}
+
+	// Clear out leftover operators
+	while (shuntingSouth.size() > 0) {
+		outputQueue.push_back(shuntingSouth.top());
+		shuntingSouth.pop();
+	}
+
 	return outputQueue;
 }
 

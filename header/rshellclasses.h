@@ -48,6 +48,9 @@ class Subcommand : public Token {
 			content = V; 
 			isOperator = false;
 		}
+
+        virtual string stringify() { return "Subcommand: " + joinVector(content, ' '); }
+
 		bool operator==(Subcommand const rhs) const {
 			return (this->content == rhs.content);
 		}
@@ -144,6 +147,8 @@ class AndToken: public Token {
 			isOperator = true;
 		}
 
+        virtual string stringify() { return "AndToken: " + joinVector(content, ' '); }
+
 		bool operator==(AndToken const rhs) const {
 			return (this->content == rhs.content);
 		}
@@ -179,6 +184,8 @@ class OrToken: public Token {
 			content = V; 
 			isOperator = true;
 		}
+
+        virtual string stringify() { return "OrToken: " + joinVector(content, ' '); }
 
 		bool operator==(OrToken const rhs) const {
 			return (this->content == rhs.content);
@@ -216,6 +223,8 @@ class SemiToken: public Token {
 			isOperator = true;
 		}
 		
+        virtual string stringify() { return "SemiToken: " + joinVector(content, ' '); }
+
 		bool operator==(SemiToken const rhs) const {
 			return (this->content == rhs.content); 
 		}
@@ -233,6 +242,15 @@ class ParenthesisToken : public Token {
 		ParenthesisToken(deque<Token*> inside) {
 			interior = inside;
 			isOperator = false;
+		}
+
+        virtual string stringify() { 
+			vector<string> outputV;
+			outputV.push_back("ParenthesisToken:");
+			for (Token* t : interior) {
+				outputV.push_back("    " + t->stringify());
+			}
+			return joinVector(outputV, "\n");
 		}
 
 		virtual int execute() { // Placeholder
@@ -255,6 +273,8 @@ class TestToken : public Token {
 			content = V;
 			isOperator = false;
 		}
+
+        virtual string stringify() { return "TestToken: " + joinVector(content, ' '); }
 
 		// is not an operator	
 		
