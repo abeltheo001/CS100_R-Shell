@@ -38,12 +38,16 @@ class Token {
         Token* leftChild = nullptr;
         Token* rightChild = nullptr;
         int status = -2; // Current exit status of Token. -2 is "hasn't run yet"
+		bool isOperator;
 };
 
 class Subcommand : public Token {
     public:
         virtual ~Subcommand() {}
-        Subcommand(vector<string> V) { content = V; }
+        Subcommand(vector<string> V) { 
+			content = V; 
+			isOperator = false;
+		}
 		bool operator==(Subcommand const rhs) const {
 			return (this->content == rhs.content);
 		}
@@ -134,7 +138,10 @@ class Subcommand : public Token {
 class AndToken: public Token {
 	public: 
 			
-		AndToken(vector<string> V) { content = V; }
+		AndToken(vector<string> V) { 
+			content = V; 
+			isOperator = true;
+		}
 
 		bool operator==(AndToken const rhs) const {
 			return (this->content == rhs.content);
@@ -167,7 +174,10 @@ class AndToken: public Token {
 
 class OrToken: public Token {
 	public: 
-		OrToken(vector<string> V) { content = V; }
+		OrToken(vector<string> V) { 
+			content = V; 
+			isOperator = true;
+		}
 
 		bool operator==(OrToken const rhs) const {
 			return (this->content == rhs.content);
@@ -200,7 +210,10 @@ class OrToken: public Token {
 
 class SemiToken: public Token {
 	public:
-		SemiToken(vector<string> V) {content = V; }
+		SemiToken(vector<string> V) {
+			content = V; 
+			isOperator = true;
+		}
 		
 		bool operator==(SemiToken const rhs) const {
 			return (this->content == rhs.content); 
@@ -215,21 +228,23 @@ class SemiToken: public Token {
 
 class ParenthesisToken : public Token {
 	// Acts like a decorator
-	ParenthesisToken(Token* c) {
-		leftChild = c;
+	ParenthesisToken(vector<Token*> inside) {
+		interior = inside;
+		isOperator = false;
 	}
 
 	virtual int execute() {
-		this->status = leftChild->execute();
-		return this->status;
+		shuntingExecute(inside);
 	}
+
+	vector<Token*> interior;
 }
 
 class TestToken : public Token {
 	// Holds stuff from [   ]
 	// So this->content = {"-e", "path/to/file"} or something similar.
 	
-	
+	// is not an operator	
 	
 }
 
