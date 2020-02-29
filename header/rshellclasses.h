@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <stack>
-#include <queue>
+#include <deque>
 #include <cassert>
 #include <unordered_map>
 #include <stdlib.h>
@@ -52,40 +52,6 @@ class Subcommand : public Token {
 			return (this->content == rhs.content);
 		}
         
-		virtual int execute() {
-			if (GLOBAL_EXIT_STATUS == 1) {
-				// Do nothing
-				return -2;
-			}
-            else if (content[0] == "exit") {
-				GLOBAL_EXIT_STATUS = 1;
-				status = 0;
-				return status;
-			else if (content[0] == "test")	{
-				if (test() == true) { 
-					cout << "(True)" << endl;
-					status = 0;
-				} else { 
-					cout << "(False)" << endl;
-					status = 1;
-				}	
-			} else { 
-				char** chararr = convertVectorToCharArray(content);
-				status = executeCharArray(chararr);
-				
-				if (status == -1) {
-					cout << "RSHELL: Command not found!" << endl;
-				}
-
-				for (int i = 0; i < content.size()+1; i++) {
-					delete[] chararr[i];
-				}
-				delete[] chararr;
-
-				return status;
-			}
-		}
-
 		bool test()
 		{
 			if (content[1] == "-e")
@@ -133,6 +99,41 @@ class Subcommand : public Token {
 			 
 			}
 		}
+
+		virtual int execute() {
+			if (GLOBAL_EXIT_STATUS == 1) {
+				// Do nothing
+				return -2;
+			}
+            else if (content[0] == "exit") {
+				GLOBAL_EXIT_STATUS = 1;
+				status = 0;
+				return status;
+			} else if (content[0] == "test") {
+				if (test() == true) { 
+					cout << "(True)" << endl;
+					status = 0;
+				} else { 
+					cout << "(False)" << endl;
+					status = 1;
+				}	
+			} else { 
+				char** chararr = convertVectorToCharArray(content);
+				status = executeCharArray(chararr);
+				
+				if (status == -1) {
+					cout << "RSHELL: Command not found!" << endl;
+				}
+
+				for (int i = 0; i < content.size()+1; i++) {
+					delete[] chararr[i];
+				}
+				delete[] chararr;
+
+				return status;
+			}
+		}
+
 };
 
 class AndToken: public Token {
@@ -227,26 +228,37 @@ class SemiToken: public Token {
 };
 
 class ParenthesisToken : public Token {
-	// Acts like a decorator
-	ParenthesisToken(vector<Token*> inside) {
-		interior = inside;
-		isOperator = false;
-	}
+	public:
+		// Acts like a decorator
+		ParenthesisToken(deque<Token*> inside) {
+			interior = inside;
+			isOperator = false;
+		}
 
-	virtual int execute() {
-		shuntingExecute(inside);
-	}
+		virtual int execute() { // Placeholder
+			return 0;
+		}
 
-	vector<Token*> interior;
-}
+	//	virtual int execute() {
+	//		shuntingExecute(interior);
+	//	}
+
+		deque<Token*> interior;
+};
 
 class TestToken : public Token {
-	// Holds stuff from [   ]
-	// So this->content = {"-e", "path/to/file"} or something similar.
-	
-	// is not an operator	
-	
-}
+	public:
+		// Holds stuff from [   ]
+		// So this->content = {"-e", "path/to/file"} or something similar.
+		
+		TestToken(vector<string> V) {
+			content = V;
+			isOperator = false;
+		}
+
+		// is not an operator	
+		
+};
 
 
 class CommandTree {

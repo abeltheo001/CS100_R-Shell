@@ -2,6 +2,9 @@
 #include <queue>
 #include <vector>
 
+#include "rshellclasses.h"
+#include "rshelldefinition.h"
+
 using namespace std;
 
 int shuntingExecute(vector<Token*> V) {
