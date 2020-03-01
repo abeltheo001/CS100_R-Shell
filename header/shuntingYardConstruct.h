@@ -75,69 +75,78 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 			backlog.pop_front();
 		}
 
-		string accepted = " ";
-		int matchsize = -1;
-		for (int i : allowed_lengths) {
-			string query(backlog.begin()+(maxbacklog-i), backlog.end());
-			if (operators.count(query) > 0) {
-				accepted = query;
-				matchsize = i;
-				if (DEBUG == true) {
-					cout << "backlog queue matched with: \"" << accepted << "\"" << endl;
+		bool opfound = false;
+		if (currPos >= 2) {
+			string accepted = " ";
+			int matchsize = -1;
+			for (int i : allowed_lengths) {
+				string query(backlog.begin()+(maxbacklog-i), backlog.end());
+				if (operators.count(query) > 0) {
+					accepted = query;
+					matchsize = i;
+					if (DEBUG == true) {
+						cout << "backlog queue matched with: \"" << accepted << "\"" << endl;
+					}
+					break;
 				}
+			}
+
+			// If _# is the furthest right, then we just started a comment block.
+			string tworight(backlog.end()-2, backlog.end());
+			if (tworight == " #") {
 				break;
 			}
+
+
+			if (accepted != " ") {
+				opfound = true;
+				string subcstring(buffer.begin(), buffer.end()-matchsize+1);
+
+				if (DEBUG == true) {
+					cout << "generated subcommand string:" << subcstring << endl;
+				}
+
+				buffer.clear();
+				vector<string> subcvect = splitOnChar(subcstring, ' '); // strip() and split(' ')!
+
+				if (DEBUG == true) {
+					cout << "generated subcommand vector:" << endl;
+					printVector(subcvect,"; ");
+				}
+
+				lastFlushed = currPos + 1;
+
+				if (subcvect.size() > 0) {
+					// Needed for edge case of operator after ParenToken (should not insert )
+					Subcommand* subcobj = new Subcommand(subcvect);
+					outputQueue.push_back(subcobj);
+				}
+
+				// Construct specific type of Token
+				Token* myToken;
+				if (accepted == "||") {
+					myToken = new OrToken({"||"});
+				} else if (accepted == "&&") {
+					myToken = new AndToken({"&&"});
+				} else if (accepted == ";") {
+					myToken = new SemiToken({";"});
+				}
+
+				if (DEBUG == true) {
+					cout << "generated operator:" << myToken->stringify() << endl;
+				}
+
+				// In shunting yard, pop operators when a new one is added.
+				while (shuntingSouth.size() > 0) {
+					Token* myOp = shuntingSouth.top();
+					shuntingSouth.pop();
+					outputQueue.push_back(myOp);
+				}
+				shuntingSouth.push(myToken);
+			}
 		}
-		
-		//check for "", create substring and turn into subCommand. 
-
-
-		if (accepted != " ") {
-			// Will need to double check whether this kind of pointer arithmetic is valid
-			string subcstring(buffer.begin(), buffer.end()-matchsize+1);
-
-			if (DEBUG == true) {
-				cout << "generated subcommand string:" << subcstring << endl;
-			}
-
-			buffer.clear();
-			vector<string> subcvect = splitOnChar(subcstring, ' '); // strip() and split(' ')!
-
-			if (DEBUG == true) {
-				cout << "generated subcommand vector:" << endl;
-				printVector(subcvect,"; ");
-			}
-
-			lastFlushed = currPos + 1;
-
-			if (subcvect.size() > 0) {
-				// Needed for edge case of operator after ParenToken (should not insert )
-				Subcommand* subcobj = new Subcommand(subcvect);
-				outputQueue.push_back(subcobj);
-			}
-
-			// Construct specific type of Token
-			Token* myToken;
-			if (accepted == "||") {
-				myToken = new OrToken({"||"});
-			} else if (accepted == "&&") {
-				myToken = new AndToken({"&&"});
-			} else if (accepted == ";") {
-				myToken = new SemiToken({";"});
-			}
-
-			if (DEBUG == true) {
-				cout << "generated operator:" << myToken->stringify() << endl;
-			}
-
-			// In shunting yard, pop operators when a new one is added.
-			while (shuntingSouth.size() > 0) {
-				Token* myOp = shuntingSouth.top();
-				shuntingSouth.pop();
-				outputQueue.push_back(myOp);
-			}
-			shuntingSouth.push(myToken);
-
+		if (opfound) {
+			// Was already done in inner loop
 		} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ]	
 			int closepos = findClose(commandString, currPos, openToClose[c]);
 			string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
