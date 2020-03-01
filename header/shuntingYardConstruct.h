@@ -58,6 +58,7 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 	deque<char> backlog;
 	int maxbacklog = 2; // Defined by the longest operator in operators; update as needed
 	vector<int> allowed_lengths = {2, 1}; // Defined by length of each operator...
+	// TODO: Assignment 4 will cause this approach to fail (probably)
 
 	// The following vector is used for flushes to Subcommand
 	vector<char> buffer;
@@ -66,7 +67,7 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 	stack<Token*> shuntingSouth;
 	deque<Token*> outputQueue;
 
-	int lastFlushed = 0; // TODO (maybe)
+	int lastFlushed = 0;
 	int currPos = 0;
 	for (auto it = commandString.begin(); it != commandString.end(); it++) {
 		// Check if currently on something in "operators"
@@ -108,7 +109,11 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 
 			lastFlushed = currPos + 1;
 
-			Subcommand* subcobj = new Subcommand(subcvect);
+			if (subcvect.size() > 0) {
+				// Needed for edge case of operator after ParenToken (should not insert )
+				Subcommand* subcobj = new Subcommand(subcvect);
+				outputQueue.push_back(subcobj);
+			}
 
 			// Construct specific type of Token
 			Token* myToken;
@@ -119,8 +124,6 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 			} else if (accepted == ";") {
 				myToken = new SemiToken({";"});
 			}
-
-			outputQueue.push_back(subcobj);
 
 			if (DEBUG == true) {
 				cout << "generated operator:" << myToken->stringify() << endl;
@@ -175,6 +178,12 @@ deque<Token*> shuntingYardConstruct(string commandString) {
 
 	// Clear out leftover subcommand stuff
 	if (buffer.size() > 0) {
+		// No appending Subcommands after ParenTokens - this is an error
+		ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
+		if (ptest != nullptr) {
+			// TODO: throw error
+		}
+
 		bool allspaces = true;
 		for (char c : buffer) {
 			if ((c != ' ') && (c != '\t')) {
