@@ -24,10 +24,14 @@ using namespace std;
 void RShell::makeCommandDeque(string userInput)
 {
 
-	deque<Token*> resq = shuntingYardConstruct(userInput);
-	for (Token* t : resq) {
-		cout << t->stringify() << endl;
+	deque<Token*> resd = shuntingYardConstruct(userInput);
+	this->commandDeque = resd;
+	if (DEBUG) {
+		for (Token* t : this->commandDeque) {
+			cout << t->stringify() << endl;
+		}
 	}
+
 
 
 //	if (DEBUG) {
@@ -76,34 +80,40 @@ void RShell::makeCommandDeque(string userInput)
 int RShell::executeCommandDeque()
 {
 
-	return 0; // temp
+	int execres = shuntingExecute(this->commandDeque);
 
-
-	if (currentTree == nullptr) {
-		cout << "RSHELL: CommandTree is a nullptr! This is not good! Inform the developer." << endl; 
-	} else {
-		Token* head = currentTree->getHead();
-		if (head == nullptr) {
-			if (DEBUG) {
-				cout << "CommandTree was empty, so nothing to run." << endl;
-			}
-			return 0;
-		} else {	
-			head->execute(); // Will recursively call children if needed
-			
-			if (DEBUG) {
-				cout << "Execution complete! CommandTree post-execution:" << endl;
-				cout << currentTree->stringify() << endl;
-			}
-
-			int retstatus = (currentTree->getHead())->status;
-
-			delete currentTree;
-			currentTree = nullptr;
-
-			return retstatus;
-		}
+	for (Token* t : this->commandDeque) {
+		delete t;
 	}
+
+	return execres;
+
+
+	// if (currentTree == nullptr) {
+	// 	cout << "RSHELL: CommandTree is a nullptr! This is not good! Inform the developer." << endl; 
+	// } else {
+	// 	Token* head = currentTree->getHead();
+	// 	if (head == nullptr) {
+	// 		if (DEBUG) {
+	// 			cout << "CommandTree was empty, so nothing to run." << endl;
+	// 		}
+	// 		return 0;
+	// 	} else {	
+	// 		head->execute(); // Will recursively call children if needed
+			
+	// 		if (DEBUG) {
+	// 			cout << "Execution complete! CommandTree post-execution:" << endl;
+	// 			cout << currentTree->stringify() << endl;
+	// 		}
+
+	// 		int retstatus = (currentTree->getHead())->status;
+
+	// 		delete currentTree;
+	// 		currentTree = nullptr;
+
+	// 		return retstatus;
+	// 	}
+	// }
 }
 
 #endif

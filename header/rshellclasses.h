@@ -361,6 +361,20 @@ class TestToken : public Token {
 		
 };
 
+class StorageToken : public Token {
+	public:
+		StorageToken(int s) {
+			isOperator = false;
+			status = s;
+		}
+		int execute() {
+			return status;
+		}
+		string stringify() {
+			return "StorageToken."; // Should never be printed
+		}
+};
+
 
 // class CommandTree {
 //     public:
@@ -569,18 +583,21 @@ class RShell {
 		
 		// Member variables;
 		// CommandTree* currentTree = nullptr;
+		deque<Token*> commandDeque;
 		
 		unordered_map <string, string> configData;
 		bool DEBUG = true;
    
 		bool checkBuiltin(vector<string>);
+
 		void constructSubTree(const vector<Token*>&, int);
 		vector<string> groupQuotes(vector<string>);
-		vector <string> filterComments (vector <string>);
+		vector<string> filterComments (vector <string>);
 		vector<Token*> tokenize(vector<string>);
 		void constructExpressionTree(vector<string>);
+
 		deque<Token*> shuntingYardConstruct(string);
-		int shuntingExecute(vector<Token*>);
+		int shuntingExecute(deque<Token*>);
 		int findClose(const string&,int,char); 
 };
 
