@@ -54,7 +54,6 @@ class Subcommand : public Token {
 			content = V; 
 			isOperator = false;
 		}
-:x
         virtual string stringify() { return "Subcommand: " + joinVector(content, ' '); }
 
 		bool operator==(Subcommand const rhs) const {
