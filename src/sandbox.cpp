@@ -14,7 +14,6 @@ void shuntingTest()
 }
 
 int main() {
-	
 	string input = "echo a || (echo b && echo c)";
 	RShell shell = RShell();
 	

@@ -22,10 +22,10 @@ int main(int argc, char *argv[]) {
 			}
 	} else {
 		// TODO: Re-add argv support
-		// vector<string> args(argv, argv+argc);
-		// args.erase(args.begin()); // Unfortunate inefficiency...
-		// string cmd = joinVector(args, ' ');
-		// shellobj.makeCommandTree(cmd);
-		// shellobj.executeCommandTree();
+		vector<string> args(argv, argv+argc);
+		args.erase(args.begin()); // Unfortunate inefficiency...
+		string cmd = joinVector(args, ' ');
+		shellobj.makeCommandDeque(cmd);
+		shellobj.executeCommandDeque();
 	}
 }
