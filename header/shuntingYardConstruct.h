@@ -140,7 +140,11 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 			string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
 			
 			if (c == '[') {
-				// TODO: Write test implementation
+				vector<string> testContent = splitOnChar(pairedstring,' ');
+				Token* tToken;
+				tToken = new TestToken(testContent);
+				outputQueue.push_back(tToken);
+				
 			
 			} else if (c == '(') {
 
