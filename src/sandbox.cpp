@@ -16,7 +16,7 @@ void shuntingTest()
 int main() {
 	
 	string input = "echo a || (echo b && echo c)";
-	Rshell shell = Rshell();
+	RShell shell = RShell();
 	
 	shell.makeCommandTree(input);
 	shell.executeCommandTree();
