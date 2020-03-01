@@ -515,6 +515,7 @@ class RShell {
 		vector<Token*> tokenize(vector<string>);
 		void constructExpressionTree(vector<string>);
 		deque<Token*> shuntingYardConstruct(string);
+		int shuntingExecute(vector<Token*>);
 		int findClose(const string&,int,char); 
 };
 

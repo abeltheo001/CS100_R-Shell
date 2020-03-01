@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int shuntingExecute(vector<Token*> V) {
+int RShell::shuntingExecute(vector<Token*> V) {
 	stack<Token*> toExecute;
 	
 	for (Token* t : V) {
