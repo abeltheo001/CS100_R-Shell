@@ -14,7 +14,8 @@
 
 bool DEBUG = true;
 
-int findClose(const string& targetString, int start, char targetClose) {
+
+int Rshell::findClose(const string& targetString, int start, char targetClose) {
 	// Given this:
 	//              |
 	// mgoiejnoaijt ( kteopajtio []gea][]g[a((()))(()) )
@@ -40,7 +41,7 @@ int findClose(const string& targetString, int start, char targetClose) {
 	return -1;
 }
 
-deque<Token*> shuntingYardConstruct(string commandString) {
+deque<Token*> Rshell::shuntingYardConstruct(string commandString) {
 	// Want to go from input string to final deque to execute on
 	// echo a || (( false && echo c ))
 	// becomes
