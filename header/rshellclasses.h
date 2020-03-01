@@ -249,24 +249,15 @@ class ParenthesisToken : public Token {
 			isOperator = false;
 		}
 
-        virtual string stringify(int currDepth=0) { 
+        virtual string stringify() { 
 			vector<string> outputV;
-			if (currDepth != 0) {
-				string preindent(currDepth, ' ');
-				outputV.push_back(preindent + "ParenthesisToken:");
-			} else {	
-				outputV.push_back("ParenthesisToken:");
-			}
-			string indent(currDepth+4, ' ');
+			outputV.push_back("ParenthesisToken:");
+			string indent(4, ' ');
 
 			for (Token* t : interior) {
-				ParenthesisToken* check = dynamic_cast<ParenthesisToken*>(t);
-				if (check != nullptr) {
-					outputV.push_back(indent + check->stringify(currDepth+4));
-				} else {
-					outputV.push_back(indent + t->stringify());
-				}
+				outputV.push_back(indent + t->stringify());
 			}
+			outputV.push_back("}");
 			return joinVector(outputV, "\n");
 		}
 
