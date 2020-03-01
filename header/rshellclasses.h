@@ -580,7 +580,6 @@ class RShell {
 		unordered_map <string, string> configData;
 		bool DEBUG = true;
    
-  	private: 
 		bool checkBuiltin(vector<string>);
 		void constructSubTree(const vector<Token*>&, int);
 		vector<string> groupQuotes(vector<string>);
