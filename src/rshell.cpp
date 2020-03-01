@@ -13,18 +13,19 @@ int main(int argc, char *argv[]) {
 			while (currInput != "exit") {
 				cout << "$ ";
 				getline(cin, currInput);	
-				shellobj.makeCommandTree(currInput);
-				shellobj.executeCommandTree();
+				shellobj.makeCommandDeque(currInput);
+				shellobj.executeCommandDeque();
 				if (GLOBAL_EXIT_STATUS == 1) {
 					exit(0);
 				}
 				// cout << returnval << endl; // Debug
 			}
 	} else {
+		// TODO: Re-add argv support
 		vector<string> args(argv, argv+argc);
 		args.erase(args.begin()); // Unfortunate inefficiency...
 		string cmd = joinVector(args, ' ');
-		shellobj.makeCommandTree(cmd);
-		shellobj.executeCommandTree();
+		shellobj.makeCommandDeque(cmd);
+		shellobj.executeCommandDeque();
 	}
 }

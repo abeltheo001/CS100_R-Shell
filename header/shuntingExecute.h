@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int RShell::shuntingExecute(vector<Token*> V) {
+int RShell::shuntingExecute(deque<Token*> V) {
 	stack<Token*> toExecute;
 	
 	for (Token* t : V) {
@@ -23,6 +23,18 @@ int RShell::shuntingExecute(vector<Token*> V) {
 			t->rightChild = r;
 
 			t->execute();
+
+			vector<Token*> pointers = {l, r, t};
+			for (Token* currToken : pointers) {
+				StorageToken* sptr = dynamic_cast<StorageToken*>(currToken);
+				if (sptr != nullptr) {
+					delete sptr;
+				}
+			}
+
+			// Need to re-add execution value
+			StorageToken* s = new StorageToken(t->status);
+			toExecute.push(s);
 		}
 	}
 }
