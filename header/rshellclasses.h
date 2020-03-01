@@ -293,11 +293,11 @@ class TestToken : public Token {
 
 	virtual int execute()
 	{
-		if (content[1] == "-e")
+		if (content[0] == "-e")
 			{
 				struct stat check;
 				
-				if (stat(content[0].c_str(), &check) == 0) 
+				if (stat(content[1].c_str(), &check) == 0) 
 				{
 					this->status = 0;
 					return this->status;
@@ -309,11 +309,11 @@ class TestToken : public Token {
 				}
 				//checks if the file/directory exists
 			}
-			else if (content[1] == "-f")
+			else if (content[0] == "-f")
 			{
 				//checks if the file/directory exists and is a regular file
 				struct stat check;
-				if (stat(content[2].c_str(), &check) == 0)
+				if (stat(content[1].c_str(), &check) == 0)
 				{
 					if (check.st_mode & S_IFREG)
 					{
@@ -327,10 +327,10 @@ class TestToken : public Token {
 
 		
 			}
-			else if (content[1] == "-d")
+			else if (content[0] == "-d")
 			{
 				struct stat check;
-				if (stat(content[2].c_str(),&check) == 0)
+				if (stat(content[1].c_str(),&check) == 0)
 				{
 					if (check.st_mode & S_IFDIR)
 					{
