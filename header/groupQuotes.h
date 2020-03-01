@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "rshellutils.h"
 #include <cstdio>
 #include "rshellclasses.h"
@@ -55,12 +56,24 @@ vector<string> RShell::groupQuotes(vector<string> Vin) {
 
 	// If there's still stuff on the buffer, something is wrong
 	if (buffer.size() > 0) {
-        string s = "No end quote in quote grouping.";
-        const char* errormsg = s.c_str();
-        perror(errormsg);
+        	string s = "No end quote in quote grouping.";
+        	const char* errormsg = s.c_str();
+       		perror(errormsg);
+	}
+/*
+	if (grouped.front() == "\"" || grouped.back() == "\"") {
+		grouped.erase(grouped.begin());
+		grouped.erase(grouped.end());
 	}
 
+*/
+
+	
+
+	for (vector<string>::iterator it = grouped.begin(); it != grouped.end(); it++)
+	{	if (*it == "\"") 
+			grouped.erase(it); 
+	}
 	return grouped;
 }
 
-#endif

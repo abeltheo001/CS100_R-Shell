@@ -1,41 +1,26 @@
 #include <iostream>
-#include "parser.h"
-#include "executor.h"
+#include <iostream>
+#include <vector>
+#include <string>
+#include "../header/rshellclasses.h"
+#include "../header/rshelldefinition.h"
+
 
 using namespace std;
 
-void testLeaf() {
-
-    vector<string> left = {"echo", "hello", "world"};
-
-    CommandTree ct;
-    ct.setHead(new Subcommand(left)); // gets deleted in ct's dtor
-
-    int retval = executor(ct);
-}
-
-void testConnector() {
-
-    vector<string> left_v = {"echo", "Pog"};
-    vector<string> right_v = { "echo", "Champ" };
-    vector<string> op_v = { "||" };
-
-    Token* op = new Operator(op_v);
-    op->leftChild = new Subcommand(left_v);
-    op->rightChild = new Subcommand(right_v);
-
-    CommandTree ct;
-    ct.setHead(op);
-
-    executor(ct);
-
+void shuntingTest()
+{
+	
 }
 
 int main() {
+	
+	string input = "echo a || (echo b && echo c)";
+	RShell shell = RShell();
+	
+	shell.makeCommandTree(input);
+	shell.executeCommandTree();
 
-    // testLeaf(); // works, no mem leak
-
-    testConnector();
-
-    return 0;
+	
+	return 0;
 }
