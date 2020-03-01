@@ -181,9 +181,11 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	// Clear out leftover subcommand stuff
 	if (buffer.size() > 0) {
 		// No appending Subcommands after ParenTokens - this is an error
-		ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
-		if (ptest != nullptr) {
-			// TODO: throw error
+		if (outputQueue.size() > 0) {
+			ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
+			if (ptest != nullptr) {
+				// TODO: throw error
+			}
 		}
 
 		bool allspaces = true;
