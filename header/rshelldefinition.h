@@ -21,7 +21,7 @@
 
 using namespace std;
 
-void RShell::makeCommandTree(string userInput)
+void RShell::makeCommandDeque(string userInput)
 {
 
 	deque<Token*> resq = shuntingYardConstruct(userInput);
@@ -73,7 +73,7 @@ void RShell::makeCommandTree(string userInput)
 
 }
 
-int RShell::executeCommandTree()
+int RShell::executeCommandDeque()
 {
 
 	return 0; // temp

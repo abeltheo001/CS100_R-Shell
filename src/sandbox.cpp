@@ -18,8 +18,8 @@ int main() {
 	string input = "echo a || (echo b && echo c)";
 	RShell shell = RShell();
 	
-	shell.makeCommandTree(input);
-	shell.executeCommandTree();
+	shell.makeCommandDeque(input);
+	shell.executeCommandDeque();
 
 	
 	return 0;

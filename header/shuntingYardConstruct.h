@@ -14,7 +14,6 @@
 
 bool DEBUG = true;
 
-
 int RShell::findClose(const string& targetString, int start, char targetClose) {
 	// Given this:
 	//              |
