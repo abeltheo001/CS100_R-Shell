@@ -6,7 +6,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
 	// unordered_map<string, bool> config = initConfig("../.rshellrc");
 	
-	RShell shellobj = RShell();
+	RShell shellobj = RShell(false);
 
 	if (argc == 1) {
 			string currInput = "";

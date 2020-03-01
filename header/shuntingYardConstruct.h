@@ -88,6 +88,9 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 				break;
 			}
 		}
+		
+		//check for "", create substring and turn into subCommand. 
+
 
 		if (accepted != " ") {
 			// Will need to double check whether this kind of pointer arithmetic is valid

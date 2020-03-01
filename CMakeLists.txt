@@ -15,10 +15,8 @@ ADD_EXECUTABLE(rshell
 ADD_EXECUTABLE(sandbox
  src/sandbox.cpp
 )
-
 #ADD_EXECUTABLE(test
-#	test.cpp
-#)
+#	test.cpp)
 
 #TARGET_LINK_LIBRARIES(test gtest)
 #TARGET_COMPILE_DEFINITIONS(test PRIVATE gtest_disable_pthreads=ON)
