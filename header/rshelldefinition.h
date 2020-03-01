@@ -34,6 +34,8 @@ int RShell::executeCommandDeque()
 
 	deconstructDeque();
 
+	this->commandDeque.clear();
+
 	return execres;
 }
 

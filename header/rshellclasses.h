@@ -278,14 +278,14 @@ class TestToken : public Token {
 		// Holds stuff from [   ]
 		// So this->content = {"-e", "path/to/file"} or something similar.
 		
-	TestToken(vector<string> V) {
+		TestToken(vector<string> V) {
 			content = V;
 			isOperator = false;
 		}
 
-	virtual int execute()
-	{
-		if (content[0] == "-e")
+		virtual int execute()
+		{
+			if (content[0] == "-e")
 			{
 				struct stat check;
 				
@@ -315,13 +315,13 @@ class TestToken : public Token {
 						this->status = 0;
 						return this->status; 
 					}
-					else{
+					else
+					{
 						cout << "(False)" << endl;
 						this->status = 1;
-						return this->status;}
+						return this->status;
+					}
 				}
-
-		
 			}
 			else if (content[0] == "-d")
 			{
@@ -361,13 +361,9 @@ class TestToken : public Token {
 					return this->status;
 				}	
 				//checks if the file/directory exists
-			 
 			}
 		}
         virtual string stringify() { return "TestToken: " + joinVector(content, ' '); }
-
-		// is not an operator	
-		
 };
 
 class StorageToken : public Token {

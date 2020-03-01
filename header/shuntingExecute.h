@@ -13,7 +13,9 @@ using namespace std;
 int RShell::shuntingExecute(deque<Token*> V) {
 	stack<Token*> toExecute;
 
-	if (V.size() == 1) {
+	if (V.size() == 0) {
+		return 0;
+	} else if (V.size() == 1) {
 		return V[0]->execute();
 	} else {
 		for (Token* t : V) {
