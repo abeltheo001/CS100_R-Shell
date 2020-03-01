@@ -299,11 +299,13 @@ class TestToken : public Token {
 				
 				if (stat(content[1].c_str(), &check) == 0) 
 				{
+					cout << "(True)" << endl;
 					this->status = 0;
 					return this->status;
 				}
 				else 
 				{	
+					cout << "(False)" << endl;
 					this->status = 1;
 					return this->status;
 				}
@@ -317,10 +319,12 @@ class TestToken : public Token {
 				{
 					if (check.st_mode & S_IFREG)
 					{
+						cout << "(True)" << endl;
 						this->status = 0;
 						return this->status; 
 					}
 					else{
+						cout << "(False)" << endl;
 						this->status = 1;
 						return this->status;}
 				}
@@ -334,11 +338,13 @@ class TestToken : public Token {
 				{
 					if (check.st_mode & S_IFDIR)
 					{
+						cout << "(True)" << endl;
 						this->status = 0;
 						return this->status; 
 					}
 					else 
 					{
+						cout << "(False)" << endl;
 						this->status = 1;
 						return this->status;
 					}
@@ -352,11 +358,13 @@ class TestToken : public Token {
 				
 				if (stat(content[0].c_str(), &check) == 0) 
 				{
+					cout << "(True)" << endl;
 					this->status = 0;
 					return this->status;
 				}
 				else 
 				{
+					cout << "(False)" << endl;
 					this->status = 1;
 					return this->status;
 				}	
