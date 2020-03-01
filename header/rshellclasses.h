@@ -415,12 +415,6 @@ class RShell {
    
 		bool checkBuiltin(vector<string>);
 
-		void constructSubTree(const vector<Token*>&, int);
-		vector<string> groupQuotes(vector<string>);
-		vector<string> filterComments (vector <string>);
-		vector<Token*> tokenize(vector<string>);
-		void constructExpressionTree(vector<string>);
-
 		deque<Token*> shuntingYardConstruct(string);
 		int shuntingExecute(deque<Token*>);
 		int findClose(const string&,int,char); 
