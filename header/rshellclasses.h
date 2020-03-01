@@ -286,11 +286,84 @@ class TestToken : public Token {
 		// Holds stuff from [   ]
 		// So this->content = {"-e", "path/to/file"} or something similar.
 		
-		TestToken(vector<string> V) {
+	TestToken(vector<string> V) {
 			content = V;
 			isOperator = false;
 		}
 
+	virtual int execute()
+	{
+		if (content[1] == "-e")
+			{
+				struct stat check;
+				
+				if (stat(content[0].c_str(), &check) == 0) 
+				{
+					this->status = 0;
+					return this->status;
+				}
+				else 
+				{	
+					this->status = 1;
+					return this->status;
+				}
+				//checks if the file/directory exists
+			}
+			else if (content[1] == "-f")
+			{
+				//checks if the file/directory exists and is a regular file
+				struct stat check;
+				if (stat(content[2].c_str(), &check) == 0)
+				{
+					if (check.st_mode & S_IFREG)
+					{
+						this->status = 0;
+						return this->status; 
+					}
+					else{
+						this->status = 1;
+						return this->status;}
+				}
+
+		
+			}
+			else if (content[1] == "-d")
+			{
+				struct stat check;
+				if (stat(content[2].c_str(),&check) == 0)
+				{
+					if (check.st_mode & S_IFDIR)
+					{
+						this->status = 0;
+						return this->status; 
+					}
+					else 
+					{
+						this->status = 1;
+						return this->status;
+					}
+
+				}
+				//checks if the file/directory exists and is a directory
+			}
+			else 
+			{
+				struct stat check;
+				
+				if (stat(content[0].c_str(), &check) == 0) 
+				{
+					this->status = 0;
+					return this->status;
+				}
+				else 
+				{
+					this->status = 1;
+					return this->status;
+				}	
+				//checks if the file/directory exists
+			 
+			}
+	}
         virtual string stringify() { return "TestToken: " + joinVector(content, ' '); }
 
 		// is not an operator	
