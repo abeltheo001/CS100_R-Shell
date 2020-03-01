@@ -7,6 +7,7 @@
 #include <stack>
 #include <unordered_map>
 #include <unordered_set>
+#include <string>
 
 #include "rshellclasses.h"
 #include "rshellutils.h"
@@ -50,7 +51,8 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	unordered_set<string> operators = {"||", "&&", ";"};
 	unordered_map<char, char> openToClose = {
 											{'(',')'},  
-											{'[', ']'}
+											{'[', ']'},
+											{'"', '"'}
 											};
 	// The following deque is used for checking whether an operator has been read
 	deque<char> backlog;
@@ -59,7 +61,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	// TODO: Assignment 4 will cause this approach to fail (probably)
 
 	// The following vector is used for flushes to Subcommand
-	vector<char> buffer;
+	vector<string> buffer;
 
 	// Shunting yard deque/stack
 	stack<Token*> shuntingSouth;
@@ -99,7 +101,10 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 
 			if (accepted != " ") {
 				opfound = true;
-				string subcstring(buffer.begin(), buffer.end()-matchsize+1);
+				for (int i = 0; i < matchsize; i++) {
+					buffer.pop_back();
+				}
+				string subcstring(buffer.begin(), buffer.end());
 
 				if (DEBUG == true) {
 					cout << "generated subcommand string:" << subcstring << endl;
@@ -146,7 +151,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 		}
 		if (opfound) {
 			// Was already done in inner loop
-		} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ]	
+		} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ] or "  "
 			int closepos = findClose(commandString, currPos, openToClose[c]);
 			string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
 			
@@ -155,7 +160,6 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 				Token* tToken;
 				tToken = new TestToken(testContent);
 				outputQueue.push_back(tToken);
-				
 			
 			} else if (c == '(') {
 
@@ -177,15 +181,25 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 				ParenthesisToken* stuffInside = new ParenthesisToken(retq);
 
 				outputQueue.push_back(stuffInside);
+			
+			} else if (c == '"') {
+
+				buffer.push_back(pairedstring);
+
 			}
+
+
 
 			// Now have to move iterator past the parenthesis end
 			it += closepos-currPos;
 			currPos += closepos-currPos;
 
 		} else {
-			buffer.push_back(c);
+			string cstr;
+			// cstr.push_back(c);
+			buffer.push_back(cstr);
 		}
+
 		currPos += 1;
 	}
 
@@ -200,12 +214,13 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 		}
 
 		bool allspaces = true;
-		for (char c : buffer) {
-			if ((c != ' ') && (c != '\t')) {
+		for (string s : buffer) {
+			if ((s != " ") && (s != "\t")) {
 				allspaces = false;
 				break;
 			}
 		}
+
 		if (!(allspaces)) {
 			string finsubcstring(buffer.begin(), buffer.end());
 			vector<string> finsubcvect = splitOnChar(finsubcstring, ' ');

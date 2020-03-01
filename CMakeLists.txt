@@ -12,9 +12,9 @@ ADD_EXECUTABLE(rshell
     header/rshelldefinition.h src/rshell.cpp 
 )
 
-ADD_EXECUTABLE(sandbox
- src/sandbox.cpp
-)
+# ADD_EXECUTABLE(sandbox
+#     src/sandbox.cpp
+# )
 
 #ADD_EXECUTABLE(test
 #	test.cpp

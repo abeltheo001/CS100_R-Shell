@@ -1,3 +1,6 @@
+#ifndef SHUNTINGEXECUTE_H
+#define SHUNTINGEXECUTE_H
+
 #include <stack>
 #include <queue>
 #include <vector>
@@ -11,7 +14,7 @@ int RShell::shuntingExecute(deque<Token*> V) {
 	stack<Token*> toExecute;
 
 	if (V.size() == 1) {
-		V[0]->execute();
+		return V[0]->execute();
 	} else {
 		for (Token* t : V) {
 			if (t->isOperator == false) {
@@ -44,3 +47,5 @@ int RShell::shuntingExecute(deque<Token*> V) {
 	
 	
 }
+
+#endif

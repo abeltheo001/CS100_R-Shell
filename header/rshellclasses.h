@@ -124,7 +124,8 @@ class Subcommand : public Token {
 				} else { 
 					cout << "(False)" << endl;
 					status = 1;
-				}	
+				}
+				return status;
 			} else { 
 				char** chararr = convertVectorToCharArray(content);
 				status = executeCharArray(chararr);
@@ -362,7 +363,7 @@ class TestToken : public Token {
 				//checks if the file/directory exists
 			 
 			}
-	}
+		}
         virtual string stringify() { return "TestToken: " + joinVector(content, ' '); }
 
 		// is not an operator	
