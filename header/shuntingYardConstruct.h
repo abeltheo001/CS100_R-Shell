@@ -170,10 +170,12 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 			} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ] or "  "
 				int closepos = findClose(commandString, currPos, openToClose[c]);
 				if (closepos == -1) {
-					// TODO: Throw error
-					if (DEBUG) {
-						cout << "No close found!" << endl;
+					cout << "RSHELL error: mismatched " << c << " " << openToClose[c] << ". Exiting back to command loop." << endl;
+					for (Token* t : outputQueue) {
+						delete t;
 					}
+					outputQueue.clear();
+					return outputQueue;
 				} else {
 					string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
 					
