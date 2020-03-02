@@ -32,6 +32,7 @@ int RShell::shuntingExecute(deque<Token*> V) {
 
 				t->execute();
 
+				// Clean up storageToken pointers
 				vector<Token*> pointers = {l, r, t};
 				for (Token* currToken : pointers) {
 					StorageToken* sptr = dynamic_cast<StorageToken*>(currToken);
