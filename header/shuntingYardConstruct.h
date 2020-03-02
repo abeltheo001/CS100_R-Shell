@@ -26,12 +26,13 @@ int RShell::findClose(const string& targetString, int start, char targetClose) {
 	// This allows for the range of ParenthesisToken to be defined.
 	int depth = 0;
 	char open = targetString.at(start);
-	cout << "Requested char: " << targetClose << endl;
 	for (int i = start+1; i < targetString.size(); i++) {
 		char currChar = targetString.at(i);
 
 		if ((currChar == targetClose) && (depth > 0)) {
-			cout << "Found another " << open << " at pos " << i << "." << endl;
+			if (DEBUG) {
+				cout << "Found another " << open << " at pos " << i << "." << endl;
+			}
 			depth -= 1;
 		} else if ((currChar == targetClose) && (depth == 0)) {
 			return i;
