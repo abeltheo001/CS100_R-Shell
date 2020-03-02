@@ -23,7 +23,7 @@ void RShell::makeCommandDeque(string userInput)
 	this->commandDeque = resd;
 	if (DEBUG) {
 		for (Token* t : this->commandDeque) {
-			cout << t->stringify() << endl;
+			//cout << t->stringify() << endl;
 		}
 	}
 }
