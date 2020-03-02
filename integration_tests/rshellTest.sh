@@ -30,15 +30,15 @@ else
 	echo "rshell does not work as expected on ls -a"
 fi
 
-#OUTPUT_ls_j=$(ls -j)
-#RSHELLOUTPUT_ls_j=$(./rshell ls -j)
+OUTPUT_ls_j=$(ls -j)
+RSHELLOUTPUT_ls_j=$(./rshell ls -j)
 
-#if [ "$OUTPUT_ls_j" == "$RSHELLOUTPUT_ls_j" ]
-#then
-#	echo "rshell works as expected on ls-j."
-#else
-#	echo "rshell does not work as expected on ls-j."
-#fi
+if [ "$OUTPUT_ls_j" == "$RSHELLOUTPUT_ls_j" ]
+then
+	echo "rshell works as expected on ls-j."
+else
+	echo "rshell does not work as expected on ls-j."
+fi
 
 OUTPUTecho=$(echo echo)
 RSHELLOUTPUTecho=$(./rshell echo echo)
@@ -50,15 +50,15 @@ else
 	echo "rshell does not work as expected on echo echo."
 fi
 
-OUTPUTconnector=$(echo A \#&& echo B )
-RSHELLOUTPUTconnector=$(./rshell echo A \#&& echo B )
+#OUTPUTconnector=$(echo A \#&& echo B )
+#RSHELLOUTPUTconnector=$(./rshell echo A \#&& echo B )
 
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
-then
-	echo "rshell works as expected on echo A #&& echo B."
-else
-	echo "rshell does not work as expected on echo A #&& echo B."
-fi
+#if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+#then
+#	echo "rshell works as expected on echo A #&& echo B."
+#else
+#	echo "rshell does not work as expected on echo A #&& echo B."
+#fi
 
 OUTPUTconnector=$(git status)
 RSHELLOUTPUTconnector=$(./rshell git status)
@@ -79,8 +79,8 @@ else
 	echo "rshell does not work as expected on test -e CMakeLists.."
 fi
 
-OUTPUTconnector=$(echo "A || exit")
-RSHELLOUTPUTconnector=$(./rshell echo "A || exit")
+OUTPUTconnector=$(echo A || exit)
+RSHELLOUTPUTconnector=$(./rshell echo A || exit)
 
 if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
 then
@@ -91,9 +91,9 @@ fi
 
 
 
-OUTPUTconnector=$([ -e CMakeLists.txt ])
+#OUTPUTconnector=$([ -e CMakeLists.txt ])
 RSHELLOUTPUTconnector=$(./rshell [ -e CMakeLists.txt ])
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+if [ "(True)" == "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on [-e CMakeLists.txt]."
 else
