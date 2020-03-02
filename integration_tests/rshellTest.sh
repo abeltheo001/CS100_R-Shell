@@ -80,3 +80,13 @@ else
 	echo "rshell does not work as expected on echo \"A || exit \"."
 fi
 
+
+
+OUTPUTconnector=$([ -e CMakeLists.txt ])
+RSHELLOUTPUTconnector=$(./rshell [ -e CMakeLists.txt ])
+if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+then
+	echo "rshell works as expected on [-e CMakeLists.txt]."
+else
+	echo "rshell does not work as expected on on [-e CMakeLists.txt]."
+fi
