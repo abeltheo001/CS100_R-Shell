@@ -16,7 +16,7 @@ int main() {
 	RShell shell = RShell();
 	
 	shell.makeCommandDeque(input);
-	shell.executeCommandDeque();
+
 
 	
 	return 0;

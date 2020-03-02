@@ -54,7 +54,7 @@ class Subcommand : public Token {
 			content = V; 
 			isOperator = false;
 		}
-        virtual string stringify() { return "Subcommand: " + joinVector(content, ' '); }
+        virtual string stringify() { return /*"Subcommand: " + */joinVector(content, ' '); }
 
 		bool operator==(Subcommand const rhs) const {
 			return (this->content == rhs.content);
@@ -372,10 +372,10 @@ class StorageToken : public Token {
 			isOperator = false;
 			status = s;
 		}
-		int execute() {
+		virtual int execute() {
 			return status;
 		}
-		string stringify() {
+		virtual string stringify() {
 			return "StorageToken."; // Should never be printed
 		}
 };
@@ -406,12 +406,10 @@ class RShell {
 		
 		// Member variables
 		deque<Token*> commandDeque;
-		
 		unordered_map <string, string> configData;
 		bool DEBUG = true;
    
 		bool checkBuiltin(vector<string>);
-
 		deque<Token*> shuntingYardConstruct(string);
 		int shuntingExecute(deque<Token*>);
 		int findClose(const string&,int,char); 

@@ -42,7 +42,7 @@ int RShell::shuntingExecute(deque<Token*> V) {
 				}
 
 				// Need to re-add execution value
-				StorageToken* s = new StorageToken(t->status);
+				Token* s = new StorageToken(t->status);
 				toExecute.push(s);
 			}
 		}
