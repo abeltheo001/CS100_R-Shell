@@ -124,7 +124,8 @@ class Subcommand : public Token {
 				} else { 
 					cout << "(False)" << endl;
 					status = 1;
-				}	
+				}
+				return status;
 			} else { 
 				char** chararr = convertVectorToCharArray(content);
 				status = executeCharArray(chararr);
@@ -277,14 +278,14 @@ class TestToken : public Token {
 		// Holds stuff from [   ]
 		// So this->content = {"-e", "path/to/file"} or something similar.
 		
-	TestToken(vector<string> V) {
+		TestToken(vector<string> V) {
 			content = V;
 			isOperator = false;
 		}
 
-	virtual int execute()
-	{
-		if (content[0] == "-e")
+		virtual int execute()
+		{
+			if (content[0] == "-e")
 			{
 				struct stat check;
 				
@@ -314,13 +315,13 @@ class TestToken : public Token {
 						this->status = 0;
 						return this->status; 
 					}
-					else{
+					else
+					{
 						cout << "(False)" << endl;
 						this->status = 1;
-						return this->status;}
+						return this->status;
+					}
 				}
-
-		
 			}
 			else if (content[0] == "-d")
 			{
@@ -360,13 +361,9 @@ class TestToken : public Token {
 					return this->status;
 				}	
 				//checks if the file/directory exists
-			 
 			}
-	}
+		}
         virtual string stringify() { return "TestToken: " + joinVector(content, ' '); }
-
-		// is not an operator	
-		
 };
 
 class StorageToken : public Token {
@@ -375,10 +372,10 @@ class StorageToken : public Token {
 			isOperator = false;
 			status = s;
 		}
-		int execute() {
+		virtual int execute() {
 			return status;
 		}
-		string stringify() {
+		virtual string stringify() {
 			return "StorageToken."; // Should never be printed
 		}
 };
@@ -409,12 +406,10 @@ class RShell {
 		
 		// Member variables
 		deque<Token*> commandDeque;
-		
 		unordered_map <string, string> configData;
 		bool DEBUG = true;
    
 		bool checkBuiltin(vector<string>);
-
 		deque<Token*> shuntingYardConstruct(string);
 		int shuntingExecute(deque<Token*>);
 		int findClose(const string&,int,char); 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 OUTPUT=$(ls)
 RSHELLOUTPUT=$(./rshell ls)
@@ -15,9 +15,9 @@ RSHELLOUTPUTconnector=$(./rshell echo a || echo b && echo c)
 
 if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
 then
-	echo "rshell works as expected on connectors."
+	echo "rshell works as expected on echo a || echo b && echo c."
 else
-	echo "rshell does not work as expected on connectors."
+	echo "rshell does not work as expected on echo a || echo b && echo c."
 fi
 
 OUTPUT_ls_a=$(ls -a)
@@ -60,14 +60,14 @@ else
 	echo "rshell does not work as expected on git status."
 fi
 
-OUTPUTconnector=$(echo A \#&& echo B)
-RSHELLOUTPUTconnector=$(./rshell echo A \#&& echo B)
+OUTPUTconnector=$(echo "A #&& echo B ")
+RSHELLOUTPUTconnector=$(./rshell echo A "#&& echo B ")
 
 if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
 then
-	echo "rshell works as expected on git status."
+	echo "rshell works as expected on echo A #&& echo B."
 else
-	echo "rshell does not work as expected on git status."
+	echo "rshell does not work as expected on echo A #&& echo B."
 fi
 
 OUTPUTconnector=$(echo "A || exit")

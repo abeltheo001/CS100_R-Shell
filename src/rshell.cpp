@@ -1,4 +1,3 @@
-#include <iostream>
 #include "../header/rshellclasses.h"
 #include "../header/rshelldefinition.h"
 using namespace std;
@@ -6,7 +5,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
 	// unordered_map<string, bool> config = initConfig("../.rshellrc");
 	
-	RShell shellobj = RShell(false);
+	RShell shellobj = new RShell(false);
 
 	if (argc == 1) {
 			string currInput = "";
@@ -18,7 +17,6 @@ int main(int argc, char *argv[]) {
 				if (GLOBAL_EXIT_STATUS == 1) {
 					exit(0);
 				}
-				// cout << returnval << endl; // Debug
 			}
 	} else {
 		// TODO: Re-add argv support

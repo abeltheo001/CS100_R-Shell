@@ -45,12 +45,13 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	// {Subcommand: {"echo", "a"},
 	//  OrToken:    {"||"},
 	//  ParenToken: leftChild->ParenToken,
-	//  ParenToken: 
+	//  ParenToken:
 
 	unordered_set<string> operators = {"||", "&&", ";"};
 	unordered_map<char, char> openToClose = {
 											{'(',')'},  
-											{'[', ']'}
+											{'[', ']'},
+
 											};
 	// The following deque is used for checking whether an operator has been read
 	deque<char> backlog;
@@ -65,163 +66,182 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	stack<Token*> shuntingSouth;
 	deque<Token*> outputQueue;
 
-	int lastFlushed = 0;
-	int currPos = 0;
-	for (auto it = commandString.begin(); it != commandString.end(); it++) {
-		// Check if currently on something in "operators"
-		char c = *it;
-		backlog.push_back(c);
-		if (backlog.size() > maxbacklog) {
-			backlog.pop_front();
+	if (commandString.at(0) == '#') {
+		return outputQueue;
+	} else {
+		int lastFlushed = 0;
+		int currPos = 0;
+		for (auto it = commandString.begin(); it != commandString.end(); it++) {
+			// Check if currently on something in "operators"
+			char c = *it;
+			backlog.push_back(c);
+			if (backlog.size() > maxbacklog) {
+				backlog.pop_front();
+			}
+
+			bool opfound = false;
+			if (currPos >= 4) { // Only makes sense to run this for "f ||" and larger
+				string accepted = " ";
+				int matchsize = -1;
+				for (int i : allowed_lengths) {
+					string query(backlog.begin()+(maxbacklog-i), backlog.end());
+					if (operators.count(query) > 0) {
+						accepted = query;
+						matchsize = i;
+						if (DEBUG == true) {
+							cout << "backlog queue matched with: \"" << accepted << "\"" << endl;
+						}
+						break;
+					}
+				}
+
+				// If _# is the furthest right, then we just started a comment block.
+				string tworight(backlog.end()-2, backlog.end());
+				if (tworight == " #") {
+					break;
+				}
+
+				if (accepted != " ") {
+					opfound = true;
+					for (int i = 0; i < matchsize-1; i++) {
+						buffer.pop_back();
+					}
+					string subcstring(buffer.begin(), buffer.end());
+					// string subcstring = "echo hello";
+
+					if (DEBUG == true) {
+						cout << "generated subcommand string:" << subcstring << endl;
+					}
+
+					buffer.clear();
+					vector<string> subcvect = splitOnChar(subcstring, ' '); // strip() and split(' ')!
+
+					if (DEBUG == true) {
+						cout << "generated subcommand vector:" << endl;
+						printVector(subcvect,"; ");
+					}
+
+					lastFlushed = currPos + 1;
+
+					if (subcvect.size() > 0) {
+						// Needed for edge case of operator after ParenToken (should not insert " ")
+						Subcommand* subcobj = new Subcommand(subcvect);
+						outputQueue.push_back(subcobj);
+					}
+
+					// Construct specific type of Token
+					Token* myToken;
+					if (accepted == "||") {
+						myToken = new OrToken({"||"});
+					} else if (accepted == "&&") {
+						myToken = new AndToken({"&&"});
+					} else if (accepted == ";") {
+						myToken = new SemiToken({";"});
+					}
+
+					if (DEBUG == true) {
+						cout << "generated operator:" << myToken->stringify() << endl;
+					}
+
+					// In shunting yard, pop operators when a new one is added.
+					while (shuntingSouth.size() > 0) {
+						Token* myOp = shuntingSouth.top();
+						shuntingSouth.pop();
+						outputQueue.push_back(myOp);
+					}
+					shuntingSouth.push(myToken);
+				}
+			}
+
+
+			if (opfound) {
+				// Was already done in inner loop
+			} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ] or "  "
+				int closepos = findClose(commandString, currPos, openToClose[c]);
+				string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
+				
+				if (c == '[') {
+					vector<string> testContent = splitOnChar(pairedstring,' ');
+					Token* tToken;
+					tToken = new TestToken(testContent);
+					outputQueue.push_back(tToken);
+				
+				} else if (c == '(') {
+
+					// Recursion time!
+					// Why?
+					// Shunting yard doesn't handle conditional execution for parentheses properly.
+					// Example:
+					// echo a || ( echo b && echo c )
+					// Shunting yard would output this deque:
+					// [echo a, echo b, echo c, &&, ||]
+					// When thrown into execution,"d = echo b && echo c" would run first, and then "echo a || d".
+					// While this is correct order of operations if this were algebra, we never wanted the stuff
+					//     inside the parentheses to execute in the first place.
+					// Therefore, I pair (   ) delimited stuff into a "ParenthesisToken", which causes Shunting Yard to produce something like this:
+					// [echo a, [echo b, echo c, &&], ||]
+					// This WILL be properly handled during execution, as opposed to the other deque.
+
+					deque<Token*> retq = shuntingYardConstruct(pairedstring);
+					ParenthesisToken* stuffInside = new ParenthesisToken(retq);
+
+					outputQueue.push_back(stuffInside);
+				
+				} else if (c == '"') {
+
+					// buffer.push_back(pairedstring);
+
+				}
+
+
+
+				// Now have to move iterator past the parenthesis end
+				it += closepos-currPos;
+				currPos += closepos-currPos;
+
+			} else { // Not an operator or ()[]"", so it's part of a subcommand
+				// string cstr;
+				// cstr.push_back(c);
+				buffer.push_back(c);
+			}
+
+			currPos += 1;
 		}
 
-		bool opfound = false;
-		if (currPos >= 2) {
-			string accepted = " ";
-			int matchsize = -1;
-			for (int i : allowed_lengths) {
-				string query(backlog.begin()+(maxbacklog-i), backlog.end());
-				if (operators.count(query) > 0) {
-					accepted = query;
-					matchsize = i;
-					if (DEBUG == true) {
-						cout << "backlog queue matched with: \"" << accepted << "\"" << endl;
-					}
+		// Clear out leftover subcommand stuff
+		if (buffer.size() > 0) {
+			// No appending Subcommands after ParenTokens - this is an error
+			if (outputQueue.size() > 0) {
+				ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
+				if (ptest != nullptr) {
+					// TODO: throw error
+				}
+			}
+
+			bool allspaces = false;
+			for (char s : buffer) {
+				if ((s != ' ') && (s != '\t')) {
+					allspaces = false;
 					break;
 				}
 			}
 
-			// If _# is the furthest right, then we just started a comment block.
-			string tworight(backlog.end()-2, backlog.end());
-			if (tworight == " #") {
-				break;
-			}
-
-
-			if (accepted != " ") {
-				opfound = true;
-				string subcstring(buffer.begin(), buffer.end()-matchsize+1);
-
-				if (DEBUG == true) {
-					cout << "generated subcommand string:" << subcstring << endl;
-				}
-
-				buffer.clear();
-				vector<string> subcvect = splitOnChar(subcstring, ' '); // strip() and split(' ')!
-
-				if (DEBUG == true) {
-					cout << "generated subcommand vector:" << endl;
-					printVector(subcvect,"; ");
-				}
-
-				lastFlushed = currPos + 1;
-
-				if (subcvect.size() > 0) {
-					// Needed for edge case of operator after ParenToken (should not insert )
-					Subcommand* subcobj = new Subcommand(subcvect);
-					outputQueue.push_back(subcobj);
-				}
-
-				// Construct specific type of Token
-				Token* myToken;
-				if (accepted == "||") {
-					myToken = new OrToken({"||"});
-				} else if (accepted == "&&") {
-					myToken = new AndToken({"&&"});
-				} else if (accepted == ";") {
-					myToken = new SemiToken({";"});
-				}
-
-				if (DEBUG == true) {
-					cout << "generated operator:" << myToken->stringify() << endl;
-				}
-
-				// In shunting yard, pop operators when a new one is added.
-				while (shuntingSouth.size() > 0) {
-					Token* myOp = shuntingSouth.top();
-					shuntingSouth.pop();
-					outputQueue.push_back(myOp);
-				}
-				shuntingSouth.push(myToken);
+			if (!(allspaces)) {
+				string finsubcstring(buffer.begin(), buffer.end());
+				vector<string> finsubcvect = splitOnChar(finsubcstring, ' ');
+				Subcommand* finsubcobj = new Subcommand(finsubcvect);
+				outputQueue.push_back(finsubcobj);
 			}
 		}
-		if (opfound) {
-			// Was already done in inner loop
-		} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ]	
-			int closepos = findClose(commandString, currPos, openToClose[c]);
-			string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
-			
-			if (c == '[') {
-				vector<string> testContent = splitOnChar(pairedstring,' ');
-				Token* tToken;
-				tToken = new TestToken(testContent);
-				outputQueue.push_back(tToken);
-				
-			
-			} else if (c == '(') {
 
-				// Recursion time!
-				// Why?
-				// Shunting yard doesn't handle conditional execution for parentheses properly.
-				// Example:
-				// echo a || ( echo b && echo c )
-				// Shunting yard would output this deque:
-				// [echo a, echo b, echo c, &&, ||]
-				// When thrown into execution,"d = echo b && echo c" would run first, and then "echo a || d".
-				// While this is correct order of operations if this were algebra, we never wanted the stuff
-				//     inside the parentheses to execute in the first place.
-				// Therefore, I pair (   ) delimited stuff into a "ParenthesisToken", which causes Shunting Yard to produce something like this:
-				// [echo a, [echo b, echo c, &&], ||]
-				// This WILL be properly handled during execution, as opposed to the other deque.
-
-				deque<Token*> retq = shuntingYardConstruct(pairedstring);
-				ParenthesisToken* stuffInside = new ParenthesisToken(retq);
-
-				outputQueue.push_back(stuffInside);
-			}
-
-			// Now have to move iterator past the parenthesis end
-			it += closepos-currPos;
-			currPos += closepos-currPos;
-
-		} else {
-			buffer.push_back(c);
+		// Clear out leftover operators
+		while (shuntingSouth.size() > 0) {
+			outputQueue.push_back(shuntingSouth.top());
+			shuntingSouth.pop();
 		}
-		currPos += 1;
+
+		return outputQueue;
 	}
-
-	// Clear out leftover subcommand stuff
-	if (buffer.size() > 0) {
-		// No appending Subcommands after ParenTokens - this is an error
-		if (outputQueue.size() > 0) {
-			ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
-			if (ptest != nullptr) {
-				// TODO: throw error
-			}
-		}
-
-		bool allspaces = true;
-		for (char c : buffer) {
-			if ((c != ' ') && (c != '\t')) {
-				allspaces = false;
-				break;
-			}
-		}
-		if (!(allspaces)) {
-			string finsubcstring(buffer.begin(), buffer.end());
-			vector<string> finsubcvect = splitOnChar(finsubcstring, ' ');
-			Subcommand* finsubcobj = new Subcommand(finsubcvect);
-			outputQueue.push_back(finsubcobj);
-		}
-	}
-
-	// Clear out leftover operators
-	while (shuntingSouth.size() > 0) {
-		outputQueue.push_back(shuntingSouth.top());
-		shuntingSouth.pop();
-	}
-
-	return outputQueue;
 }
 
 #endif

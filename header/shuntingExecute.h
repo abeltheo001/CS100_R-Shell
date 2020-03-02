@@ -1,3 +1,6 @@
+#ifndef SHUNTINGEXECUTE_H
+#define SHUNTINGEXECUTE_H
+
 #include <stack>
 #include <queue>
 #include <vector>
@@ -10,8 +13,10 @@ using namespace std;
 int RShell::shuntingExecute(deque<Token*> V) {
 	stack<Token*> toExecute;
 
-	if (V.size() == 1) {
-		V[0]->execute();
+	if (V.size() == 0) {
+		return 0;
+	} else if (V.size() == 1) {
+		return V[0]->execute();
 	} else {
 		for (Token* t : V) {
 			if (t->isOperator == false) {
@@ -36,11 +41,14 @@ int RShell::shuntingExecute(deque<Token*> V) {
 				}
 
 				// Need to re-add execution value
-				StorageToken* s = new StorageToken(t->status);
+				Token* s = new StorageToken(t->status);
 				toExecute.push(s);
+				delete s;
 			}
 		}
 	}
 	
 	
 }
+
+#endif
