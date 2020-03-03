@@ -8,6 +8,9 @@ SET(CMAKE_CXX_STANDARD 11)
 # SET(DEBUG_FLAG "-g")
 # add_definitions(${DEBUG_FLAG})
 
+SET(C11 "-std=c++11")
+add_definitions(${C11})
+
 ADD_EXECUTABLE(rshell
     src/rshell.cpp 
 )
