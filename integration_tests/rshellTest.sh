@@ -11,16 +11,6 @@ else
 	echo "rshell does not work as expected on test -e CMakeLists.txt"
 fi
 
-OUTPUTconnector=$(echo A || exit)
-RSHELLOUTPUTconnector=$(./rshell echo A || exit)
-
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
-then
-	echo "rshell works as expected on echo \"A || exit \" ."
-else
-	echo "rshell does not work as expected on echo \"A || exit \"."
-fi
-
 # OUTPUTconnector=$([ -e CMakeLists.txt ])
 RSHELLOUTPUTconnector=$(./rshell [ -e CMakeLists.txt ])
 if [ "(True)" == "$RSHELLOUTPUTconnector" ]
