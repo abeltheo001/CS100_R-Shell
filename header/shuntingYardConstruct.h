@@ -210,8 +210,6 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						buffer.push_back(pairedstring);
 					}
 
-
-
 					// Now have to move iterator past the parenthesis end
 					it += closepos-currPos;
 					currPos += closepos-currPos;
@@ -227,14 +225,19 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 		// Clear out leftover subcommand stuff
 		if (buffer.size() > 0) {
 			// No appending Subcommands after ParenTokens - this is an error
+			if (DEBUG) {
+				cout << "some chars or strings are still in the buffer" << endl;
+				printVector(buffer, "; ");
+			}
+
 			if (outputQueue.size() > 0) {
 				ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
 				if (ptest != nullptr) {
-					// TODO: throw error
+					// TODO: throw error - this is a command of syntax "(echo a) somestuffafterparen"
 				}
 			}
 
-			bool allspaces = false;
+			bool allspaces = true;
 			for (string s : buffer) {
 				if ((s != " ") && (s != "\t")) {
 					allspaces = false;

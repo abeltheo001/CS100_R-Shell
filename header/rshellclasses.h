@@ -54,7 +54,7 @@ class Subcommand : public Token {
 			content = V; 
 			isOperator = false;
 		}
-        virtual string stringify() { return /*"Subcommand: " + */joinVector(content, ' '); }
+        virtual string stringify() { return "Subcommand: \"" + joinVector(content, ' ') + "\""; }
 
 		bool operator==(Subcommand const rhs) const {
 			return (this->content == rhs.content);
@@ -153,7 +153,7 @@ class AndToken: public Token {
 			isOperator = true;
 		}
 
-        virtual string stringify() { return "AndToken: " + joinVector(content, ' '); }
+        virtual string stringify() { return "AndToken: \"" + joinVector(content, ' ') + '\"'; }
 
 		bool operator==(AndToken const rhs) const {
 			return (this->content == rhs.content);
@@ -191,7 +191,7 @@ class OrToken: public Token {
 			isOperator = true;
 		}
 
-        virtual string stringify() { return "OrToken: " + joinVector(content, ' '); }
+        virtual string stringify() { return "OrToken: \"" + joinVector(content, ' ') + '\"'; }
 
 		bool operator==(OrToken const rhs) const {
 			return (this->content == rhs.content);
@@ -229,7 +229,7 @@ class SemiToken: public Token {
 			isOperator = true;
 		}
 		
-        virtual string stringify() { return "SemiToken: " + joinVector(content, ' '); }
+        virtual string stringify() { return "SemiToken: \"" + joinVector(content, ' ') + "\""; }
 
 		bool operator==(SemiToken const rhs) const {
 			return (this->content == rhs.content); 
@@ -251,6 +251,8 @@ class TestToken : public Token {
 			content = V;
 			isOperator = false;
 		}
+		
+		virtual string stringify() { return "TestToken: \"" + joinVector(content, ' ') + "\""; }
 
 		virtual int execute()
 		{
@@ -332,7 +334,6 @@ class TestToken : public Token {
 				//checks if the file/directory exists
 			}
 		}
-        virtual string stringify() { return "TestToken: " + joinVector(content, ' '); }
 };
 
 class StorageToken : public Token {
@@ -345,7 +346,7 @@ class StorageToken : public Token {
 			return status;
 		}
 		virtual string stringify() {
-			return "StorageToken: " + (char) status + '\n';
+			return "StorageToken: " + (char) status;
 		}
 };
 
@@ -390,6 +391,13 @@ class ParenthesisToken : public Token {
 		ParenthesisToken(deque<Token*> inside) {
 			interior = inside;
 			isOperator = false;
+		}
+		virtual ~ParenthesisToken() {
+			if (this->interior.size() > 0) {
+				for (Token* t : this->interior) {
+					delete t;
+				}
+			}
 		}
 
         virtual string stringify() { 
