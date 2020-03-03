@@ -18,17 +18,51 @@ SID: 862021171
 
 ### Introduction
 
-This project implements a shell, which allows for execution of programs from a command line (text input) interface. Commands (e.g. "echo hello") are mostly passed through to C++'s execvp() for execution, and the shell catches some special operators and commands. These will be as follows:
+This project implements a shell, which allows for execution of programs from a command line (text input) interface. Commands (e.g. "echo hello") are mostly passed through to C++'s execvp() for execution, and the shell catches some special operators and commands. These are as follows:
 
 - Ordered/relative execution
     - Bash connectors ( "||", ";", "&&")
-    - Parentheses (to be executed first, inner parentheses first)
+    - Parentheses (inner parentheses are executed first)
+- Handling of comments ("echo hello #" prints hello )
+- "exit" causes RShell to clean up its own memory and exit
+- test command
+	- "test" works similarly to bash - allows for -e, -f, -d flags
+	- symbolic test calls: "[ -e /path/to/file ]" is handled
+- quotes are allowed - eg "echo " ##### "" doesn't stop at #
+
+Some planned special constructs to catch:
+
 - Aliases ( eg "i" → "sudo apt-get install" )
 - Storage of state variables, like "pwd"
-- Handling of comments ("echo hello #" prints hello )
-- (Potentially) a config file, a la .bashrc or .vimrc
+- Construction of the RShell with a config file, a la .bashrc or .vimrc
 
-Parsing of statements like "echo a || echo b && echo c" is done by first filtering out comments and then constructing an "expression tree" (which in our implementation is of class CommandTree).
+Parsing of statements happens in header/shuntingYardConstruct.h, which directly constructs the postfix queue from the input string. The algorithm is based around Shunting Yard, and roughly follows these steps:
+
+for char c in inString
+
+	if c and previous chars are equivalent to "&&", "||", or ";". This means we're currently on an operator.
+		Flush the buffer (except for the length of the operator) and store it in a Subcommand.
+		Flush the operator to its operator type, such as AndToken, OrToken, or SemiToken.
+		Handle the Subcommand and operator Token in the same manner as Shunting Yard. In particular,
+			Subcommand gets sent to the outputQueue, and the operator Token gets sent to the operator stack.
+			If there are any operators on the operator stack, push those to the outputQueue before pushing onto the stack.
+	else if c is ( or [ or ",
+		then a block of inString needs to grouped and dealt with.
+		first, find the relevant "close" position for this char. If c = (, then close = ).
+		this skips nested parentheses and only outputs the depth when the close paren is at the same depth.
+		if parentheses
+			recursively run shuntingYardConstruct and place the outputQueue into a ParenthesisToken
+		if brackets
+			set the inside to a TestToken
+		if "
+			add the quote block to the buffer
+	else
+		store c in a buffer of strings
+
+if buffer is nonempty
+	flush buffer to a Subcommand and push it onto outputQueue.
+
+Execution is much more straightforward:
 
 ![Command Tree](/images/CommandTree.png)
 
