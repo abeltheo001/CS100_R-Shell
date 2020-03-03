@@ -233,7 +233,7 @@ TEST (executorTest, DequeExecutor)
 	ASSERT_EQ(0,result);
 }
 
-TEST (findCloseTest, smallCheck)
+TEST (findCloseTest, oneLayerCheck)
 {
 	string input = "echo a || (false && echo c)";
 	int start = 10;
@@ -241,8 +241,18 @@ TEST (findCloseTest, smallCheck)
 	RShell shell = RShell(false);
 	int result = shell.findClose(input,start,targetClose);
 
-	
-	ASSERT_EQ(result,26);
+	EXPECT_EQ(result, 26);
+}
+
+TEST (findCloseTest, multiLayerCheck)
+{
+	string input = "echo a || ((  ((  ( (false && echo c)) ) )   ) )";
+	int start = 10;
+	char targetClose = ')';
+	RShell shell = RShell(false);
+	int result = shell.findClose(input,start,targetClose);
+
+	EXPECT_EQ(result, 47);
 }
 
 #endif

@@ -377,7 +377,7 @@ class RShell {
 		// Member variables
 		deque<Token*> commandDeque;
 		unordered_map <string, string> configData;
-		bool DEBUG = true;
+		bool DEBUG = false;
    
 		bool checkBuiltin(vector<string>);
 		deque<Token*> shuntingYardConstruct(string);
