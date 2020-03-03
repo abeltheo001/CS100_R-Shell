@@ -392,11 +392,13 @@ class ParenthesisToken : public Token {
 			interior = inside;
 			isOperator = false;
 		}
+
 		virtual ~ParenthesisToken() {
 			if (this->interior.size() > 0) {
 				for (Token* t : this->interior) {
 					delete t;
 				}
+				interior.clear();
 			}
 		}
 
