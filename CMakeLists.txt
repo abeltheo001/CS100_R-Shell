@@ -11,16 +11,20 @@ SET(CMAKE_CXX_STANDARD 11)
 SET(C11 "-std=c++11")
 add_definitions(${C11})
 
+# SET(warnings "-Wall")
+# add_definitions(${warnings})
+
 ADD_EXECUTABLE(rshell
     src/rshell.cpp 
 )
 
-ADD_EXECUTABLE(sandbox
- src/sandbox.cpp
-)
+# ADD_EXECUTABLE(sandbox
+#     src/sandbox.cpp
+# )
 
 ADD_EXECUTABLE(test
-	test.cpp)
+	test.cpp
+)
 
 TARGET_LINK_LIBRARIES(test gtest)
 TARGET_COMPILE_DEFINITIONS(test PRIVATE gtest_disable_pthreads=ON)
