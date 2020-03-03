@@ -262,13 +262,10 @@ class ParenthesisToken : public Token {
 			return joinVector(outputV, "\n");
 		}
 
-		virtual int execute() { // Placeholder
-			return 0;
+		virtual int execute() {
+			this->status = shuntingExecute(interior);
+			return status;
 		}
-
-	//	virtual int execute() {
-	//		shuntingExecute(interior);
-	//	}
 
 		deque<Token*> interior;
 };
@@ -376,7 +373,7 @@ class StorageToken : public Token {
 			return status;
 		}
 		virtual string stringify() {
-			return "StorageToken."; // Should never be printed
+			return "StorageToken: " << status << endl;
 		}
 };
 
