@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Assignment 2 tests
+
 OUTPUT=$(ls)
 RSHELLOUTPUT=$(./rshell ls)
 
@@ -50,15 +52,15 @@ else
 	echo "rshell does not work as expected on echo echo."
 fi
 
-#OUTPUTconnector=$(echo A \#&& echo B )
-#RSHELLOUTPUTconnector=$(./rshell echo A \#&& echo B )
+OUTPUTconnector=$(echo A \#&& echo B )
+RSHELLOUTPUTconnector=$(./rshell echo A \#&& echo B )
 
-#if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
-#then
-#	echo "rshell works as expected on echo A #&& echo B."
-#else
-#	echo "rshell does not work as expected on echo A #&& echo B."
-#fi
+if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+then
+	echo "rshell works as expected on echo A #&& echo B."
+else
+	echo "rshell does not work as expected on echo A #&& echo B."
+fi
 
 OUTPUTconnector=$(git status)
 RSHELLOUTPUTconnector=$(./rshell git status)
@@ -69,6 +71,8 @@ then
 else
 	echo "rshell does not work as expected on git status."
 fi
+
+# Assignment 3 tests
 
 RSHELLOUTPUTconnector=$(./rshell test -e CMakeLists.txt)
 
@@ -89,9 +93,7 @@ else
 	echo "rshell does not work as expected on echo \"A || exit \"."
 fi
 
-
-
-#OUTPUTconnector=$([ -e CMakeLists.txt ])
+# OUTPUTconnector=$([ -e CMakeLists.txt ])
 RSHELLOUTPUTconnector=$(./rshell [ -e CMakeLists.txt ])
 if [ "(True)" == "$RSHELLOUTPUTconnector" ]
 then

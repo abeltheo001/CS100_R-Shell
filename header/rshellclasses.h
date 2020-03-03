@@ -242,37 +242,6 @@ class SemiToken: public Token {
 		}
 };
 
-class ParenthesisToken : public Token {
-	public:
-		// Acts like a decorator
-		ParenthesisToken(deque<Token*> inside) {
-			interior = inside;
-			isOperator = false;
-		}
-
-        virtual string stringify() { 
-			vector<string> outputV;
-			outputV.push_back("ParenthesisToken:");
-			string indent(4, ' ');
-
-			for (Token* t : interior) {
-				outputV.push_back(indent + t->stringify());
-			}
-			outputV.push_back("}");
-			return joinVector(outputV, "\n");
-		}
-
-		virtual int execute() { // Placeholder
-			return 0;
-		}
-
-	//	virtual int execute() {
-	//		shuntingExecute(interior);
-	//	}
-
-		deque<Token*> interior;
-};
-
 class TestToken : public Token {
 	public:
 		// Holds stuff from [   ]
@@ -376,7 +345,7 @@ class StorageToken : public Token {
 			return status;
 		}
 		virtual string stringify() {
-			return "StorageToken."; // Should never be printed
+			return "StorageToken: " + (char) status + '\n';
 		}
 };
 
@@ -413,6 +382,35 @@ class RShell {
 		deque<Token*> shuntingYardConstruct(string);
 		int shuntingExecute(deque<Token*>);
 		int findClose(const string&,int,char); 
+};
+
+class ParenthesisToken : public Token {
+	public:
+		// Acts like a decorator
+		ParenthesisToken(deque<Token*> inside) {
+			interior = inside;
+			isOperator = false;
+		}
+
+        virtual string stringify() { 
+			vector<string> outputV;
+			outputV.push_back("ParenthesisToken:");
+			string indent(4, ' ');
+
+			for (Token* t : interior) {
+				outputV.push_back(indent + t->stringify());
+			}
+			outputV.push_back("}");
+			return joinVector(outputV, "\n");
+		}
+
+		virtual int execute() {
+			RShell temp = RShell(false);
+			this->status = temp.shuntingExecute(interior);
+			return status;
+		}
+
+		deque<Token*> interior;
 };
 
 #endif
