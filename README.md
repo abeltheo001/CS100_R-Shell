@@ -102,7 +102,7 @@ which produces the expected behavior.
 
 ### Diagram
 
-![OMT Diagram (for Assignment 2)](/images/omt_diagram_2.png)
+![OMT Diagram (for Assignment 3)](/images/omt_diagram_3.png)
 
 ### Classes
 
