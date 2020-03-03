@@ -18,15 +18,20 @@ SID: 862021171
 
 ### Introduction
 
-This project implements a shell, which allows for execution of programs from a command line (text input) interface. Commands (e.g. "echo hello") are mostly passed through to C++'s execvp() for execution, and the shell catches some special operators and commands. These will be as follows:
+This project implements a shell, which allows for execution of programs from a command line (text input) interface. Commands (e.g. "echo hello") are mostly passed through to C++'s execvp() for execution, and the shell catches some special operators and commands. These are as follows:
 
 - Ordered/relative execution
     - Bash connectors ( "||", ";", "&&")
-    - Parentheses (to be executed first, inner parentheses first)
+    - Parentheses (inner parentheses are executed first)
+- Handling of comments ("echo hello #" prints hello )
+- "exit" causes RShell to clean up its own memory and exit
+- "test" works similarly to bash - allows for -e, -f, -d flags
+
+Some planned special constructs to catch:
 - Aliases ( eg "i" → "sudo apt-get install" )
 - Storage of state variables, like "pwd"
-- Handling of comments ("echo hello #" prints hello )
-- (Potentially) a config file, a la .bashrc or .vimrc
+- Construction of the RShell with a config file, a la .bashrc or .vimrc
+
 
 Parsing of statements like "echo a || echo b && echo c" is done by first filtering out comments and then constructing an "expression tree" (which in our implementation is of class CommandTree).
 
