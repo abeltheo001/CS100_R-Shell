@@ -66,6 +66,7 @@ TEST(shuntingYardConstruct, parenthesesAndTest) {
 	intermediate.push_back(s3);
 	ParenthesisToken* t3 = new ParenthesisToken(intermediate);
 
+	// Construct AndTokens
 	V = {"&&"};
 	AndToken* t4 = new AndToken(V);
 	V = {"&&"};
@@ -122,34 +123,106 @@ TEST (makeCommandDeque, bashConnectors)
 	delete a, b, c;
 }	
 
-TEST (shuntingExecute, execution)
+TEST (shuntingExecute, singleEcho)
 {
 	deque<Token*> result;
-	vector<string> V = {"echo","b"};
+	vector<string> V = {"echo", "a"};
 	Subcommand* a = new Subcommand(V);
 	result.push_back(a);
 
 	RShell rshellobj = RShell(false);
-	int functionResult = rshellobj.shuntingExecute(result);
+	rshellobj.shuntingExecute(result);
+
+	vector<int> expectation = {0};
 	
-	ASSERT_EQ(functionResult, 0);
+	ASSERT_EQ(result.size(), expectation.size()); // If this fails, you wrote the test wrong
+
+	bool equal = true;
+	for (int i = 0; i < expectation.size(); i++) {
+		if (expectation[i] != result[i]->status) {
+			equal = false;
+			cout << "Status was not as expected:" << endl;
+			cout << expectation[i] << " != " << result[i]->status << endl;
+			cout << "Happened on command " << result[i]->stringify() << endl;
+		}
+	}
+
+	EXPECT_EQ(equal, true);
+
 	delete a;
 }
 
+// TEST (shuntingExecute, allConditionCodes)
+// {
+// 	// "./segfault || [ -e CMakeLists.txt ] && (           echa && echo d)"
 
-TEST (executorTest, execution)
-{
-	deque<Token*> result;
-	vector<string> V = {"echo","b"};
-	Subcommand* a = new Subcommand(V);
-	result.push_back(a);
+// 	// First command from:
+// 	// https://codegolf.stackexchange.com/a/4403
 
-	RShell rshellobj = RShell(false);
-	int functionResult = rshellobj.shuntingExecute(result);
+// 		// Meanings of status:
+// 		// -3: Subcommand segfaulted when we tried to run it with execvp
+// 		// -2: Token has not run
+// 		// -1: Subcommand not found
+// 		// 0: Subcommand ran successfully
+// 		// anything else: Subcommand failed
+
+// 	// Should return {-3, 0, 0, 1, 1} with the inside of ParenthesisToken being {-1, -2, 1}
+
+// 	// Construct Subcommand
+// 	vector<string> V = {"./segfault"};
+// 	Subcommand* t1 = new Subcommand(V);
+
+// 	// Construct TestToken
+// 	V = {"-e", "CMakeLists.txt"};
+// 	TestToken* t2 = new TestToken(V);
+
+// 	// Construct ParenToken
+// 	V = {"echa"};
+// 	Subcommand* s1 = new Subcommand(V);
+// 	V = {"echo", "d"};
+// 	Subcommand* s2 = new Subcommand(V);
+// 	V = {"||"};
+// 	OrToken* s3 = new OrToken(V);
+// 	deque<Token*> intermediate;
+// 	intermediate.push_back(s1);
+// 	intermediate.push_back(s2);
+// 	intermediate.push_back(s3);
+// 	ParenthesisToken* t3 = new ParenthesisToken(intermediate);
+
+// 	// Construct And/Or Tokens
+// 	V = {"||"};
+// 	OrToken* t4 = new OrToken(V);
+// 	V = {"&&"};
+// 	AndToken* t5 = new AndToken(V);
+
+// 	deque<Token*> result;
+// 	result.push_back(t1); // kill -11 $$
+// 	result.push_back(t2); // -e CMakeLists.txt
+// 	result.push_back(t4); // ||
+// 	result.push_back(t3); // ParenthesisToken
+// 	result.push_back(t5); // &&
+
+// 	RShell rshellobj = RShell(false);
+// 	rshellobj.shuntingExecute(result);
+
+// 	vector<int> expectation = {-3, 0, 0, 1, 1};
 	
-	ASSERT_EQ(functionResult, 0);
-	delete a;
-}
+// 	ASSERT_EQ(result.size(), expectation.size()); // If this fails, you wrote the test wrong
+
+// 	bool equal = true;
+// 	for (int i = 0; i < expectation.size(); i++) {
+// 		if (expectation[i] != result[i]->status) {
+// 			equal = false;
+// 			cout << "Status was not as expected (expected on left):" << endl;
+// 			cout << expectation[i] << " != " << result[i]->status << endl;
+// 			cout << "Happened on command " << result[i]->stringify() << endl;
+// 		}
+// 	}
+
+// 	EXPECT_EQ(equal, true);
+
+// 	delete t1, t2, t3, t4, t5;
+// }
 
 TEST (executorTest, DequeExecutor)
 {
