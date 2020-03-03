@@ -106,7 +106,7 @@ which produces the expected behavior.
 
 ### Classes
 
-Class: RShell
+Base class: RShell
 - Keeps track of the runtime of the entire shell. Stores config values and keeps track of memory.
 - Class variables
 	- deque\<Token\*\> commandDeque
@@ -207,17 +207,6 @@ Inherited class: StorageToken : Token
     - StorageToken(int)
 	- virtual int execute()
 	- virtual string stringify()
-
-Base class: CommandTree
-- CommandTree stores a Token\* head of the execution tree.
-- Class variables
-    - Token\* head
-- Class functions
-    - CommandTree()
-    - void setHead(Token\*) (defunct; either switch to proper encapsulation or remove get/setters)
-    - Token\* getHead() (defunct; either switch to proper encapsulation or remove get/setters)
-	- string stringify() (Outputs command tree in a nicely readable format)
-	- bool operator==(CommandTree&) (uses DFS to check if all nodes are equal, and if the trees are of the same size)
 
 ### Prototypes/Research
 
