@@ -13,6 +13,7 @@
 
 using namespace std;
 
+
 TEST(shuntingYardConstruct, singleEcho) {
 	string input = "echo a";
    	RShell rshellobj = RShell(false);
@@ -135,11 +136,40 @@ TEST (shuntingExecute, execution)
 	delete a;
 }
 
-/*
- * Remaining tests:
- * void makeCommandDeque(string);
- * deque<Token*> shuntingYardConstruct(string);
- * int findClose(const string&,int,char); 
- * */
+
+TEST (executorTest, execution)
+{
+	deque<Token*> result;
+	vector<string> V = {"echo","b"};
+	Subcommand* a = new Subcommand(V);
+	result.push_back(a);
+
+	RShell rshellobj = RShell(false);
+	int functionResult = rshellobj.shuntingExecute(result);
+	
+	ASSERT_EQ(functionResult, 0);
+	delete a;
+}
+
+TEST (executorTest, DequeExecutor)
+{
+	RShell input = RShell(false);
+	input.makeCommandDeque("echo a || (false && echo c)");
+	int result = input.executeCommandDeque();
+	
+	ASSERT_EQ(0,result);
+}
+
+TEST (findCloseTest, smallCheck)
+{
+	string input = "echo a || (false && echo c)";
+	int start = 10;
+	char targetClose = ')';
+	RShell shell = RShell(false);
+	int result = shell.findClose(input,start,targetClose);
+
+	
+	ASSERT_EQ(result,26);
+}
 
 #endif
