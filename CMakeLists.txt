@@ -5,11 +5,11 @@ ADD_SUBDIRECTORY(googletest)
 SET(CMAKE_CXX_STANDARD 11)
 
 # Used for compilation with the -g flag; needed for useful gdb
-SET(DEBUG_FLAG "-ggdb")
-add_definitions(${DEBUG_FLAG})
+# SET(DEBUG_FLAG "-g")
+# add_definitions(${DEBUG_FLAG})
 
 ADD_EXECUTABLE(rshell
-    header/rshelldefinition.h src/rshell.cpp 
+    src/rshell.cpp 
 )
 
 ADD_EXECUTABLE(sandbox

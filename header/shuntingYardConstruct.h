@@ -7,6 +7,8 @@
 #include <stack>
 #include <unordered_map>
 #include <unordered_set>
+#include <sstream>
+#include <iterator>
 
 #include "rshellclasses.h"
 #include "rshellutils.h"
@@ -26,12 +28,16 @@ int RShell::findClose(const string& targetString, int start, char targetClose) {
 	char open = targetString.at(start);
 	for (int i = start+1; i < targetString.size(); i++) {
 		char currChar = targetString.at(i);
-		if (currChar == open) {
-			depth += 1;
-		} else if ((currChar == targetClose) && (depth > 0)) {
+
+		if ((currChar == targetClose) && (depth > 0)) {
+			if (DEBUG) {
+				cout << "Found another " << open << " at pos " << i << "." << endl;
+			}
 			depth -= 1;
 		} else if ((currChar == targetClose) && (depth == 0)) {
 			return i;
+		} else if (currChar == open) {
+			depth += 1;
 		}
 	}
 
@@ -51,8 +57,14 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	unordered_map<char, char> openToClose = {
 											{'(',')'},  
 											{'[', ']'},
-
+											{'\"', '\"'}
 											};
+	unordered_set<char> closes;
+	for (pair<char, char> cpair : openToClose) {
+		closes.insert(cpair.second);
+	}
+	closes.erase('\"'); // This will be handled by findCloses later on.
+
 	// The following deque is used for checking whether an operator has been read
 	deque<char> backlog;
 	int maxbacklog = 2; // Defined by the longest operator in operators; update as needed
@@ -60,7 +72,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	// TODO: Assignment 4 will cause this approach to fail (probably)
 
 	// The following vector is used for flushes to Subcommand
-	vector<char> buffer;
+	vector<string> buffer;
 
 	// Shunting yard deque/stack
 	stack<Token*> shuntingSouth;
@@ -74,6 +86,9 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 		for (auto it = commandString.begin(); it != commandString.end(); it++) {
 			// Check if currently on something in "operators"
 			char c = *it;
+			if (DEBUG) {
+				cout << "currChar: " << c << endl;
+			}
 			backlog.push_back(c);
 			if (backlog.size() > maxbacklog) {
 				backlog.pop_front();
@@ -106,7 +121,9 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 					for (int i = 0; i < matchsize-1; i++) {
 						buffer.pop_back();
 					}
-					string subcstring(buffer.begin(), buffer.end());
+					stringstream res;
+					copy(buffer.begin(), buffer.end(), ostream_iterator<string>(res));
+					string subcstring = res.str();
 					// string subcstring = "echo hello";
 
 					if (DEBUG == true) {
@@ -156,53 +173,63 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 
 			if (opfound) {
 				// Was already done in inner loop
+			} else if (closes.count(c) > 0) {
+				cout << "RSHELL error: mismatched " << c << ". Exiting back to command loop." << endl;
+				for (Token* t : outputQueue) {
+					delete t;
+				}
+				outputQueue.clear();
+				return outputQueue;
 			} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ] or "  "
 				int closepos = findClose(commandString, currPos, openToClose[c]);
-				string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
-				
-				if (c == '[') {
-					vector<string> testContent = splitOnChar(pairedstring,' ');
-					Token* tToken;
-					tToken = new TestToken(testContent);
-					outputQueue.push_back(tToken);
-				
-				} else if (c == '(') {
+				if (closepos == -1) {
+					cout << "RSHELL error: mismatched " << c << ". Exiting back to command loop." << endl;
+					for (Token* t : outputQueue) {
+						delete t;
+					}
+					outputQueue.clear();
+					return outputQueue;
+				} else {
+					string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
+					
+					if (c == '[') {
+						vector<string> testContent = splitOnChar(pairedstring,' ');
+						Token* tToken;
+						tToken = new TestToken(testContent);
+						outputQueue.push_back(tToken);
+					
+					} else if (c == '(') {
 
-					// Recursion time!
-					// Why?
-					// Shunting yard doesn't handle conditional execution for parentheses properly.
-					// Example:
-					// echo a || ( echo b && echo c )
-					// Shunting yard would output this deque:
-					// [echo a, echo b, echo c, &&, ||]
-					// When thrown into execution,"d = echo b && echo c" would run first, and then "echo a || d".
-					// While this is correct order of operations if this were algebra, we never wanted the stuff
-					//     inside the parentheses to execute in the first place.
-					// Therefore, I pair (   ) delimited stuff into a "ParenthesisToken", which causes Shunting Yard to produce something like this:
-					// [echo a, [echo b, echo c, &&], ||]
-					// This WILL be properly handled during execution, as opposed to the other deque.
+						// Recursion time!
+						// Why?
+						// Shunting yard doesn't handle conditional execution for parentheses properly.
+						// Example:
+						// echo a || ( echo b && echo c )
+						// Shunting yard would output this deque:
+						// [echo a, echo b, echo c, &&, ||]
+						// When thrown into execution,"d = echo b && echo c" would run first, and then "echo a || d".
+						// While this is correct order of operations if this were algebra, we never wanted the stuff
+						//     inside the parentheses to execute in the first place.
+						// Therefore, I pair (   ) delimited stuff into a "ParenthesisToken", which causes Shunting Yard to produce something like this:
+						// [echo a, [echo b, echo c, &&], ||]
+						// This WILL be properly handled during execution, as opposed to the other deque.
 
-					deque<Token*> retq = shuntingYardConstruct(pairedstring);
-					ParenthesisToken* stuffInside = new ParenthesisToken(retq);
+						deque<Token*> retq = shuntingYardConstruct(pairedstring);
+						ParenthesisToken* stuffInside = new ParenthesisToken(retq);
 
-					outputQueue.push_back(stuffInside);
-				
-				} else if (c == '"') {
+						outputQueue.push_back(stuffInside);
+					
+					} else if (c == '"') {
+						buffer.push_back(pairedstring);
+					}
 
-					// buffer.push_back(pairedstring);
-
+					// Now have to move iterator past the parenthesis end
+					it += closepos-currPos;
+					currPos += closepos-currPos;
 				}
-
-
-
-				// Now have to move iterator past the parenthesis end
-				it += closepos-currPos;
-				currPos += closepos-currPos;
-
 			} else { // Not an operator or ()[]"", so it's part of a subcommand
-				// string cstr;
-				// cstr.push_back(c);
-				buffer.push_back(c);
+				string cstr(1, c);
+				buffer.push_back(cstr);
 			}
 
 			currPos += 1;
@@ -211,23 +238,30 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 		// Clear out leftover subcommand stuff
 		if (buffer.size() > 0) {
 			// No appending Subcommands after ParenTokens - this is an error
+			if (DEBUG) {
+				cout << "some chars or strings are still in the buffer" << endl;
+				printVector(buffer, "; ");
+			}
+
 			if (outputQueue.size() > 0) {
 				ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
 				if (ptest != nullptr) {
-					// TODO: throw error
+					// TODO: throw error - this is a command of syntax "(echo a) somestuffafterparen"
 				}
 			}
 
-			bool allspaces = false;
-			for (char s : buffer) {
-				if ((s != ' ') && (s != '\t')) {
+			bool allspaces = true;
+			for (string s : buffer) {
+				if ((s != " ") && (s != "\t")) {
 					allspaces = false;
 					break;
 				}
 			}
 
 			if (!(allspaces)) {
-				string finsubcstring(buffer.begin(), buffer.end());
+				stringstream finres;
+				copy(buffer.begin(), buffer.end(), ostream_iterator<string>(finres));
+				string finsubcstring = finres.str();
 				vector<string> finsubcvect = splitOnChar(finsubcstring, ' ');
 				Subcommand* finsubcobj = new Subcommand(finsubcvect);
 				outputQueue.push_back(finsubcobj);
