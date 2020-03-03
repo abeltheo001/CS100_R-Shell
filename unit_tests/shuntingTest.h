@@ -11,7 +11,7 @@
 #include <vector>
 using namespace std;
 
-TEST(constructorTest,singleEcho) {
+TEST(constuctorTest,singleEcho) {
 	string input = "echo a";
    	RShell rshellobj = RShell(false);
     	deque<Token*> commandDeque = rshellobj.shuntingYardConstruct(input);
@@ -25,29 +25,9 @@ TEST(constructorTest,singleEcho) {
 	delete a;
 
 }
-	
 
-TEST (executorTest, execution)
-{
-	deque<Token*> result;
-	vector<string> V = {"echo","b"};
-	Subcommand* a = new Subcommand(V);
-	result.push_back(a);
 
-	RShell rshellobj = RShell(false);
-	int functionResult = rshellobj.shuntingExecute(result);
-	
-	ASSERT_EQ(functionResult, 0);
-	delete a;
-}
-/*
- * Remaining tests:
- * void makeCommandDeque(string);
- * deque<Token*> shuntingYardConstruct(string);
- * int findClose(const string&,int,char); 
- * */
-
-TEST (DequeCreatorTest,DequeCreator)
+TEST (constructorTest,DequeCreator)
 {
 	string input = "echo a || echo b && echo c";
 	RShell shell = RShell(false);
@@ -73,5 +53,42 @@ TEST (DequeCreatorTest,DequeCreator)
 
 	ASSERT_EQ(result.size(),check.size());
 	delete a, b, c;
+}
+
+
+
+TEST (executorTest, execution)
+{
+	deque<Token*> result;
+	vector<string> V = {"echo","b"};
+	Subcommand* a = new Subcommand(V);
+	result.push_back(a);
+
+	RShell rshellobj = RShell(false);
+	int functionResult = rshellobj.shuntingExecute(result);
+	
+	ASSERT_EQ(functionResult, 0);
+	delete a;
+}
+
+TEST (executorTest, DequeExecutor)
+{
+	RShell input = RShell(false);
+	input.makeCommandDeque("echo a || (false && echo c)");
+	int result = input.executeCommandDeque();
+	
+	ASSERT_EQ(0,result);
+}
+
+TEST (findCloseTest, smallCheck)
+{
+	string input = "echo a || (false && echo c)";
+	int start = 10;
+	char targetClose = ')';
+	RShell shell = RShell(false);
+	int result = shell.findClose(input,start,targetClose);
+
+	
+	ASSERT_EQ(result,26);
 }
 #endif
