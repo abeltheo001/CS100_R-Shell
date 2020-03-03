@@ -14,16 +14,15 @@ using namespace std;
 TEST(constructorTest,singleEcho) {
 	string input = "echo a";
    	RShell rshellobj = RShell(false);
-    	deque<Token*> commandDeque = rshellobj.shuntingYardConstruct(input);
-	
-    	deque<Token*> correct;
-    	vector<string> V = {"echo", "a"};
-    	Subcommand* a = new Subcommand(V);
-    	correct.push_back(a);
+	deque<Token*> commandDeque = rshellobj.shuntingYardConstruct(input);
+
+	deque<Token*> correct;
+	vector<string> V = {"echo", "a"};
+	Subcommand* a = new Subcommand(V);
+	correct.push_back(a);
 
 	ASSERT_EQ(correct.size(),commandDeque.size());
 	delete a;
-
 }
 	
 
@@ -69,7 +68,6 @@ TEST (DequeCreatorTest,DequeCreator)
 	check.push_back(c);
 	Token* addToken = new AndToken({"&&"});
 	check.push_back(addToken);
-
 
 	ASSERT_EQ(result.size(),check.size());
 	delete a, b, c;
