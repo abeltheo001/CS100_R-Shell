@@ -59,6 +59,12 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 											{'[', ']'},
 											{'\"', '\"'}
 											};
+	unordered_set<char> closes;
+	for (pair<char, char> cpair : openToClose) {
+		closes.insert(cpair.second);
+	}
+	closes.erase('\"'); // This will be handled by findCloses later on.
+
 	// The following deque is used for checking whether an operator has been read
 	deque<char> backlog;
 	int maxbacklog = 2; // Defined by the longest operator in operators; update as needed
@@ -167,10 +173,17 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 
 			if (opfound) {
 				// Was already done in inner loop
+			} else if (closes.count(c) > 0) {
+				cout << "RSHELL error: mismatched " << c << ". Exiting back to command loop." << endl;
+				for (Token* t : outputQueue) {
+					delete t;
+				}
+				outputQueue.clear();
+				return outputQueue;
 			} else if (openToClose.count(c) > 0) { // It's something in the form (  ) or [   ] or "  "
 				int closepos = findClose(commandString, currPos, openToClose[c]);
 				if (closepos == -1) {
-					cout << "RSHELL error: mismatched " << c << " " << openToClose[c] << ". Exiting back to command loop." << endl;
+					cout << "RSHELL error: mismatched " << c << ". Exiting back to command loop." << endl;
 					for (Token* t : outputQueue) {
 						delete t;
 					}
