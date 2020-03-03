@@ -1,10 +1,8 @@
 #ifndef __CONSTRUCTEXPRESSIONTREETEST_H__
 #define __CONSTRUCTEXPRESSIONTREETEST_H__
 
-#include "gtest/gtest.h"
 #include "../header/rshellclasses.h"
 #include "../header/tokenize.h"
-#include "../header/constructExpressionTree.h"
 #include <vector>
 #include <string>
 
