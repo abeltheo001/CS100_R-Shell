@@ -52,19 +52,17 @@ else
 	echo "rshell does not work as expected on echo echo."
 fi
 
-# Unfortunately bash scripts cannot handle comments inside of evaluate arguments
+OUTPUTconnector=$(echo A)
+RSHELLOUTPUTconnector=$(./rshell 'echo A # && echo B' )
 
-# OUTPUTconnector=$(echo A '#' echo B )
-# RSHELLOUTPUTconnector=$(./rshell echo A \# && echo B )
-
-# if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
-# then
-# 	echo "rshell works as expected on echo A #&& echo B."
-# else
-# 	echo "rshell does not work as expected on echo A #&& echo B."
-# 	echo $OUTPUTconnector
-# 	echo $RSHELLOUTPUTconnector
-# fi
+if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+then
+	echo "rshell works as expected on echo A #&& echo B."
+else
+	echo "rshell does not work as expected on echo A #&& echo B."
+	echo $OUTPUTconnector
+	echo $RSHELLOUTPUTconnector
+fi
 
 OUTPUTconnector=$(git status)
 RSHELLOUTPUTconnector=$(./rshell git status)
