@@ -38,41 +38,41 @@ Some planned special constructs to catch:
 
 Parsing of statements happens in header/shuntingYardConstruct.h, which directly constructs the postfix queue from the input string. The algorithm is based around Shunting Yard, and roughly follows these steps:
 
-for char c in inString
+	for char c in inString
 
-	if c and previous chars are equivalent to "&&", "||", or ";". This means we're currently on an operator.
-		Flush the buffer (except for the length of the operator) and store it in a Subcommand.
-		Flush the operator to its operator type, such as AndToken, OrToken, or SemiToken.
-		Handle the Subcommand and operator Token in the same manner as Shunting Yard. In particular,
-			Subcommand gets sent to the outputQueue, and the operator Token gets sent to the operator stack.
-			If there are any operators on the operator stack, push those to the outputQueue before pushing onto the stack.
-	else if c is ( or [ or ",
-		then a block of inString needs to grouped and dealt with.
-		first, find the relevant "close" position for this char. If c = (, then close = ).
-		this skips nested parentheses and only outputs the depth when the close paren is at the same depth.
-		if parentheses
-			recursively run shuntingYardConstruct and place the outputQueue into a ParenthesisToken. This is for proper handling of precedence order.
-		if brackets
-			set the inside to a TestToken
-		if "
-			add the quote block to the buffer
-	else
-		store c in a buffer of strings
+		if c and previous chars are equivalent to "&&", "||", or ";". This means we're currently on an operator.
+			Flush the buffer (except for the length of the operator) and store it in a Subcommand.
+			Flush the operator to its operator type, such as AndToken, OrToken, or SemiToken.
+			Handle the Subcommand and operator Token in the same manner as Shunting Yard. In particular,
+				Subcommand gets sent to the outputQueue, and the operator Token gets sent to the operator stack.
+				If there are any operators on the operator stack, push those to the outputQueue before pushing onto the stack.
+		else if c is ( or [ or ",
+			then a block of inString needs to grouped and dealt with.
+			first, find the relevant "close" position for this char. If c = (, then close = ).
+			this skips nested parentheses and only outputs the depth when the close paren is at the same depth.
+			if parentheses
+				recursively run shuntingYardConstruct and place the outputQueue into a ParenthesisToken. This is for proper handling of precedence order.
+			if brackets
+				set the inside to a TestToken
+			if "
+				add the quote block to the buffer
+		else
+			store c in a buffer of strings
 
-if buffer is nonempty
-	flush buffer to a Subcommand and push it onto outputQueue.
+	if buffer is nonempty
+		flush buffer to a Subcommand and push it onto outputQueue.
 
 Execution is comparatively more straightforward and follows the same pattern as the Shunting Yard algorithm:
 
-for Token\* t in outputQueue
-	if not operator
-		push to execution stack
-	else
-		pop top two elements from execution stack
-		set first and second elements to operator right and left children (respectively)
-		retval = operator->execute()
-		delete any leftover StorageTokens from previous steps
-		create a new StorageToken(retval) so future operators have access to the return value and push it to the execution stack
+	for Token\* t in outputQueue
+		if not operator
+			push to execution stack
+		else
+			pop top two elements from execution stack
+			set first and second elements to operator right and left children (respectively)
+			retval = operator->execute()
+			delete any leftover StorageTokens from previous steps
+			create a new StorageToken(retval) so future operators have access to the return value and push it to the execution stack
 
 ### Why are parentheses treated recursively?
 
