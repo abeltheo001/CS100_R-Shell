@@ -46,6 +46,7 @@ int RShell::shuntingExecute(deque<Token*> V) {
 				toExecute.push(s);
 			}
 		}
+		return V[V.size()-1]->status;
 	}
 	
 	

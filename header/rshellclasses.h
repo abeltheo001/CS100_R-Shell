@@ -79,7 +79,8 @@ class Subcommand : public Token {
 						return true; 
 					}
 					else{
-						return false;}
+						return false;
+					}
 				}
 
 		
@@ -94,7 +95,8 @@ class Subcommand : public Token {
 						return true; 
 					}
 					else{
-						return false;}
+						return false;
+					}
 
 				}
 				//checks if the file/directory exists and is a directory
@@ -346,7 +348,7 @@ class StorageToken : public Token {
 			return status;
 		}
 		virtual string stringify() {
-			return "StorageToken: " + (char) status;
+			return "StorageToken: " + to_string(status);
 		}
 };
 
@@ -377,7 +379,7 @@ class RShell {
 		// Member variables
 		deque<Token*> commandDeque;
 		unordered_map <string, string> configData;
-		bool DEBUG = true;
+		bool DEBUG = false;
    
 		bool checkBuiltin(vector<string>);
 		deque<Token*> shuntingYardConstruct(string);

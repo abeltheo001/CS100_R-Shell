@@ -32,6 +32,14 @@ int RShell::executeCommandDeque()
 {
 	int execres = shuntingExecute(this->commandDeque);
 
+	if (DEBUG) {
+		cout << "Final execution status:" << endl;
+		for (Token* t : this->commandDeque) {
+			cout << t->status << " ";
+		}
+		cout << endl;
+	}
+
 	deconstructDeque();
 
 	this->commandDeque.clear();
