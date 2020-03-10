@@ -9,6 +9,10 @@
 #include <unordered_map>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "rshellutils.h"
 #include "executeCharArray.h"
 #include "convertVectorToCharArray.h"
@@ -424,5 +428,71 @@ class ParenthesisToken : public Token {
 
 		deque<Token*> interior;
 };
+
+//Assignment 4 Classes 
+//
+// Check for inputredirection. 
+// <, >, >>, and |. 
+		
+// < - Accept input from a file or given subcommand. Store the contents of the command and	
+// insert the result into the desired location. 
+//
+// > - Redirect current subcommand into a file. Create the file if it dosen't exist. If it already
+// exists, Empty the file's exisiting content before appending the new information.
+//
+// >> - Redirect subcommand to a file and append it's result to a file by the given name. 
+// Create the file if it dosen't exist. 
+//
+//>
+class OverrideOutToken : public Token {
+	public: 
+		OverrideOutToken(vector<string> V) {
+			content = V; 
+			isOperator = true; }	
+		virtual string stringify()
+		{return joinVector(content, ' ') + "\""; }
+		virtual int execute()
+		{
+			/* To be deleted
+			//Duplicate file descriptor, store original cin into a different one. 
+			int old_cin = dup(0);
+			if (old_cin < 0)
+				cerr << "Error found" << endl;
+			assert (old_cin == 3);
+			
+			// Create string based on stored input. 
+			// For the sake of concept understanding, a temp string will be created
+			// to see if this works. 
+			
+			string file = "input.txt";
+			int input_fd = open(file,0);
+			*/
+
+			
+
+		}
+};
+// >>
+class AppendOutToken : public Token {
+	public:
+		AppendOutToken(vector<string> V) {
+			content = V;
+			isOperator = true; }
+		virtual string stringify()
+		{return joinVector(content, ' ') + "\""; }
+		virtual int execute();
+};
+// <
+class InputToken : public Token {
+	public:
+		InputToken(vector<string> V) {
+			content = V;
+			isOperator = true; }
+		virtual string stringify()
+		{return joinVector(content, ' ') + "\""; }
+		virtual int execute();
+
+};
+
 
 #endif

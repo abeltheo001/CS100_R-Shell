@@ -53,7 +53,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	//  ParenToken: leftChild->ParenToken,
 	//  ParenToken:
 
-	unordered_set<string> operators = {"||", "&&", ";"};
+	unordered_set<string> operators = {"||", "&&", ";",">","<",">>","|"};
 	unordered_map<char, char> openToClose = {
 											{'(',')'},  
 											{'[', ']'},
@@ -146,6 +146,16 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						outputQueue.push_back(subcobj);
 					}
 
+					// Check for inputredirection. 
+					// <, >, >>, and |. 
+					// < - Accept input from a file or given subcommand. Store the contents of the command and
+					// insert the result into the desired location.  
+					//
+					// > - Redirect current subcommand into a file. Create the file if it dosen't exist. Empty
+					// the contents before appending the new information.
+					//
+					// >> - Redirect subcommand to a file and append it's result to a file by the given name. 
+					// Create the file if it dosen't exist. 
 					// Construct specific type of Token
 					Token* myToken;
 					if (accepted == "||") {
@@ -154,13 +164,19 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						myToken = new AndToken({"&&"});
 					} else if (accepted == ";") {
 						myToken = new SemiToken({";"});
-					}
+					}/* else if (accepted == "<") {
+						myToken = new InputToken({"<"});
+					} else if (accepted == ">>") {
+						myToken = new AppendOutToken({">>"});
+					} else if (accepted == ">") {
+						myToken = new OverrideOutToken({">"});
+					*/
 
 					if (DEBUG == true) {
 						cout << "generated operator:" << myToken->stringify() << endl;
 					}
 
-					// In shunting yard, pop operators when a new one is added.
+					// In shunting yard pop operators when a new one is added.
 					while (shuntingSouth.size() > 0) {
 						Token* myOp = shuntingSouth.top();
 						shuntingSouth.pop();
@@ -190,6 +206,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 					outputQueue.clear();
 					return outputQueue;
 				} else {
+
 					string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
 					
 					if (c == '[') {
@@ -275,7 +292,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 		}
 
 		return outputQueue;
-	}
+
 }
 
 #endif
