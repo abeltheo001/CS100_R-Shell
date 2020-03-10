@@ -65,11 +65,24 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	}
 	closes.erase('\"'); // This will be handled by findCloses later on.
 
+	// Prepare parser for information in operators
+	// 1. Maximum size of deque to look back
+	// 2. Allowed lengths to check (is 1 back this? is 2 back this?)
+	// 3. Collisions requiring lookahead (eg > and >>)
+
 	// The following deque is used for checking whether an operator has been read
 	deque<char> backlog;
-	int maxbacklog = 2; // Defined by the longest operator in operators; update as needed
-	vector<int> allowed_lengths = {2, 1}; // Defined by length of each operator...
-	// TODO: Assignment 4 will cause this approach to fail (probably)
+
+	int maxbacklog = 0;
+	unordered_set<int> allowed_lengths;
+	for (string s : operators) {
+		if (s.size() > maxbacklog) {
+			maxbacklog = s.size();
+		}
+		allowed_lengths.insert(s.size());
+	}
+	
+	// Defined by length of each operator...
 
 	// The following vector is used for flushes to Subcommand
 	vector<string> buffer;
