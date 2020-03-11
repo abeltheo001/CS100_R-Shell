@@ -453,9 +453,9 @@ class RedirectOutToken : public Token {
 	public: 
 		RedirectOutToken(vector<string> V) {
 			content = V; 
-			isOperator = true; }	
-		virtual string stringify()
-		{return joinVector(content, ' ') + "\""; }
+			isOperator = true; 
+		}
+		virtual string stringify() { return joinVector(content, ' ') + "\""; }
 		virtual int execute()
 		{
 			//Placeholder for result from command. Use dup to run command. 
@@ -464,7 +464,7 @@ class RedirectOutToken : public Token {
 			string testCommand = "a";
 			char buffer[20];
 			
-			if (content[0] == ">"){
+			if (content[0] == ">") {
 				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_TRUNC);
 				if (file_fd == -1) {
 					cout << "Error found" << endl;
@@ -491,14 +491,17 @@ class RedirectOutToken : public Token {
 			return 0; 
 		}
 };
+
 class RedirectInputToken : public Token {
 	public:
 		RedirectInputToken(vector<string> V) {
 			content = V;
-			isOperator = true; }
-		virtual string stringify()
-		{return joinVector(content, ' ') + "\""; }
-		virtual int execute();
+			isOperator = true; 
+		}
+		virtual string stringify() {return joinVector(content, ' ') + "\""; }
+		virtual int execute() {
+			return 0; // Needs to have a default value to avoid being pure virtual
+		};
 
 };
 
@@ -506,9 +509,9 @@ class PipeToken : public Token {
 	public: 
 		PipeToken(vector<string> V) {
 			content = V;
-			isOperator = true; }
-		virtual string stringify()
-		{return joinVector(content, ' ') + "\""; }
+			isOperator = true; 
+		}
+		virtual string stringify() {return joinVector(content, ' ') + "\""; }
 		virtual int execute() {
 			string leftCommand = leftChild -> content[0];
 			string rightCommand = rightChild -> content[0];
