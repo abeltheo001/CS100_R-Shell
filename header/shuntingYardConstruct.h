@@ -72,7 +72,9 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 
 	// The following deque is used for checking whether an operator has been read
 	deque<char> backlog;
+	unordered_map<int, vector<string>> operatorlengths;
 
+	// Set 1 and 2
 	int maxbacklog = 0;
 	unordered_set<int> allowed_lengths;
 	for (string s : operators) {
@@ -80,9 +82,20 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 			maxbacklog = s.size();
 		}
 		allowed_lengths.insert(s.size());
+		if (operatorlengths.count(s.size()) > 0) {
+
+		} else {
+			pair<int, vector<string>> toInsert = {s.size(), {}};
+			operatorlengths.insert(toInsert);
+		}
 	}
-	
-	// Defined by length of each operator...
+
+	// Find collisions (eg | and ||)
+	unordered_map<string, string> collisions;
+	// If any operators match at any end position, (eg | and || match at index 0, which is the end of |), then there's a collision
+	for (string o : operators) {
+		// TODO: Add collisions algorithm
+	}
 
 	// The following vector is used for flushes to Subcommand
 	vector<string> buffer;
