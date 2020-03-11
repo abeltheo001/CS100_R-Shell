@@ -53,7 +53,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	//  ParenToken: leftChild->ParenToken,
 	//  ParenToken:
 
-	unordered_set<string> operators = {"||", "&&", ";"};
+	unordered_set<string> operators = {"||", "&&", ";" ,">", "<"}; //,">>","|"}; // Excluding these for collisions reasons
 	unordered_map<char, char> openToClose = {
 											{'(',')'},  
 											{'[', ']'},
@@ -172,6 +172,16 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						outputQueue.push_back(subcobj);
 					}
 
+					// Check for inputredirection. 
+					// <, >, >>, and |. 
+					// < - Accept input from a file or given subcommand. Store the contents of the command and
+					// insert the result into the desired location.  
+					//
+					// > - Redirect current subcommand into a file. Create the file if it dosen't exist. Empty
+					// the contents before appending the new information.
+					//
+					// >> - Redirect subcommand to a file and append it's result to a file by the given name. 
+					// Create the file if it dosen't exist. 
 					// Construct specific type of Token
 					Token* myToken;
 					if (accepted == "||") {
@@ -180,13 +190,21 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						myToken = new AndToken({"&&"});
 					} else if (accepted == ";") {
 						myToken = new SemiToken({";"});
+					} else if (accepted == "<") {
+						myToken = new RedirectInputToken({"<"});
+					} else if (accepted == ">>") {
+						myToken = new RedirectOutToken({">>"});
+					} else if (accepted == ">") {
+						myToken = new RedirectOutToken({">"});
+					} else if (accepted == "|") {
+						myToken = new PipeToken({"|"});
 					}
-
+					
 					if (DEBUG == true) {
 						cout << "generated operator:" << myToken->stringify() << endl;
 					}
 
-					// In shunting yard, pop operators when a new one is added.
+					// In shunting yard pop operators when a new one is added.
 					while (shuntingSouth.size() > 0) {
 						Token* myOp = shuntingSouth.top();
 						shuntingSouth.pop();
@@ -216,6 +234,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 					outputQueue.clear();
 					return outputQueue;
 				} else {
+
 					string pairedstring(commandString.begin()+currPos+1, commandString.begin()+closepos);
 					
 					if (c == '[') {
@@ -260,48 +279,49 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 
 			currPos += 1;
 		}
-
-		// Clear out leftover subcommand stuff
-		if (buffer.size() > 0) {
-			// No appending Subcommands after ParenTokens - this is an error
-			if (DEBUG) {
-				cout << "some chars or strings are still in the buffer" << endl;
-				printVector(buffer, "; ");
-			}
-
-			if (outputQueue.size() > 0) {
-				ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
-				if (ptest != nullptr) {
-					// TODO: throw error - this is a command of syntax "(echo a) somestuffafterparen"
-				}
-			}
-
-			bool allspaces = true;
-			for (string s : buffer) {
-				if ((s != " ") && (s != "\t")) {
-					allspaces = false;
-					break;
-				}
-			}
-
-			if (!(allspaces)) {
-				stringstream finres;
-				copy(buffer.begin(), buffer.end(), ostream_iterator<string>(finres));
-				string finsubcstring = finres.str();
-				vector<string> finsubcvect = splitOnChar(finsubcstring, ' ');
-				Subcommand* finsubcobj = new Subcommand(finsubcvect);
-				outputQueue.push_back(finsubcobj);
-			}
-		}
-
-		// Clear out leftover operators
-		while (shuntingSouth.size() > 0) {
-			outputQueue.push_back(shuntingSouth.top());
-			shuntingSouth.pop();
-		}
-
-		return outputQueue;
 	}
+
+	// Clear out leftover subcommand stuff
+	if (buffer.size() > 0) {
+		// No appending Subcommands after ParenTokens - this is an error
+		if (DEBUG) {
+			cout << "some chars or strings are still in the buffer" << endl;
+			printVector(buffer, "; ");
+		}
+
+		if (outputQueue.size() > 0) {
+			ParenthesisToken* ptest = dynamic_cast<ParenthesisToken*>(outputQueue[outputQueue.size()-1]);
+			if (ptest != nullptr) {
+				// TODO: throw error - this is a command of syntax "(echo a) somestuffafterparen"
+			}
+		}
+
+		bool allspaces = true;
+		for (string s : buffer) {
+			if ((s != " ") && (s != "\t")) {
+				allspaces = false;
+				break;
+			}
+		}
+
+		if (!(allspaces)) {
+			stringstream finres;
+			copy(buffer.begin(), buffer.end(), ostream_iterator<string>(finres));
+			string finsubcstring = finres.str();
+			vector<string> finsubcvect = splitOnChar(finsubcstring, ' ');
+			Subcommand* finsubcobj = new Subcommand(finsubcvect);
+			outputQueue.push_back(finsubcobj);
+		}
+	}
+
+	// Clear out leftover operators
+	while (shuntingSouth.size() > 0) {
+		outputQueue.push_back(shuntingSouth.top());
+		shuntingSouth.pop();
+	}
+
+	return outputQueue;
+
 }
 
 #endif

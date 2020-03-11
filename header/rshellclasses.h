@@ -1,6 +1,7 @@
 #ifndef RSHELLCLASSES_H
 #define RSHELLCLASSES_H
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <stack>
@@ -9,6 +10,14 @@
 #include <unordered_map>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <cstring>
+#include <thread>
+#include <chrono>
+#include <fcntl.h>
 #include "rshellutils.h"
 #include "executeCharArray.h"
 #include "convertVectorToCharArray.h"
@@ -35,6 +44,7 @@ class Token {
 
         // Member variables
         vector<string> content;
+	bool isOperator;
         Token* leftChild = nullptr;
         Token* rightChild = nullptr;
         int status = -2; // Current exit status of Token.
@@ -44,7 +54,6 @@ class Token {
 		// -1: Subcommand not found
 		// 0: Subcommand ran successfully
 		// anything else: Subcommand failed
-		bool isOperator;
 };
 
 class Subcommand : public Token {
@@ -424,5 +433,117 @@ class ParenthesisToken : public Token {
 
 		deque<Token*> interior;
 };
+
+//Assignment 4 Classes 
+//
+// Check for inputredirection. 
+// <, >, >>, and |. 
+		
+// < - Accept input from a file or given subcommand. Store the contents of the command and	
+// insert the result into the desired location. 
+//
+// > - Redirect current subcommand into a file. Create the file if it dosen't exist. If it already
+// exists, Empty the file's exisiting content before appending the new information.
+//
+// >> - Redirect subcommand to a file and append it's result to a file by the given name. 
+// Create the file if it dosen't exist. 
+//
+//> and >> 
+class RedirectOutToken : public Token {
+	public: 
+		RedirectOutToken(vector<string> V) {
+			content = V; 
+			isOperator = true; 
+		}
+		virtual string stringify() { return joinVector(content, ' ') + "\""; }
+		virtual int execute()
+		{
+			//Placeholder for result from command. Use dup to run command. 
+		 	int command = leftChild->execute();
+			string fileName = rightChild->content[0];
+			string testCommand = "a";
+			char buffer[20];
+			
+			if (content[0] == ">") {
+				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_TRUNC);
+				if (file_fd == -1) {
+					cout << "Error found" << endl;
+					return -1;
+				}
+				write (file_fd, testCommand.c_str(), testCommand.size()+1);
+				close (file_fd);
+			}
+			else if (content[0] == ">>") {
+				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_APPEND);
+				if (file_fd == -1) {
+					cout << "Error found" << endl;
+					return -1; 
+				}
+				write (file_fd, testCommand.c_str(), testCommand.size()+1);
+				close (file_fd);
+			}
+			else 
+			{
+				cout << "Error found" << endl;
+				return -1;
+			}
+
+			return 0; 
+		}
+};
+
+class RedirectInputToken : public Token {
+	public:
+		RedirectInputToken(vector<string> V) {
+			content = V;
+			isOperator = true; 
+		}
+		virtual string stringify() {return joinVector(content, ' ') + "\""; }
+		virtual int execute() {
+			return 0; // Needs to have a default value to avoid being pure virtual
+		};
+
+};
+
+class PipeToken : public Token {
+	public: 
+		PipeToken(vector<string> V) {
+			content = V;
+			isOperator = true; 
+		}
+		virtual string stringify() {return joinVector(content, ' ') + "\""; }
+		virtual int execute() {
+			string leftCommand = leftChild -> content[0];
+			string rightCommand = rightChild -> content[0];
+			bool flag = true;
+			string r = "r";
+			string w = "w";
+			
+			const int PATH_MX = 420;
+			char buffer[PATH_MX];
+			char buffer2[PATH_MX];
+			
+			memset(buffer,'\0',PATH_MX);
+			memset(buffer2, '\0',PATH_MX);
+			
+			FILE *in_pipe = popen(leftCommand.c_str(), r.c_str());
+			FILE *out_pipe = popen(rightCommand.c_str(), w.c_str());
+			
+			if ((in_pipe = nullptr) && (out_pipe == nullptr)) {
+				flag = false;
+				cout << "Piping error, check input";
+			}
+
+			while (fgets(buffer,PATH_MX,in_pipe) != nullptr) {
+				fputs(buffer,out_pipe);
+			}
+			
+			pclose(in_pipe);
+			pclose(out_pipe);
+			
+			return 0;
+		}
+};
+
 
 #endif
