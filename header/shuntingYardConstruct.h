@@ -5,6 +5,8 @@
 #include <vector>
 #include <deque>
 #include <stack>
+#include <map>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
 #include <sstream>
@@ -53,7 +55,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	//  ParenToken: leftChild->ParenToken,
 	//  ParenToken:
 
-	unordered_set<string> operators = {"||", "&&", ";" ,">", "<"}; //,">>","|"}; // Excluding these for collisions reasons
+	unordered_set<string> operators = {"||", "&&", ";" ,">", "<", ">>", "|"};
 	unordered_map<char, char> openToClose = {
 											{'(',')'},  
 											{'[', ']'},
@@ -72,29 +74,53 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 
 	// The following deque is used for checking whether an operator has been read
 	deque<char> backlog;
-	unordered_map<int, vector<string>> operatorlengths;
+	map<int, vector<string>> operatorlengths; // By default this is already sorted by key on inserts :)
 
-	// Set 1 and 2
+	// Set (1) and (2)
 	int maxbacklog = 0;
-	unordered_set<int> allowed_lengths;
+	set<int> allowed_lengths;
 	for (string s : operators) {
 		if (s.size() > maxbacklog) {
 			maxbacklog = s.size();
 		}
 		allowed_lengths.insert(s.size());
 		if (operatorlengths.count(s.size()) > 0) {
-
+			operatorlengths[s.size()].push_back(s);
 		} else {
-			pair<int, vector<string>> toInsert = {s.size(), {}};
+			pair<int, vector<string>> toInsert = {s.size(), {s}};
 			operatorlengths.insert(toInsert);
 		}
 	}
 
-	// Find collisions (eg | and ||)
-	unordered_map<string, string> collisions;
+	// Find collisions (eg | and ||) (ie set (3))
 	// If any operators match at any end position, (eg | and || match at index 0, which is the end of |), then there's a collision
-	for (string o : operators) {
-		// TODO: Add collisions algorithm
+	// Simplest as an n^2 algorithm
+	unordered_map<string, string> collisions;
+	for (auto it = allowed_lengths.begin(); it != allowed_lengths.end(); it++) {
+		if (*it != maxbacklog) {
+			for (string op_small : operatorlengths[*it]) {
+				auto it2 = it;
+				it2++;
+				while (it2 != allowed_lengths.end()) {
+					for (string op_large : operatorlengths[*it2]) {
+						// cout << op_small << " " << op_large.substr(0,*it) << endl;
+						if (op_small == op_large.substr(0,*it)) {
+							pair<string, string> col = {op_small, op_large};
+							collisions.insert(col);
+
+						}
+					}
+					it2++;
+				}
+			}
+		}
+	}
+
+	if (DEBUG) {
+		cout << "Detected collisions: " << collisions.size() << endl;
+		for (auto p : collisions) {
+			cout << p.first << " " << p.second << endl;
+		}
 	}
 
 	// The following vector is used for flushes to Subcommand
@@ -104,10 +130,25 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	stack<Token*> shuntingSouth;
 	deque<Token*> outputQueue;
 
+	// Cases for shuntingYardConstruct.h:
+	// 0. If the string starts with #, then it's empty. Return an empty deque.
+	// 1. The current backlog is _#. If so, just make a Subcommand if there's anything meaningful 
+	//    on the buffer, and then return outputQueue.
+	// 2. If the backlog queue matches a defined operator, then construct an operator and
+	//    shunting push it onto the stack.
+	//    In some special cases, eg | and ||, there can be collisions, but these are detected prior
+	//    to runtime and handled by looking ahead one character.
+	// 3. If the current character matches something in openToClose (eg ( ) or [ ]), then the entire
+	//    inside of the block needs to be dealt with together. For ( ), shuntingYardConstruct is
+	//    called recursively. For [ ], the insides are split on spaces and sent to TestToken. For
+	//    quotes, the entire inside is turned into a string, and then pushed onto the buffer.
+	// 4. If none of the above conditions applied, then this char is probably part of a Subcommand.
+	//    Push it to the buffer. (The multi-char operators deal with this by deleting stuff from the
+	//    buffer as needed.)
+
 	if (commandString.at(0) == '#') {
 		return outputQueue;
 	} else {
-		int lastFlushed = 0;
 		int currPos = 0;
 		for (auto it = commandString.begin(); it != commandString.end(); it++) {
 			// Check if currently on something in "operators"
@@ -120,8 +161,17 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 				backlog.pop_front();
 			}
 
+			// If _# is the furthest right, then we just started a comment block.
+			if (backlog.size() > 1) {
+				string tworight(backlog.end()-2, backlog.end());
+				if (tworight == " #") {
+					break;
+				}
+			}
+
 			bool opfound = false;
-			if (currPos >= 4) { // Only makes sense to run this for "f ||" and larger
+			if (currPos >= 2) { // Only makes sense to run this block (checks for operators) for "f ||" and larger
+				// Look through operator list and see if there's a match
 				string accepted = " ";
 				int matchsize = -1;
 				for (int i : allowed_lengths) {
@@ -136,17 +186,13 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 					}
 				}
 
-				// If _# is the furthest right, then we just started a comment block.
-				string tworight(backlog.end()-2, backlog.end());
-				if (tworight == " #") {
-					break;
-				}
-
 				if (accepted != " ") {
 					opfound = true;
 					for (int i = 0; i < matchsize-1; i++) {
 						buffer.pop_back();
 					}
+
+					// Create Subcommand string by merging vector<string> buffer
 					stringstream res;
 					copy(buffer.begin(), buffer.end(), ostream_iterator<string>(res));
 					string subcstring = res.str();
@@ -156,6 +202,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						cout << "generated subcommand string:" << subcstring << endl;
 					}
 
+					// Split Subcommand string
 					buffer.clear();
 					vector<string> subcvect = splitOnChar(subcstring, ' '); // strip() and split(' ')!
 
@@ -164,25 +211,46 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						printVector(subcvect,"; ");
 					}
 
-					lastFlushed = currPos + 1;
-
+					// Actually generate Subcommand vector
 					if (subcvect.size() > 0) {
 						// Needed for edge case of operator after ParenToken (should not insert " ")
 						Subcommand* subcobj = new Subcommand(subcvect);
 						outputQueue.push_back(subcobj);
 					}
 
-					// Check for inputredirection. 
-					// <, >, >>, and |. 
-					// < - Accept input from a file or given subcommand. Store the contents of the command and
-					// insert the result into the desired location.  
-					//
-					// > - Redirect current subcommand into a file. Create the file if it dosen't exist. Empty
-					// the contents before appending the new information.
-					//
-					// >> - Redirect subcommand to a file and append it's result to a file by the given name. 
-					// Create the file if it dosen't exist. 
-					// Construct specific type of Token
+					// Run collision checks to see if we need to do > or >>
+					if (collisions.count(accepted) > 0) {
+						string larger = collisions[accepted];
+						int diff = larger.size() - accepted.size();
+						if (currPos + diff >= commandString.size()) {
+							cout << "ERROR: There appears to be an operator at the end of your commandString. Terminating." << endl;
+							for (Token* t : outputQueue) {
+								delete t;
+							}
+							outputQueue.clear();
+							return outputQueue;
+						} else {
+							// Either it's > or >> at this point
+							bool allmatch = true;
+							int largerpos = accepted.size();
+							for (int i = currPos + accepted.size(); i < currPos + diff; i++) {
+								if (commandString[i] != larger[largerpos]) {
+									allmatch = false;
+									break;
+								}
+							}
+
+							// If not everything matches, just keep the old accepted string.
+							// Otherwise update accordingly.
+							if (allmatch == true) {
+								accepted = larger;
+								currPos += diff;
+								it += diff;
+							}
+						}
+					}
+
+					// Construct our specific type of Token
 					Token* myToken;
 					if (accepted == "||") {
 						myToken = new OrToken({"||"});
@@ -204,7 +272,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						cout << "generated operator:" << myToken->stringify() << endl;
 					}
 
-					// In shunting yard pop operators when a new one is added.
+					// In Shunting Yard, pop operators when a new one is added.
 					while (shuntingSouth.size() > 0) {
 						Token* myOp = shuntingSouth.top();
 						shuntingSouth.pop();

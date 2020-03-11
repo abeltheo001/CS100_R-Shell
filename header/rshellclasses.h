@@ -455,7 +455,7 @@ class RedirectOutToken : public Token {
 			content = V; 
 			isOperator = true; 
 		}
-		virtual string stringify() { return joinVector(content, ' ') + "\""; }
+		virtual string stringify() { return "RedirectOutToken (>, >>): \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute()
 		{
 			//Placeholder for result from command. Use dup to run command. 
@@ -498,7 +498,7 @@ class RedirectInputToken : public Token {
 			content = V;
 			isOperator = true; 
 		}
-		virtual string stringify() {return joinVector(content, ' ') + "\""; }
+		virtual string stringify() { return "RedirectInputToken (<): \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute() {
 			return 0; // Needs to have a default value to avoid being pure virtual
 		};
@@ -506,12 +506,12 @@ class RedirectInputToken : public Token {
 };
 
 class PipeToken : public Token {
-	public: 
+	public:
 		PipeToken(vector<string> V) {
 			content = V;
 			isOperator = true; 
 		}
-		virtual string stringify() {return joinVector(content, ' ') + "\""; }
+		virtual string stringify() { return "PipeToken (|): \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute() {
 			string leftCommand = leftChild -> content[0];
 			string rightCommand = rightChild -> content[0];
