@@ -164,13 +164,15 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						myToken = new AndToken({"&&"});
 					} else if (accepted == ";") {
 						myToken = new SemiToken({";"});
-					}/* else if (accepted == "<") {
-						myToken = new InputToken({"<"});
+					} else if (accepted == "<") {
+						myToken = new RedirectInputToken({"<"});
 					} else if (accepted == ">>") {
-						myToken = new AppendOutToken({">>"});
+						myToken = new RedirectOutToken({">>"});
 					} else if (accepted == ">") {
-						myToken = new OverrideOutToken({">"});
-					*/
+						myToken = new RedirectOutToken({">"});
+					} else if (accepted == "|") {
+						myToken = new PipeToken({"|"});}
+					
 
 					if (DEBUG == true) {
 						cout << "generated operator:" << myToken->stringify() << endl;
