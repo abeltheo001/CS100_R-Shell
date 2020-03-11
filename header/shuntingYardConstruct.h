@@ -53,7 +53,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	//  ParenToken: leftChild->ParenToken,
 	//  ParenToken:
 
-	unordered_set<string> operators = {"||", "&&", ";" ,">", "<"}; //,">>","|"}; // Excluding these for collisions reasons
+	unordered_set<string> operators = {"||", "&&", ";" ,">", "<", ">>","|"}; //,">>","|"}; // Excluding these for collisions reasons
 	unordered_map<char, char> openToClose = {
 											{'(',')'},  
 											{'[', ']'},
