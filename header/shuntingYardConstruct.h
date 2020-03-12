@@ -220,8 +220,18 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 
 					// Run collision checks to see if we need to do > or >>
 					if (collisions.count(accepted) > 0) {
+						if (DEBUG) {
+							cout << "Operator \"" << accepted << "\" has collision with operator \"" << collisions[accepted] << '"' << endl;
+							cout << "Running collision mitigation..." << endl;
+						}
+
 						string larger = collisions[accepted];
 						int diff = larger.size() - accepted.size();
+
+						if (DEBUG) {
+							cout << "Length diff between two operators: " << diff << endl;
+						}
+
 						if (currPos + diff >= commandString.size()) {
 							cout << "ERROR: There appears to be an operator at the end of your commandString. Terminating." << endl;
 							for (Token* t : outputQueue) {
@@ -231,6 +241,10 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 							return outputQueue;
 						} else {
 							// Either it's > or >> at this point
+							if (DEBUG) {
+								cout << "Peeking forward to see if subsequent characters match bigger operator." << endl;
+							}
+
 							bool allmatch = true;
 							int largerpos = accepted.size();
 							for(int i = currPos + accepted.size(); i < currPos + accepted.size() + diff; i++) {
