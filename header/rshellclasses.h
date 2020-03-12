@@ -64,10 +64,6 @@ class Subcommand : public Token {
 			isOperator = false;
 		}
         virtual string stringify() { return "Subcommand: \"" + joinVector(content, ' ') + "\""; }
-
-		bool operator==(Subcommand const rhs) const {
-			return (this->content == rhs.content);
-		}
         
 		bool test()
 		{
@@ -166,10 +162,6 @@ class AndToken: public Token {
 
         virtual string stringify() { return "AndToken: \"" + joinVector(content, ' ') + '\"'; }
 
-		bool operator==(AndToken const rhs) const {
-			return (this->content == rhs.content);
-		}
-
 		virtual int execute() {
 			int statusLeft, statusRight = -2;
 			statusLeft = leftChild->execute();
@@ -204,10 +196,6 @@ class OrToken: public Token {
 
         virtual string stringify() { return "OrToken: \"" + joinVector(content, ' ') + '\"'; }
 
-		bool operator==(OrToken const rhs) const {
-			return (this->content == rhs.content);
-		}
-
         virtual int execute() {
             int statusLeft, statusRight = -2;
             statusLeft = leftChild->execute();
@@ -241,10 +229,6 @@ class SemiToken: public Token {
 		}
 		
         virtual string stringify() { return "SemiToken: \"" + joinVector(content, ' ') + "\""; }
-
-		bool operator==(SemiToken const rhs) const {
-			return (this->content == rhs.content); 
-		}
 
 		virtual int execute() { 
 			leftChild->execute();
