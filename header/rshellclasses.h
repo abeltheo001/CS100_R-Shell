@@ -510,8 +510,8 @@ class EmptyOutToken : public Token {
 	public: 
 		EmptyOutToken(vector<string> V) {
 			content = V; 
-			isOperator = true; i
-		
+			isOperator = true; 
+		}
 		virtual string stringify() { return "EmptyOutToken \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute()
 		{
