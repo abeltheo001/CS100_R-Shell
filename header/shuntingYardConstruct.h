@@ -178,6 +178,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 					string query(backlog.begin()+(maxbacklog-i), backlog.end());
 					if (operators.count(query) > 0) {
 						accepted = query;
+						cout << accepted << endl;
 						matchsize = i;
 						if (DEBUG == true) {
 							cout << "backlog queue matched with: \"" << accepted << "\"" << endl;
@@ -209,6 +210,7 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 					if (DEBUG == true) {
 						cout << "generated subcommand vector:" << endl;
 						printVector(subcvect,"; ");
+						cout << accepted << endl;
 					}
 
 					// Actually generate Subcommand vector
@@ -260,10 +262,10 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						myToken = new SemiToken({";"});
 					} else if (accepted == "<") {
 						myToken = new RedirectInputToken({"<"});
-					} else if (accepted == ">>") {
-						myToken = new RedirectOutToken({">>"});
 					} else if (accepted == ">") {
-						myToken = new RedirectOutToken({">"});
+						myToken = new EmptyOutToken({">"});
+					} else if (accepted == ">>") {
+						myToken = new AppendOutToken({">>"});
 					} else if (accepted == "|") {
 						myToken = new PipeToken({"|"});
 					}

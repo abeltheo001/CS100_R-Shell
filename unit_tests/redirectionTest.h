@@ -21,7 +21,7 @@ TEST (redirectOutTest, Appending)
 
 	Token* command = new Subcommand({file});
 	Token* response = new Subcommand({"DM the god himself"});
-	Token* check = new RedirectOutToken({">>"});
+	Token* check = new AppendOutToken({">>"});
 
 
 	deque<Token*> V;
