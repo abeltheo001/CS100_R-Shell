@@ -137,7 +137,7 @@ class Subcommand : public Token {
 				char** chararr = convertVectorToCharArray(content);
 				status = executeCharArray(chararr);
 				
-				if (status == -1) {
+				if (status == 47) {
 					cout << "RSHELL: Command not found!" << endl;
 				}
 

@@ -26,7 +26,8 @@ int executeCharArray(char** charIn)
             // Akin to *argv[0], the first argument is the name of the thing it's being called inside
             execvp(charIn[0], charIn);
             // If it returns, the charIn[0] is unknown
-            return -1;
+            // return -1; // -1 as an exit status has undefined behavior https://stackoverflow.com/questions/18890534/c-how-can-i-return-a-negative-value-in-main-cpp
+            return 47;
         }
         else 
         {
