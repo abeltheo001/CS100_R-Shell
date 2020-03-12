@@ -449,48 +449,120 @@ class ParenthesisToken : public Token {
 // Create the file if it dosen't exist. 
 //
 //> and >> 
-class RedirectOutToken : public Token {
+class AppendOutToken : public Token {
 	public: 
-		RedirectOutToken(vector<string> V) {
+		AppendOutToken(vector<string> V) {
 			content = V; 
 			isOperator = true; 
 		}
-		virtual string stringify() { return "RedirectOutToken (>, >>): \"" + joinVector(content, ' ') + "\""; }
+		virtual string stringify() { return "AppendOutToken \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute()
 		{
-			//Placeholder for result from command. Use dup to run command. 
-		 	int command = leftChild->execute();
-			string fileName = rightChild->content[0];
-			string testCommand = "a";
-			char buffer[20];
+			//Assign the values of the leftChild's content as a completed commmand,
+			//Store value into a cstring, and take in the filename from the
+			//rightChild's content. 	
+		 	string fileName = rightChild->content[0];	
+			const int PATH_MX = 420;
+			string testCommand;
+
+			//Take in command from leftChild. 	
+			string command = joinVector(leftChild->content,' ');
+
+			//Create buffer to store value of comamnd. 
+			char buffer2[PATH_MX];
+
+			//Use popen to invoke the shell and get a result for the command. 
+			//Push result into buffer. 
+			FILE* in_pipe = popen(command.c_str(), "r");
+			memset(buffer2, '\0',PATH_MX);
+			
+			//Store the result of the file into a string. 
+			while (fgets(buffer2,PATH_MX, in_pipe) != NULL) {
+				testCommand.append(buffer2);	
+			}
+			
+			pclose(in_pipe);
+			
+			if (content[0] == ">>") {
+				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_APPEND);
+				if (file_fd == -1) {
+					cout << "File dosen't exist" << endl;
+					this->status = 1;
+					return this->status;
+				}
+				write (file_fd, testCommand.c_str(), testCommand.size()+1);
+				close (file_fd);
+				this->status = 0;
+				return this->status;
+			}
+			else 
+			{
+				cout << "incorrectly formatted input" << endl;
+				this->status = 1;
+				return this->status;
+			}
+
+		
+		}
+};
+
+class EmptyOutToken : public Token {
+	public: 
+		EmptyOutToken(vector<string> V) {
+			content = V; 
+			isOperator = true; 
+		}
+		virtual string stringify() { return "EmptyOutToken \"" + joinVector(content, ' ') + "\""; }
+		virtual int execute()
+		{
+			//Assign the values of the leftChild's content as a completed commmand,
+			//Store value into a cstring, and take in the filename from the
+			//rightChild's content. 	
+		 	string fileName = rightChild->content[0];	
+			const int PATH_MX = 420;
+			string testCommand;
+
+			//Take in command from leftChild. 	
+			string command = joinVector(leftChild->content,' ');
+
+			//Create buffer to store value of comamnd. 
+			char buffer2[PATH_MX];
+
+			//Use popen to invoke the shell and get a result for the command. 
+			//Push result into buffer. 
+			FILE* in_pipe = popen(command.c_str(), "r");
+			memset(buffer2, '\0',PATH_MX);
+			
+			//Store the result of the file into a string. 
+			while (fgets(buffer2,PATH_MX, in_pipe) != NULL) {
+				testCommand.append(buffer2);	
+			}
+			
+			pclose(in_pipe);
 			
 			if (content[0] == ">") {
 				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_TRUNC);
 				if (file_fd == -1) {
-					cout << "Error found" << endl;
-					return -1;
+					cout << "File dosen't exist" << endl;
+					this->status = 1;
+					return this->status;
 				}
 				write (file_fd, testCommand.c_str(), testCommand.size()+1);
 				close (file_fd);
-			}
-			else if (content[0] == ">>") {
-				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_APPEND);
-				if (file_fd == -1) {
-					cout << "Error found" << endl;
-					return -1; 
-				}
-				write (file_fd, testCommand.c_str(), testCommand.size()+1);
-				close (file_fd);
+				this->status = 0;
+				return this->status;
 			}
 			else 
 			{
-				cout << "Error found" << endl;
-				return -1;
+				cout << "incorrectly formatted input" << endl;
+				this->status = 1;
+				return this->status;
 			}
 
-			return 0; 
+		
 		}
 };
+
 
 class RedirectInputToken : public Token {
 	public:
@@ -513,11 +585,12 @@ class PipeToken : public Token {
 		}
 		virtual string stringify() { return "PipeToken (|): \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute() {
-			string leftCommand = leftChild -> content[0];
-			string rightCommand = rightChild -> content[0];
-			bool flag = true;
+			string leftCommand = joinVector(leftChild->content, ' ');
+			string rightCommand = joinVector(rightChild->content, ' ');
+			
 			string r = "r";
 			string w = "w";
+			cout << r << w << endl;
 			
 			const int PATH_MX = 420;
 			char buffer[PATH_MX];
@@ -528,16 +601,13 @@ class PipeToken : public Token {
 			
 			FILE *in_pipe = popen(leftCommand.c_str(), r.c_str());
 			FILE *out_pipe = popen(rightCommand.c_str(), w.c_str());
-			
 			if ((in_pipe = nullptr) && (out_pipe == nullptr)) {
-				flag = false;
 				cout << "Piping error, check input";
 			}
 
 			while (fgets(buffer,PATH_MX,in_pipe) != nullptr) {
 				fputs(buffer,out_pipe);
 			}
-			
 			pclose(in_pipe);
 			pclose(out_pipe);
 			

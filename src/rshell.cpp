@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
 	// unordered_map<string, bool> config = initConfig("../.rshellrc");
 
 	if (argc == 1) {
-		RShell shellobj = RShell(true); // (usually) Run with debug when in rshell mode, turned off for submission
+		RShell shellobj = RShell(false); // (usually) Run with debug when in rshell mode, turned off for submission
 
 		string currInput = "";
 		while (currInput != "exit") {
