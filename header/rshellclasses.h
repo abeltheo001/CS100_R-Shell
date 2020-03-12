@@ -453,7 +453,6 @@ class AppendOutToken : public Token {
 	public: 
 		AppendOutToken(vector<string> V) {
 			content = V; 
-			cout << content[0] << endl;
 			isOperator = true; 
 		}
 		virtual string stringify() { return "AppendOutToken \"" + joinVector(content, ' ') + "\""; }
@@ -511,8 +510,8 @@ class EmptyOutToken : public Token {
 	public: 
 		EmptyOutToken(vector<string> V) {
 			content = V; 
-			isOperator = true; 
-		}
+			isOperator = true; i
+		
 		virtual string stringify() { return "EmptyOutToken \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute()
 		{
