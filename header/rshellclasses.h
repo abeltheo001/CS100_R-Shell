@@ -511,7 +511,6 @@ class EmptyOutToken : public Token {
 	public: 
 		EmptyOutToken(vector<string> V) {
 			content = V; 
-			cout << content[0] << endl;
 			isOperator = true; 
 		}
 		virtual string stringify() { return "EmptyOutToken \"" + joinVector(content, ' ') + "\""; }
