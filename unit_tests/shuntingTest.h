@@ -13,7 +13,6 @@
 
 using namespace std;
 
-
 TEST(shuntingYardConstruct, singleEcho) {
 	string input = "echo a";
    	RShell rshellobj = RShell(false);
@@ -92,7 +91,9 @@ TEST(shuntingYardConstruct, parenthesesAndTest) {
 
 	EXPECT_EQ(equal, true);
 
-	delete t1, t2, t3, t4, t5;
+	for (Token* t : correct) {
+		delete t;
+	}
 }
 
 TEST (makeCommandDeque, bashConnectors)
@@ -120,7 +121,9 @@ TEST (makeCommandDeque, bashConnectors)
 
 	ASSERT_EQ((shell.commandDeque).size(),check.size());
 
-	delete a, b, c;
+	for (Token* t : check) {
+		delete t;
+	}
 }	
 
 TEST (shuntingExecute, singleEcho)
