@@ -220,18 +220,8 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 
 					// Run collision checks to see if we need to do > or >>
 					if (collisions.count(accepted) > 0) {
-						if (DEBUG) {
-							cout << "Operator \"" << accepted << "\" has collision with operator \"" << collisions[accepted] << '"' << endl;
-							cout << "Running collision mitigation..." << endl;
-						}
-
 						string larger = collisions[accepted];
 						int diff = larger.size() - accepted.size();
-
-						if (DEBUG) {
-							cout << "Length diff between two operators: " << diff << endl;
-						}
-
 						if (currPos + diff >= commandString.size()) {
 							cout << "ERROR: There appears to be an operator at the end of your commandString. Terminating." << endl;
 							for (Token* t : outputQueue) {
@@ -240,17 +230,10 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 							outputQueue.clear();
 							return outputQueue;
 						} else {
-							// Either it's (for example) > or >> at this point
-							if (DEBUG) {
-								cout << "Peeking forward to see if subsequent characters match bigger operator." << endl;
-							}
-
+							// Either it's > or >> at this point
 							bool allmatch = true;
 							int largerpos = accepted.size();
-							for (int i = currPos + accepted.size(); i < currPos + accepted.size() + diff; i++) {
-								if (DEBUG) {
-									cout << "Comparing expected \"" << larger[largerpos] << "\" with \"" << commandString[i] << '"' << endl;
-								}
+							for (int i = currPos + accepted.size(); i < currPos + diff; i++) {
 								if (commandString[i] != larger[largerpos]) {
 									allmatch = false;
 									break;
@@ -260,9 +243,6 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 							// If not everything matches, just keep the old accepted string.
 							// Otherwise update accordingly.
 							if (allmatch == true) {
-								if (DEBUG) {
-									cout << "Lookahead matches larger operator: " << larger << endl;
-								}
 								accepted = larger;
 								currPos += diff;
 								it += diff;
@@ -288,8 +268,8 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 						myToken = new PipeToken({"|"});
 					}
 					
-					if (DEBUG) {
-						cout << "Generated operator: " << myToken->stringify() << endl;
+					if (DEBUG == true) {
+						cout << "generated operator:" << myToken->stringify() << endl;
 					}
 
 					// In Shunting Yard, pop operators when a new one is added.
