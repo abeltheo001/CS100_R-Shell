@@ -15,9 +15,11 @@ int main(int argc, char *argv[]) {
 			shellobj.makeCommandDeque(currInput);
 			shellobj.executeCommandDeque();
 			if (GLOBAL_EXIT_STATUS == 1) {
-				exit(0);
+				break;
 			}
 		}
+
+		return 0;
 	} else {
 		// Run without debug when in argv mode
 		RShell shellobj = RShell(false);
