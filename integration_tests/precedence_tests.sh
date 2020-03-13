@@ -3,7 +3,7 @@
 OUTPUTconnector=$(echo A || (echo B))
 RSHELLOUTPUTconnector=$(./rshell echo A || (echo B))
 
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+if [ "$OUTPUTconnector" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on echo A || (echo B)"
 else
@@ -13,7 +13,7 @@ fi
 OUTPUTconnector=$(echo A || (echo B || echo C))
 RSHELLOUTPUTconnector=$(./rshell echo A || (echo B || echo C))
 
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+if [ "$OUTPUTconnector" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on echo A || (echo B || echo C)"
 else
@@ -23,7 +23,7 @@ fi
 OUTPUTconnector=$((echo A && echo B) || (echo C && echo D))
 RSHELLOUTPUTconnector=$(./rshell '(echo A && echo B) || (echo C && echo D)')
 
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+if [ "$OUTPUTconnector" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on (echo A && echo B) || (echo C && echo D)"
 else
@@ -33,7 +33,7 @@ fi
 OUTPUTconnector=$( echo A && ((     echo B                  ) || echo C ) )
 RSHELLOUTPUTconnector=$(./rshell 'echo A && ((     echo B                  ) || echo C )')
 
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+if [ "$OUTPUTconnector" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on echo A && ((     echo B                  ) || echo C )"
 else
@@ -43,7 +43,7 @@ fi
 OUTPUTconnector=$( (((((echo E) && echo D ) && echo C ) && echo B ) && echo A) )
 RSHELLOUTPUTconnector=$(./rshell '(((((echo E) && echo D ) && echo C ) && echo B ) && echo A)')
 
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+if [ "$OUTPUTconnector" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on (((((echo E) && echo D ) && echo C ) && echo B ) && echo A)"
 else
