@@ -4,7 +4,7 @@
 
 RSHELLOUTPUTconnector=$(./rshell test -e CMakeLists.txt)
 
-if [ "(True)" == "$RSHELLOUTPUTconnector" ]
+if [ "(True)" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on test -e CMakeLists.txt."
 else
@@ -13,7 +13,7 @@ fi
 
 # OUTPUTconnector=$([ -e CMakeLists.txt ])
 RSHELLOUTPUTconnector=$(./rshell [ -e CMakeLists.txt ])
-if [ "(True)" == "$RSHELLOUTPUTconnector" ]
+if [ "(True)" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on [-e CMakeLists.txt]."
 else
@@ -23,7 +23,7 @@ fi
 OUTPUTconnector=$(echo A || (echo B))
 RSHELLOUTPUTconnector=$(./rshell echo A || (echo B))
 
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+if [ "$OUTPUTconnector" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on echo A || (echo B)"
 else
@@ -33,7 +33,7 @@ fi
 OUTPUTconnector=$(echo A || (echo B || echo C))
 RSHELLOUTPUTconnector=$(./rshell echo A || (echo B || echo C))
 
-if [ "$OUTPUTconnector" == "$RSHELLOUTPUTconnector" ]
+if [ "$OUTPUTconnector" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on echo A || (echo B || echo C)"
 else
