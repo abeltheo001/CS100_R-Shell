@@ -567,16 +567,28 @@ class RedirectInputToken : public Token {
 				return this->status;
 			}
 			
-			dup2(in_file,0);
-			execvp(input[0],input);
+					
+			pid_t pid = fork();
+			if (pid < 0)
+			{
+				string s = "Error: forking child process failed.";
+				const char* errormsg = s.c_str();
+				perror(errormsg);
+				this->status = 1;
+				return this->status;
+			}
+			else if (pid == 0)
+			{	
+				dup2(in_file,0);
+				close(in_file);
+				execvp(input[0],input);	
+				dup2(stdin_save,0);
+				this->status = 0;
+				return this->status;
 
-			dup2(stdin_save,0);
-			close (in_file);
-						
-		
-			this->status = 0;
-			return this->status;
-			
+			//	exit(47);
+					
+			}			
 		};
 
 };
