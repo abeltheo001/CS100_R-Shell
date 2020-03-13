@@ -574,7 +574,7 @@ class RedirectInputToken : public Token {
 			close (in_file);
 						
 		
-			this->status = 1;
+			this->status = 0;
 			return this->status;
 			
 		};
