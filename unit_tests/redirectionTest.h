@@ -20,10 +20,23 @@ TEST (redirectTest, Appending)
 	string file = "text.txt";
 
 	//Create inputs. 
-	Token* command = new Subcommand({"echo cc"});
+	Token* command = new Subcommand({"echo cc bc"});
 	Token* command2 = new Subcommand({"text.txt"});
 	Token* check = new AppendOutToken({">>"});
 
+	ifstream in;
+	in.open(file);
+	string word;
+
+	string line;
+	while(!in.eof())
+	{
+		getline(in,line);
+		word.append(" ");
+		word.append(line);	
+	}
+	
+	word.append("cc bc");
 
 	//Store inputs into deque
 	deque<Token*> V;
@@ -35,7 +48,9 @@ TEST (redirectTest, Appending)
 	//Run the shell
 	shellobj.commandDeque = V;
 	shellobj.shuntingExecute(V);
-	
+
+
+	/*original	
 	//Open the file 
 	ifstream in;
 	in.open(file);
@@ -54,9 +69,26 @@ TEST (redirectTest, Appending)
 
 	string result; 
 	result = word.substr(find+1);
+	*/
+
+	/*current */
+	ifstream in2;
+	in2.open(file);
+	string word2;
+
+	string line2;
+	while(!in2.eof())
+	{
+		getline(in2,line2);
+		word2.append(" ");
+		word2.append(line2);	
+	}
+	word2.pop_back();
 	
 
-	EXPECT_EQ(result,"cc");
+	
+
+	EXPECT_EQ(word, word2);
 }
 
 TEST (redirectTest, Wipe)
