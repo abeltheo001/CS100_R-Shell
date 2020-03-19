@@ -134,23 +134,23 @@ class Subcommand : public Token {
 				}
 				return status;
 			} else { 
-				// char** chararr = convertVectorToCharArray(content);
-				vector<char*> temp;
-				for (string s : content) {
-					temp.push_back(&s[0]);
-				}
-				temp.push_back(nullptr);
+				char** chararr = convertVectorToCharArray(content);
+				// vector<char*> temp;
+				// for (string s : content) {
+				// 	temp.push_back(&s[0]);
+				// }
+				// temp.push_back(nullptr);
 
-				status = executeCharArray(&temp[0]);
+				status = executeCharArray(chararr);
 				
 				if (status == 47) {
-					cout << "RSHELL: Command not found!" << endl;
+					cout << "RSHELL: Command not found! " << '\"' << this->content[0] << '\"' << endl;
 				}
 
-				// for (int i = 0; i < content.size()+1; i++) {
-				// 	delete[] chararr[i];
-				// }
-				// delete[] chararr;
+				for (int i = 0; i < content.size()+1; i++) {
+					delete[] chararr[i];
+				}
+				delete[] chararr;
 
 				return status;
 			}
@@ -585,7 +585,8 @@ class RedirectInputToken : public Token {
 			dup2(stdin_save, 0); // Cleanup
 
 			if (status == 47) {
-				cout << "RSHELL: Command not found!" << endl;
+				cout << "RSHELL: Command not found! " << '\"' << leftChild->content[0] << '\"' << endl;
+				printVector(leftChild->content);
 			}
 
 			for (int i = 0; i < content.size()+1; i++) {
