@@ -447,7 +447,7 @@ class AppendOutToken : public Token {
 			//Store value into a cstring, and take in the filename from the
 			//rightChild's content.
 		 	string fileName = rightChild->content[0];	
-			const int PATH_MX = 10000;
+			const int PATH_MX = 1000;
 			string commandOutput;
 
 			//Take in command from leftChild. 	
@@ -507,7 +507,7 @@ class EmptyOutToken : public Token {
 			//Store value into a cstring, and take in the filename from the
 			//rightChild's content. 	
 		 	string fileName = rightChild->content[0];	
-			const int PATH_MX = 10000;
+			const int PATH_MX = 1000;
 			string commandOutput;
 
 			//Take in command from leftChild. 	
