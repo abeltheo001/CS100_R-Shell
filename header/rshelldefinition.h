@@ -30,9 +30,16 @@ void RShell::makeCommandDeque(string userInput)
 
 int RShell::executeCommandDeque()
 {
+	if (DEBUG) {
+		cout << "EXECUTING:" << endl;
+		cout << "{" << endl;
+	}
+
 	int execres = shuntingExecute(this->commandDeque);
 
 	if (DEBUG) {
+		cout << "}" << endl;
+
 		cout << "Final execution status:" << endl;
 		for (Token* t : this->commandDeque) {
 			cout << t->status << " ";

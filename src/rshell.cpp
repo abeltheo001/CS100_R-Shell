@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	} else {
 		// Run without debug when in argv mode
-		RShell shellobj = RShell(false);
+		RShell shellobj = RShell(true);
 
 		vector<string> args(argv, argv+argc);
 		args.erase(args.begin()); // Unfortunate inefficiency...

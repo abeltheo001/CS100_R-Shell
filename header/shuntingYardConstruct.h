@@ -146,6 +146,12 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 	//    Push it to the buffer. (The multi-char operators deal with this by deleting stuff from the
 	//    buffer as needed.)
 
+	// 5. New case: >, >>, |. If one of these commands exists, the output of the rightmost command from 
+	//    the left hand needs to be recorded for purposes of throwing into a file. The easiest way to
+	//    do this is just to purge the existing deque and concat the left stuff into a string. The reason
+	//    for this is that popen() handles connectors and parentheses fine.
+	// 6. New case: <. If one of these commands exists, dup2(0, file) before running the left command.
+
 	if (commandString.at(0) == '#') {
 		return outputQueue;
 	} else {
@@ -268,6 +274,26 @@ deque<Token*> RShell::shuntingYardConstruct(string commandString) {
 								it += diff;
 							}
 						}
+					}
+
+					// Do replacements for > and >>
+					if ((accepted == ">") || (accepted == ">>") || (accepted == "|")) {
+						// Purge existing memory
+						for (Token* t : outputQueue) {
+							delete t;
+						}
+						outputQueue.clear();
+						while (shuntingSouth.size() > 0) {
+							Token* t = shuntingSouth.top();
+							shuntingSouth.pop();
+							delete t;
+						}
+
+						// Write a new Subcommand with the left stuff to outputQueue
+						string leftofredirect(commandString.begin(), commandString.begin()+currPos+1-accepted.size());
+						vector<string> leftVect = splitOnChar(leftofredirect, ' ');
+						Token* leftSubc = new Subcommand(leftVect);
+						outputQueue.push_back(leftSubc);
 					}
 
 					// Construct our specific type of Token

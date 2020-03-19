@@ -111,13 +111,7 @@ TEST(redirectTest, Pipe)
 	string file = "newInput.txt";
 		
 	//Create inputs. 
-	Token* echo = new Subcommand({"echo b > new Input.txt | tr a-z A-Z "});
-	/*Token* check = new EmptyOutToken({">"});
-	Token* input1 = new Subcommand({"newInput.txt"});
-	Token* pipe = new Subcommand({"|"});
-	Token* tr1 = new Subcommand({"tr"});
-	Token* tr2 = new Subcommand({"a-z"});
-	Token* tr3 = new Subcommand({"A-Z"});*/
+	Token* echo = new Subcommand({"echo","b",">","newInput.txt","|","tr","a-z","A-Z"});
 	Token* input2 = new Subcommand({"newInput.txt"});
 	Token* check1 = new EmptyOutToken({">"});
 
