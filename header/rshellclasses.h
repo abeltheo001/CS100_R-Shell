@@ -574,8 +574,8 @@ class RedirectInputToken : public Token {
 				string s = "Error: forking child process failed.";
 				const char* errormsg = s.c_str();
 				perror(errormsg);
-				this->status = 1;
-				return this->status;
+				//this->status = 1;
+				//return this->status;
 			}
 			else if (pid == 0)
 			{	
@@ -604,33 +604,25 @@ class PipeToken : public Token {
 			string leftCommand = joinVector(leftChild->content, ' ');
 			string rightCommand = joinVector(rightChild->content, ' ');
 
-			
-			cout << "left Command is " << leftCommand << endl;
-			cout << "right Command is " << rightCommand << endl;
-			cout << "PipeToken is " << joinVector(content,' ') << endl;
-
+			const int PATH_MX = 420;
 			string r = "r";
 			string w = "w";
-
-			const int PATH_MX = 420;
 			char buffer[PATH_MX];
-			char buffer2[PATH_MX];
 			
 			memset(buffer,'\0',PATH_MX);
-			memset(buffer2, '\0',PATH_MX);
 			
 			FILE *in_pipe = popen(leftCommand.c_str(), r.c_str());
 			FILE *out_pipe = popen(rightCommand.c_str(), w.c_str());
 
-			if ((in_pipe = nullptr) && (out_pipe == nullptr)) {
+			if ((in_pipe == nullptr) && (out_pipe == nullptr)) {
 				cout << "Piping error, check input";
 			}
-
-			while (fgets(buffer,PATH_MX,in_pipe) != nullptr) {
-				fputs(buffer,out_pipe);
+			
+				
+			while (fgets(buffer,PATH_MX,in_pipe) != NULL) {
+				fputs(buffer, out_pipe);
 			}
 
-			cout << "fputs check" << endl;
 			pclose(in_pipe);
 			pclose(out_pipe);
 			
