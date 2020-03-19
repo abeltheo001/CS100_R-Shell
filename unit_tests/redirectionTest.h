@@ -108,22 +108,22 @@ TEST (redirectTest, Wipe)
 TEST(redirectTest, Pipe)
 {
 	RShell shell = RShell();
-	string file = "input.txt";
+	string file = "newInput.txt";
 		
 	//Create inputs. 
-	Token* echo = new Subcommand({"echo b"});
-	Token* check = new Subcommand({">"});
-	Token* fileName = new Subcommand({"input.txt"});
+	Token* echo = new Subcommand({"echo b > new Input.txt | tr a-z A-Z "});
+	/*Token* check = new EmptyOutToken({">"});
+	Token* input1 = new Subcommand({"newInput.txt"});
 	Token* pipe = new Subcommand({"|"});
 	Token* tr1 = new Subcommand({"tr"});
 	Token* tr2 = new Subcommand({"a-z"});
-	Token* tr3 = new Subcommand({"A-Z"});
-	Token* input = new Subcommand({"input.txt"});
+	Token* tr3 = new Subcommand({"A-Z"});*/
+	Token* input2 = new Subcommand({"newInput.txt"});
 	Token* check1 = new EmptyOutToken({">"});
 
 
 	//Store inputs to deque
-	deque<Token*> V = {echo, check, fileName, pipe, tr1, tr2, tr3, input, check1};
+	deque<Token*> V = {echo, input2, check1};
 
 	//Run the shell
 	shell.commandDeque = V;
