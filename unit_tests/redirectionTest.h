@@ -20,8 +20,8 @@ TEST (redirectTest, Appending)
 	string file = "text.txt";
 
 	//Create inputs. 
-	Token* command2 = new Subcommand({"text.txt"});
 	Token* command = new Subcommand({"echo cc"});
+	Token* command2 = new Subcommand({"text.txt"});
 	Token* check = new AppendOutToken({">>"});
 
 
@@ -39,32 +39,24 @@ TEST (redirectTest, Appending)
 	//Open the file 
 	ifstream in;
 	in.open(file);
+	string word;
 
-	//Check bottom of file for latest input
-	//Iterator to check bottom row of file based on code from stackoverflow
-	//https://stackoverflow.com/questions/11876290/c-fastest-way-to-read-only-last-line-of-text-file
-	if (in.is_open()){	
-		char x; 
-		bool check = true;
-		while(check) {
-		if ((int)in.tellg() <= 1) {
-			in.seekg(0);
-			check = false;
-		} else if (x == '\n') {
-			check = false;
-		} else {
-			in.seekg(-2, ios_base::cur);
-		} }
-
-	}	
-
-	//Once at the lowest point in the file, grab the string and check if it's correct.
-	string end;
-	getline (in,end);
+	string line;
+	while(!in.eof())
+	{
+		getline(in,line);
+		word.append(" ");
+		word.append(line);	
+	}
+	word.pop_back();
 	in.close();	
+	size_t find = word.find_last_of(" ");
+
+	string result; 
+	result = word.substr(find+1);
 	
 
-	EXPECT_EQ(end,"cc");
+	EXPECT_EQ(result,"cc");
 }
 
 TEST (redirectTest, Wipe)
