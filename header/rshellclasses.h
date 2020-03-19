@@ -450,52 +450,49 @@ class AppendOutToken : public Token {
 		{
 			//Assign the values of the leftChild's content as a completed commmand,
 			//Store value into a cstring, and take in the filename from the
-			//rightChild's content.
+			//rightChild's content. 	
 		 	string fileName = rightChild->content[0];	
-			const int PATH_MX = 10000;
-			string commandOutput;
+			const int PATH_MX = 420;
+			string testCommand;
 
 			//Take in command from leftChild. 	
 			string command = joinVector(leftChild->content,' ');
 
 			//Create buffer to store value of comamnd. 
 			char buffer2[PATH_MX];
-			memset(buffer2, '\0',PATH_MX);
 
-			//Use popen to invoke the shell and get an fstream for the command.
+			//Use popen to invoke the shell and get a result for the command. 
+			//Push result into buffer. 
 			FILE* in_pipe = popen(command.c_str(), "r");
+			memset(buffer2, '\0',PATH_MX);
 			
-			//Store the result of the file into a string.
-			if (!in_pipe) {
-				cout << "Command not found:" << endl;
-				cout << "   ";
-				printVector(leftChild->content, "; ");
-				return 47;
-			} else {
-				while (fgets(buffer2,PATH_MX, in_pipe) != NULL) { // Reads lines from file pipe
-					commandOutput.append(buffer2);
-				}
-				pclose(in_pipe);
-				
-				ofstream ofs;
-
-				if (content[0] == ">>") {
-					ofs.open(fileName.c_str(), ofstream::out | ofstream::app);
-					if (!ofs.is_open()) {
-						cout << "Unable to open file; may already be open" << endl;
-						this->status = 1;
-					} else {
-						ofs << commandOutput;
-						ofs.close();
-						this->status = 0;
-					}
-				} else {
-					cout << "Token incorrectly constructed. Expected \">>\", found \"" 
-						 << content[0] << "\"" << endl;
+			//Store the result of the file into a string. 
+			while (fgets(buffer2,PATH_MX, in_pipe) != NULL) {
+				testCommand.append(buffer2);	
+			}
+			
+			pclose(in_pipe);
+			
+			if (content[0] == ">>") {
+				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_APPEND);
+				if (file_fd == -1) {
+					cout << "File dosen't exist" << endl;
 					this->status = 1;
+					return this->status;
 				}
+				write (file_fd, testCommand.c_str(), testCommand.size()+1);
+				close (file_fd);
+				this->status = 0;
 				return this->status;
 			}
+			else 
+			{
+				cout << "incorrectly formatted input" << endl;
+				this->status = 1;
+				return this->status;
+			}
+
+		
 		}
 };
 
