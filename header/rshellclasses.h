@@ -538,6 +538,7 @@ class EmptyOutToken : public Token {
 				this->status = 47;
 				return this->status;
 			} else {
+				leftChild->status = 0;
 				while (fgets(buffer2,PATH_MX, in_pipe) != NULL) { // Reads lines from file pipe
 					commandOutput.append(buffer2);
 				}
@@ -547,7 +548,7 @@ class EmptyOutToken : public Token {
 					cout << "Command output" << '\"' << commandOutput << '\"' << endl;
 				}
 
-				if (commandOutput == "") {
+				if (commandOutput == "") { // This catches both empty output (eg "echo a > txt.txt") and failed commands, a la "echa"
 					this->status = 0;
 					return this->status;
 				}
