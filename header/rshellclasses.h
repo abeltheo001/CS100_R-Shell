@@ -639,19 +639,26 @@ class PipeToken : public Token {
 			string r = "r";
 			string w = "w";
 			char buffer[PATH_MX];
+			char buffer2[PATH_MX];
 			
 			memset(buffer,'\0',PATH_MX);
-			
+			memset(buffer2,'\0',PATH_MX);
+				
 			FILE *in_pipe = popen(leftCommand.c_str(), r.c_str());
 			FILE *out_pipe = popen(rightCommand.c_str(), w.c_str());
 
 			if ((in_pipe == nullptr) && (out_pipe == nullptr)) {
 				cout << "Piping error, check input";
+				return 1;
 			}
 			
+			
+			
+			while (!feof(in_pipe))
+			{	
+				while (fgets(buffer,PATH_MX,in_pipe) != NULL) 
+					fputs(buffer, out_pipe);
 				
-			while (fgets(buffer,PATH_MX,in_pipe) != NULL) {
-				fputs(buffer, out_pipe);
 			}
 
 			pclose(in_pipe);

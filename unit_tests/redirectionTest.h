@@ -14,7 +14,7 @@
 
 using namespace std;
 
-TEST (redirectOutTest, Appending)
+TEST (redirectTest, Appending)
 {
 	RShell shellobj = RShell();
 	string file = "input.txt";
@@ -42,9 +42,13 @@ TEST (redirectOutTest, Appending)
 	EXPECT_EQ(checker,"DM the god himself");
 }
 
-TEST (redirectOutTest, Wipe)
+TEST (redirectTest, Wipe)
 {
 	
+}
+
+TEST(redirectTest, Pipe)
+{
 }
 
 
