@@ -111,13 +111,13 @@ TEST(redirectTest, Pipe)
 	string file = "newInput.txt";
 		
 	//Create inputs. 
-	Token* echo = new Subcommand({"echo","b",">","newInput.txt","|","tr","a-z","A-Z"});
-	Token* input2 = new Subcommand({"newInput.txt"});
-	Token* check1 = new EmptyOutToken({">"});
+	Token* echo = new Subcommand({"echo b > newInput.txt | tr a-z A-Z"});
+	Token* input = new Subcommand({"newInput.txt"}); 
+	Token* check = new EmptyOutToken({">"});
 
 
 	//Store inputs to deque
-	deque<Token*> V = {echo, input2, check1};
+	deque<Token*> V = {echo, input, check};
 
 	//Run the shell
 	shell.commandDeque = V;
