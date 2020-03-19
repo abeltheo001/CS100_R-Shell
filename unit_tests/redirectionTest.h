@@ -50,29 +50,6 @@ TEST (redirectTest, Appending)
 	shellobj.commandDeque = V;
 	shellobj.shuntingExecute(V);
 
-
-	/*original	
-	//Open the file 
-	ifstream in;
-	in.open(file);
-	string word;
-
-	string line;
-	while(!in.eof())
-	{
-		getline(in,line);
-		word.append(" ");
-		word.append(line);	
-	}
-	word.pop_back();
-	in.close();	
-	size_t find = word.find_last_of(" ");
-
-	string result; 
-	result = word.substr(find+1);
-	*/
-
-	/*current */
 	ifstream in2;
 	in2.open(file);
 	string word2;
@@ -85,10 +62,8 @@ TEST (redirectTest, Appending)
 		word2.append(line2);	
 	}
 	word2.pop_back();
-	in2.close();
-	
+	in2.close();	
 
-	
 
 	EXPECT_EQ(word, word2);
 }
