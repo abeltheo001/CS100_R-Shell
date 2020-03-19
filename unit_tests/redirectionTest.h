@@ -35,7 +35,8 @@ TEST (redirectTest, Appending)
 		word.append(" ");
 		word.append(line);	
 	}
-	
+	in.close();
+
 	word.append("cc bc");
 
 	//Store inputs into deque
@@ -84,6 +85,7 @@ TEST (redirectTest, Appending)
 		word2.append(line2);	
 	}
 	word2.pop_back();
+	in2.close();
 	
 
 	
