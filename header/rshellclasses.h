@@ -29,6 +29,7 @@ int GLOBAL_EXIT_STATUS = 0; // When set to 1, stop program execution.
 						    // This is used for proper handling of exit() -
 							// wasn't sure how to handle it otherwise since
 							// Tokens have no access to RShell, and we're using composite pattern.
+bool GLOBAL_DEBUG = false;
 
 class Token {
     public:
@@ -52,7 +53,7 @@ class Token {
 		// Meanings of status:
 		// -3: Subcommand segfaulted when we tried to run it with execvp
 		// -2: Token has not run
-		// 47: Subcommand not found
+		// -1: Subcommand not found
 		// 0: Subcommand ran successfully
 		// anything else: Subcommand failed
 };
@@ -136,10 +137,16 @@ class Subcommand : public Token {
 				return status;
 			} else { 
 				char** chararr = convertVectorToCharArray(content);
+				// vector<char*> temp;
+				// for (string s : content) {
+				// 	temp.push_back(&s[0]);
+				// }
+				// temp.push_back(nullptr);
+
 				status = executeCharArray(chararr);
 				
 				if (status == 47) {
-					cout << "RSHELL: Command not found!" << endl;
+					cout << "RSHELL: Command not found! " << '\"' << this->content[0] << '\"' << endl;
 				}
 
 				for (int i = 0; i < content.size()+1; i++) {
@@ -348,9 +355,12 @@ class StorageToken : public Token {
 
 class RShell {
     public:
-		RShell() {}
+		RShell() {
+			GLOBAL_DEBUG = false;
+		}
 		RShell(bool b) {
 			DEBUG = b;
+			GLOBAL_DEBUG = b;
 		}
 		RShell(string filename) {
 			// TODO: Make this take in .rshellrc and set up configData accordingly
@@ -411,7 +421,7 @@ class ParenthesisToken : public Token {
 		}
 
 		virtual int execute() {
-			RShell temp = RShell(false);
+			RShell temp = RShell(GLOBAL_DEBUG);
 			this->status = temp.shuntingExecute(interior);
 			return status;
 		}
@@ -525,12 +535,23 @@ class EmptyOutToken : public Token {
 				cout << "Command not found:" << endl;
 				cout << "   ";
 				printVector(leftChild->content, "; ");
-				return 47;
+				this->status = 47;
+				return this->status;
 			} else {
+				leftChild->status = 0;
 				while (fgets(buffer2,PATH_MX, in_pipe) != NULL) { // Reads lines from file pipe
 					commandOutput.append(buffer2);
 				}
 				pclose(in_pipe);
+
+				if (GLOBAL_DEBUG) {
+					cout << "Command output" << '\"' << commandOutput << '\"' << endl;
+				}
+
+				if (commandOutput == "") { // This catches both empty output (eg "echo a > txt.txt") and failed commands, a la "echa"
+					this->status = 0;
+					return this->status;
+				}
 				
 				ofstream ofs;
 
@@ -585,7 +606,8 @@ class RedirectInputToken : public Token {
 			dup2(stdin_save, 0); // Cleanup
 
 			if (status == 47) {
-				cout << "RSHELL: Command not found!" << endl;
+				cout << "RSHELL: Command not found! " << '\"' << leftChild->content[0] << '\"' << endl;
+				printVector(leftChild->content);
 			}
 
 			for (int i = 0; i < content.size()+1; i++) {
@@ -634,37 +656,31 @@ class PipeToken : public Token {
 			string leftCommand = joinVector(leftChild->content, ' ');
 			string rightCommand = joinVector(rightChild->content, ' ');
 
-			
-			cout << "left Command is " << leftCommand << endl;
-			cout << "right Command is " << rightCommand << endl;
-			cout << "PipeToken is " << joinVector(content,' ') << endl;
-
-			string r = "r";
-			string w = "w";
-
+			// Set up buffer
 			const int PATH_MX = 420;
 			char buffer[PATH_MX];
-			char buffer2[PATH_MX];
-			
 			memset(buffer,'\0',PATH_MX);
-			memset(buffer2, '\0',PATH_MX);
 			
-			FILE *in_pipe = popen(leftCommand.c_str(), r.c_str());
-			FILE *out_pipe = popen(rightCommand.c_str(), w.c_str());
+			FILE* in_pipe = popen(leftCommand.c_str(), "r");
+			FILE* out_pipe = popen(rightCommand.c_str(), "w");
 
-			if ((in_pipe = nullptr) && (out_pipe == nullptr)) {
+			if ((in_pipe == nullptr) || (out_pipe == nullptr)) {
+				this->status = 1;
 				cout << "Piping error, check input";
+				return 1;
 			}
+			else {
+				this->status = 0;
+				while (fgets(buffer,PATH_MX,in_pipe) != NULL) {
+					cout << buffer << endl;
+					fputs(buffer, out_pipe);
+				}
 
-			while (fgets(buffer,PATH_MX,in_pipe) != nullptr) {
-				fputs(buffer,out_pipe);
+				pclose(in_pipe);
+				pclose(out_pipe);
 			}
-
-			cout << "fputs check" << endl;
-			pclose(in_pipe);
-			pclose(out_pipe);
 			
-			return 0;
+			return this->status;
 		}
 };
 

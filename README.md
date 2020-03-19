@@ -29,6 +29,7 @@ This project implements a shell, which allows for execution of programs from a c
 	- "test" works similarly to bash - allows for -e, -f, -d flags
 	- symbolic test calls: "[ -e /path/to/file ]" is handled
 - quotes are allowed - eg "echo " ##### "" doesn't stop at #
+- \>, \>>, |, and \< for file redirection
 
 Some planned special constructs to catch:
 
@@ -42,6 +43,8 @@ Parsing of statements happens in header/shuntingYardConstruct.h, which directly 
 
 		if c and previous chars are equivalent to "&&", "||", or ";". This means we're currently on an operator.
 			Flush the buffer (except for the length of the operator) and store it in a Subcommand.
+			If c is >, >>, or |, we need to track the input from what came before it. Purge memory and store the entire left side of the
+				commandString into a Subcommand. This is allowed as popen() handles operators correctly.
 			Flush the operator to its operator type, such as AndToken, OrToken, or SemiToken.
 			Handle the Subcommand and operator Token in the same manner as Shunting Yard. In particular,
 				Subcommand gets sent to the outputQueue, and the operator Token gets sent to the operator stack.
@@ -102,7 +105,7 @@ which produces the expected behavior.
 
 ### Diagram
 
-![OMT Diagram (for Assignment 3)](/images/omt_diagram_3.png)
+![OMT Diagram (for Assignment 4)](/images/omt_diagram_4.png)
 
 ### Classes
 
@@ -195,7 +198,7 @@ Inherited class: TestToken : Token
 - Class variables
 	- [None additional]
 - Class functions
-    - TestToken(deque<Token\*>)
+    - TestToken(vector<string>)
 	- virtual int execute()
 	- virtual string stringify()
 
@@ -205,6 +208,42 @@ Inherited class: StorageToken : Token
 	- [None additional]
 - Class functions
     - StorageToken(int)
+	- virtual int execute()
+	- virtual string stringify()
+
+Inherited class: AppendOutToken : Token
+- Takes care of >> file redirection
+- Class variables
+	- [None additional]
+- Class functions
+    - AppendOutToken(vector<string>)
+	- virtual int execute()
+	- virtual string stringify()
+
+Inherited class: EmptyOutToken : Token
+- Takes care of > file redirection
+- Class variables
+	- [None additional]
+- Class functions
+    - EmptyOutToken(vector<string>)
+	- virtual int execute()
+	- virtual string stringify()
+
+Inherited class: RedirectInputToken : Token
+- Takes care of < file redirection
+- Class variables
+	- [None additional]
+- Class functions
+    - RedirectInputToken(vector<string>)
+	- virtual int execute()
+	- virtual string stringify()
+
+Inherited class: PipeToken : Token
+- Handles |, which takes the output from one command and inserts it as input to another command.
+- Class variables
+	- [None additional]
+- Class functions
+    - PipeToken(vector<string>)
 	- virtual int execute()
 	- virtual string stringify()
 

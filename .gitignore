@@ -50,3 +50,5 @@ Makefile
 temp/
 iofile.txt
 input.txt
+newInput.txt
+
