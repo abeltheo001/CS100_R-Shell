@@ -1,5 +1,5 @@
 #!/bin/bash
-# Assignment 4 tests ">"
+# Assignment 4 tests ">", ">>"
 
 OUTPUT_echoSingle=$(echo a > input.txt)
 RSHELLOUTPUT_echoSingle=$(./rshell echo a > input.txt)
