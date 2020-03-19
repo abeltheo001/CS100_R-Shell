@@ -17,10 +17,10 @@ using namespace std;
 TEST (redirectTest, Appending)
 {
 	RShell shellobj = RShell();
-	string file = "input.txt";
+	string file = "text.txt";
 
 	//Create inputs. 
-	Token* command2 = new Subcommand({"input.txt"});
+	Token* command2 = new Subcommand({"text.txt"});
 	Token* command = new Subcommand({"echo cc"});
 	Token* check = new AppendOutToken({">>"});
 
