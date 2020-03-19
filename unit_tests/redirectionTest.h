@@ -20,15 +20,17 @@ TEST (redirectTest, Appending)
 	string file = "input.txt";
 
 	//Create inputs. 
-	Token* command = new Subcommand({"input.txt"});
-	Token* response = new Subcommand({"echo a"});
+	Token* command2 = new Subcommand({"input.txt"});
+	Token* command = new Subcommand({"echo cc"});
 	Token* check = new AppendOutToken({">>"});
+
 
 	//Store inputs into deque
 	deque<Token*> V;
-	V.push_back(response);
 	V.push_back(command);
+	V.push_back(command2);
 	V.push_back(check);
+
 
 	//Run the shell
 	shellobj.commandDeque = V;
@@ -62,16 +64,88 @@ TEST (redirectTest, Appending)
 	in.close();	
 	
 
-	EXPECT_EQ(end,"a");
+	EXPECT_EQ(end,"cc");
 }
 
 TEST (redirectTest, Wipe)
 {
+	RShell shell = RShell();
+	string file = "input.txt";
+
+
+	//Create inputs. 
+	Token* command = new Subcommand({"input.txt"});
+	Token* response = new Subcommand({"echo a"});
+	Token* check = new EmptyOutToken({">"});
+
+	//Store inputs into deque
+	deque<Token*> V;
+	V.push_back(response);
+	V.push_back(command);
+	V.push_back(check);
+
+	//Run the shell
+	shell.commandDeque = V;
+	shell.shuntingExecute(V);
+	
+	//Open the file 
+	ifstream in;
+	in.open(file);
+	
+	//Check the first line of the file. 
+	string firstLine;
+	if (in.is_open())
+	{
+		getline(in,firstLine);
+	}
+	in.close();
+	
+	EXPECT_EQ(firstLine,"a");
+
 	
 }
 
 TEST(redirectTest, Pipe)
 {
+	RShell shell = RShell();
+	string file = "input.txt";
+		
+	//Create inputs. 
+	Token* echo = new Subcommand({"echo b"});
+	Token* check = new Subcommand({">"});
+	Token* fileName = new Subcommand({"input.txt"});
+	Token* pipe = new Subcommand({"|"});
+	Token* tr1 = new Subcommand({"tr"});
+	Token* tr2 = new Subcommand({"a-z"});
+	Token* tr3 = new Subcommand({"A-Z"});
+	Token* input = new Subcommand({"input.txt"});
+	Token* check1 = new EmptyOutToken({">"});
+
+
+	//Store inputs to deque
+	deque<Token*> V = {echo, check, fileName, pipe, tr1, tr2, tr3, input, check1};
+
+	//Run the shell
+	shell.commandDeque = V;
+	shell.shuntingExecute(V);
+
+	
+	//Open the file 
+	ifstream in;
+	in.open(file);
+	
+	//Check the first line of the file. 
+	string firstLine;
+	if (in.is_open())
+	{
+		getline(in,firstLine);
+	}
+	in.close();	
+
+	
+	EXPECT_EQ(firstLine,"B");
+
+	
 }
 
 
