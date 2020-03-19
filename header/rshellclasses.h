@@ -444,49 +444,52 @@ class AppendOutToken : public Token {
 		{
 			//Assign the values of the leftChild's content as a completed commmand,
 			//Store value into a cstring, and take in the filename from the
-			//rightChild's content. 	
+			//rightChild's content.
 		 	string fileName = rightChild->content[0];	
-			const int PATH_MX = 420;
-			string testCommand;
+			const int PATH_MX = 10000;
+			string commandOutput;
 
 			//Take in command from leftChild. 	
 			string command = joinVector(leftChild->content,' ');
 
 			//Create buffer to store value of comamnd. 
 			char buffer2[PATH_MX];
-
-			//Use popen to invoke the shell and get a result for the command. 
-			//Push result into buffer. 
-			FILE* in_pipe = popen(command.c_str(), "r");
 			memset(buffer2, '\0',PATH_MX);
-			
-			//Store the result of the file into a string. 
-			while (fgets(buffer2,PATH_MX, in_pipe) != NULL) {
-				testCommand.append(buffer2);	
-			}
-			
-			pclose(in_pipe);
-			
-			if (content[0] == ">>") {
-				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_APPEND);
-				if (file_fd == -1) {
-					cout << "File dosen't exist" << endl;
-					this->status = 1;
-					return this->status;
-				}
-				write (file_fd, testCommand.c_str(), testCommand.size()+1);
-				close (file_fd);
-				this->status = 0;
-				return this->status;
-			}
-			else 
-			{
-				cout << "incorrectly formatted input" << endl;
-				this->status = 1;
-				return this->status;
-			}
 
-		
+			//Use popen to invoke the shell and get an fstream for the command.
+			FILE* in_pipe = popen(command.c_str(), "r");
+			
+			//Store the result of the file into a string.
+			if (!in_pipe) {
+				cout << "Command not found:" << endl;
+				cout << "   ";
+				printVector(leftChild->content, "; ");
+				return 47;
+			} else {
+				while (fgets(buffer2,PATH_MX, in_pipe) != NULL) { // Reads lines from file pipe
+					commandOutput.append(buffer2);
+				}
+				pclose(in_pipe);
+				
+				ofstream ofs;
+
+				if (content[0] == ">>") {
+					ofs.open(fileName.c_str(), ofstream::out | ofstream::app);
+					if (!ofs.is_open()) {
+						cout << "Unable to open file; may already be open" << endl;
+						this->status = 1;
+					} else {
+						ofs << commandOutput;
+						ofs.close();
+						this->status = 0;
+					}
+				} else {
+					cout << "Token incorrectly constructed. Expected \">>\", found \"" 
+						 << content[0] << "\"" << endl;
+					this->status = 1;
+				}
+				return this->status;
+			}
 		}
 };
 
@@ -557,40 +560,63 @@ class RedirectInputToken : public Token {
 		virtual string stringify() { return "RedirectInputToken (<): \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute() {
 			const int PATH_MX = 420;
-			char** input = convertVectorToCharArray(leftChild->content);
-			string location = joinVector(rightChild->content,' ');
+			char** chararr = convertVectorToCharArray(leftChild->content);
+			string filename = joinVector(rightChild->content,' ');
+
 			int stdin_save = dup(0);
-			int in_file = open(location.c_str(), O_RDONLY);
+
+			// Open file, catch if error
+			int in_file = open(filename.c_str(), O_RDONLY);
 			if (in_file == -1) {
-				cout << "Open file error found. " <<endl;
+				cout << "Open file error for: \"" << filename << '\"' << endl;
 				this->status = 1;
 				return this->status;
 			}
-			
-					
-			pid_t pid = fork();
-			if (pid < 0)
-			{
-				string s = "Error: forking child process failed.";
-				const char* errormsg = s.c_str();
-				perror(errormsg);
-				this->status = 1;
-				return this->status;
+
+			dup2(in_file, 0); // Write 
+			close(in_file);
+
+			this->status = executeCharArray(chararr);
+
+			dup2(stdin_save, 0); // Cleanup
+
+			if (status == 47) {
+				cout << "RSHELL: Command not found!" << endl;
 			}
-			else if (pid == 0)
-			{	
-				dup2(in_file,0);
-				close(in_file);
-				execvp(input[0],input);	
-				dup2(stdin_save,0);
-				this->status = 0;
-				return this->status;
 
-			//	exit(47);
-					
-			}			
-		};
+			for (int i = 0; i < content.size()+1; i++) {
+				delete[] chararr[i];
+			}
+			delete[] chararr;
 
+			return status;
+			// pid_t pid = fork();
+			// if (pid < 0) {
+			// 	string s = "ERROR: forking child process failed.";
+			// 	const char* errormsg = s.c_str();
+			// 	perror(errormsg);
+			// 	this->status = 1;
+			// 	return this->status;
+			// } else if (pid == 0) {
+			// 	// Child process
+
+			// 	// Akin to *argv[0], the first argument is the name of the thing it's being called inside
+			// 	execvp(commandArray[0], commandArray);
+			// 	// If it returns, the charIn[0] is unknown
+			// 	// return -1; // -1 as an exit status has undefined behavior https://stackoverflow.com/questions/18890534/c-how-can-i-return-a-negative-value-in-main-cpp
+			// 	exit(47);
+			// } else {
+			// 	// Parent process
+			// 	int status = 0;
+			// 	waitpid(pid, &status, 0);
+			// 	dup2(stdin_save, 0); // Cleanup
+			// 	if (WIFEXITED(status) != 0) {
+			// 		return WEXITSTATUS(status);
+			// 	} else {
+			// 		return -3; // Called program segfaulted or something similar
+			// 	}
+			// }
+		}
 };
 
 class PipeToken : public Token {
