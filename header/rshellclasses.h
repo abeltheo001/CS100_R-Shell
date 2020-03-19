@@ -18,6 +18,7 @@
 #include <thread>
 #include <chrono>
 #include <fcntl.h>
+#include <fstream>
 #include "rshellutils.h"
 #include "executeCharArray.h"
 #include "convertVectorToCharArray.h"
@@ -450,49 +451,52 @@ class AppendOutToken : public Token {
 		{
 			//Assign the values of the leftChild's content as a completed commmand,
 			//Store value into a cstring, and take in the filename from the
-			//rightChild's content. 	
+			//rightChild's content.
 		 	string fileName = rightChild->content[0];	
-			const int PATH_MX = 420;
-			string testCommand;
+			const int PATH_MX = 1000;
+			string commandOutput;
 
 			//Take in command from leftChild. 	
 			string command = joinVector(leftChild->content,' ');
 
 			//Create buffer to store value of comamnd. 
 			char buffer2[PATH_MX];
-
-			//Use popen to invoke the shell and get a result for the command. 
-			//Push result into buffer. 
-			FILE* in_pipe = popen(command.c_str(), "r");
 			memset(buffer2, '\0',PATH_MX);
-			
-			//Store the result of the file into a string. 
-			while (fgets(buffer2,PATH_MX, in_pipe) != NULL) {
-				testCommand.append(buffer2);	
-			}
-			
-			pclose(in_pipe);
-			
-			if (content[0] == ">>") {
-				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_APPEND);
-				if (file_fd == -1) {
-					cout << "File dosen't exist" << endl;
-					this->status = 1;
-					return this->status;
-				}
-				write (file_fd, testCommand.c_str(), testCommand.size()+1);
-				close (file_fd);
-				this->status = 0;
-				return this->status;
-			}
-			else 
-			{
-				cout << "incorrectly formatted input" << endl;
-				this->status = 1;
-				return this->status;
-			}
 
-		
+			//Use popen to invoke the shell and get an fstream for the command.
+			FILE* in_pipe = popen(command.c_str(), "r");
+			
+			//Store the result of the file into a string.
+			if (!in_pipe) {
+				cout << "Command not found:" << endl;
+				cout << "   ";
+				printVector(leftChild->content, "; ");
+				return 47;
+			} else {
+				while (fgets(buffer2,PATH_MX, in_pipe) != NULL) { // Reads lines from file pipe
+					commandOutput.append(buffer2);
+				}
+				pclose(in_pipe);
+				
+				ofstream ofs;
+
+				if (content[0] == ">>") {
+					ofs.open(fileName.c_str(), ofstream::out | ofstream::app);
+					if (!ofs.is_open()) {
+						cout << "Unable to open file; may already be open" << endl;
+						this->status = 1;
+					} else {
+						ofs << commandOutput;
+						ofs.close();
+						this->status = 0;
+					}
+				} else {
+					cout << "Token incorrectly constructed. Expected \">>\", found \"" 
+						 << content[0] << "\"" << endl;
+					this->status = 1;
+				}
+				return this->status;
+			}
 		}
 };
 
@@ -509,47 +513,50 @@ class EmptyOutToken : public Token {
 			//Store value into a cstring, and take in the filename from the
 			//rightChild's content. 	
 		 	string fileName = rightChild->content[0];	
-			const int PATH_MX = 420;
-			string testCommand;
+			const int PATH_MX = 1000;
+			string commandOutput;
 
 			//Take in command from leftChild. 	
 			string command = joinVector(leftChild->content,' ');
 
 			//Create buffer to store value of comamnd. 
 			char buffer2[PATH_MX];
-
-			//Use popen to invoke the shell and get a result for the command. 
-			//Push result into buffer. 
-			FILE* in_pipe = popen(command.c_str(), "r");
 			memset(buffer2, '\0',PATH_MX);
-			
-			//Store the result of the file into a string. 
-			while (fgets(buffer2,PATH_MX, in_pipe) != NULL) {
-				testCommand.append(buffer2);	
-			}
-			
-			pclose(in_pipe);
-			
-			if (content[0] == ">") {
-				int file_fd = open(fileName.c_str(), O_RDWR|O_CREAT|O_TRUNC);
-				if (file_fd == -1) {
-					cout << "File dosen't exist" << endl;
-					this->status = 1;
-					return this->status;
-				}
-				write (file_fd, testCommand.c_str(), testCommand.size()+1);
-				close (file_fd);
-				this->status = 0;
-				return this->status;
-			}
-			else 
-			{
-				cout << "incorrectly formatted input" << endl;
-				this->status = 1;
-				return this->status;
-			}
 
-		
+			//Use popen to invoke the shell and get an fstream for the command.
+			FILE* in_pipe = popen(command.c_str(), "r");
+			
+			//Store the result of the file into a string.
+			if (!in_pipe) {
+				cout << "Command not found:" << endl;
+				cout << "   ";
+				printVector(leftChild->content, "; ");
+				return 47;
+			} else {
+				while (fgets(buffer2,PATH_MX, in_pipe) != NULL) { // Reads lines from file pipe
+					commandOutput.append(buffer2);
+				}
+				pclose(in_pipe);
+				
+				ofstream ofs;
+
+				if (content[0] == ">") {
+					ofs.open(fileName.c_str(), ofstream::out | ofstream::trunc);
+					if (!ofs.is_open()) {
+						cout << "Unable to open file; may already be open" << endl;
+						this->status = 1;
+					} else {
+						ofs << commandOutput;
+						ofs.close();
+						this->status = 0;
+					}
+				} else {
+					cout << "Token incorrectly constructed. Expected \">\", found \"" 
+						 << content[0] << "\"" << endl;
+					this->status = 1;
+				}
+				return this->status;
+			}
 		}
 };
 
@@ -575,7 +582,6 @@ class RedirectInputToken : public Token {
 				this->status = 1;
 				return this->status;
 			}
-
 
 			dup2(in_file, 0); // Write 
 			close(in_file);
@@ -635,36 +641,30 @@ class PipeToken : public Token {
 			string leftCommand = joinVector(leftChild->content, ' ');
 			string rightCommand = joinVector(rightChild->content, ' ');
 
+			// Set up buffer
 			const int PATH_MX = 420;
-			string r = "r";
-			string w = "w";
 			char buffer[PATH_MX];
-			char buffer2[PATH_MX];
-			
 			memset(buffer,'\0',PATH_MX);
-			memset(buffer2,'\0',PATH_MX);
-				
-			FILE *in_pipe = popen(leftCommand.c_str(), r.c_str());
-			FILE *out_pipe = popen(rightCommand.c_str(), w.c_str());
+			
+			FILE* in_pipe = popen(leftCommand.c_str(), "r");
+			FILE* out_pipe = popen(rightCommand.c_str(), "w");
 
-			if ((in_pipe == nullptr) && (out_pipe == nullptr)) {
+			if ((in_pipe == nullptr) || (out_pipe == nullptr)) {
+				this->status = 1;
 				cout << "Piping error, check input";
 				return 1;
 			}
-			
-			
-			
-			while (!feof(in_pipe))
-			{	
-				while (fgets(buffer,PATH_MX,in_pipe) != NULL) 
+			else {
+				this->status = 0;
+				while (fgets(buffer,PATH_MX,in_pipe) != NULL) {
 					fputs(buffer, out_pipe);
-				
-			}
+				}
 
-			pclose(in_pipe);
-			pclose(out_pipe);
+				pclose(in_pipe);
+				pclose(out_pipe);
+			}
 			
-			return 0;
+			return this->status;
 		}
 };
 
