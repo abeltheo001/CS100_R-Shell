@@ -29,6 +29,7 @@ int GLOBAL_EXIT_STATUS = 0; // When set to 1, stop program execution.
 						    // This is used for proper handling of exit() -
 							// wasn't sure how to handle it otherwise since
 							// Tokens have no access to RShell, and we're using composite pattern.
+bool GLOBAL_DEBUG = false;
 
 class Token {
     public:
@@ -354,9 +355,12 @@ class StorageToken : public Token {
 
 class RShell {
     public:
-		RShell() {}
+		RShell() {
+			GLOBAL_DEBUG = false;
+		}
 		RShell(bool b) {
 			DEBUG = b;
+			GLOBAL_DEBUG = b;
 		}
 		RShell(string filename) {
 			// TODO: Make this take in .rshellrc and set up configData accordingly
@@ -417,7 +421,7 @@ class ParenthesisToken : public Token {
 		}
 
 		virtual int execute() {
-			RShell temp = RShell(false);
+			RShell temp = RShell(GLOBAL_DEBUG);
 			this->status = temp.shuntingExecute(interior);
 			return status;
 		}
@@ -531,12 +535,22 @@ class EmptyOutToken : public Token {
 				cout << "Command not found:" << endl;
 				cout << "   ";
 				printVector(leftChild->content, "; ");
-				return 47;
+				this->status = 47;
+				return this->status;
 			} else {
 				while (fgets(buffer2,PATH_MX, in_pipe) != NULL) { // Reads lines from file pipe
 					commandOutput.append(buffer2);
 				}
 				pclose(in_pipe);
+
+				if (GLOBAL_DEBUG) {
+					cout << "Command output" << '\"' << commandOutput << '\"' << endl;
+				}
+
+				if (commandOutput == "") {
+					this->status = 0;
+					return this->status;
+				}
 				
 				ofstream ofs;
 
@@ -657,6 +671,7 @@ class PipeToken : public Token {
 			else {
 				this->status = 0;
 				while (fgets(buffer,PATH_MX,in_pipe) != NULL) {
+					cout << buffer << endl;
 					fputs(buffer, out_pipe);
 				}
 

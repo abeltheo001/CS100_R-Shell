@@ -137,7 +137,7 @@ TEST(redirectTest, Pipe)
 	in.close();	
 
 	
-	EXPECT_EQ(firstLine,"B");
+	EXPECT_EQ(firstLine,"b");
 
 	
 }
