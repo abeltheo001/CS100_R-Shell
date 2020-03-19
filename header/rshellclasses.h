@@ -562,7 +562,39 @@ class RedirectInputToken : public Token {
 		}
 		virtual string stringify() { return "RedirectInputToken (<): \"" + joinVector(content, ' ') + "\""; }
 		virtual int execute() {
-			return 0; // Needs to have a default value to avoid being pure virtual
+			const int PATH_MX = 420;
+			char** input = convertVectorToCharArray(leftChild->content);
+			string location = joinVector(rightChild->content,' ');
+			int stdin_save = dup(0);
+			int in_file = open(location.c_str(), O_RDONLY);
+			if (in_file == -1) {
+				cout << "Open file error found. " <<endl;
+				this->status = 1;
+				return this->status;
+			}
+			
+					
+			pid_t pid = fork();
+			if (pid < 0)
+			{
+				string s = "Error: forking child process failed.";
+				const char* errormsg = s.c_str();
+				perror(errormsg);
+				this->status = 1;
+				return this->status;
+			}
+			else if (pid == 0)
+			{	
+				dup2(in_file,0);
+				close(in_file);
+				execvp(input[0],input);	
+				dup2(stdin_save,0);
+				this->status = 0;
+				return this->status;
+
+			//	exit(47);
+					
+			}			
 		};
 
 };
@@ -577,11 +609,15 @@ class PipeToken : public Token {
 		virtual int execute() {
 			string leftCommand = joinVector(leftChild->content, ' ');
 			string rightCommand = joinVector(rightChild->content, ' ');
+
 			
+			cout << "left Command is " << leftCommand << endl;
+			cout << "right Command is " << rightCommand << endl;
+			cout << "PipeToken is " << joinVector(content,' ') << endl;
+
 			string r = "r";
 			string w = "w";
-			cout << r << w << endl;
-			
+
 			const int PATH_MX = 420;
 			char buffer[PATH_MX];
 			char buffer2[PATH_MX];
@@ -591,6 +627,7 @@ class PipeToken : public Token {
 			
 			FILE *in_pipe = popen(leftCommand.c_str(), r.c_str());
 			FILE *out_pipe = popen(rightCommand.c_str(), w.c_str());
+
 			if ((in_pipe = nullptr) && (out_pipe == nullptr)) {
 				cout << "Piping error, check input";
 			}
@@ -598,6 +635,8 @@ class PipeToken : public Token {
 			while (fgets(buffer,PATH_MX,in_pipe) != nullptr) {
 				fputs(buffer,out_pipe);
 			}
+
+			cout << "fputs check" << endl;
 			pclose(in_pipe);
 			pclose(out_pipe);
 			

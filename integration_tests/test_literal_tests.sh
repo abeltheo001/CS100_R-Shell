@@ -2,7 +2,7 @@
 
 RSHELLOUTPUTconnector=$(./rshell test -e CMakeLists.txt)
 
-if [ "(True)" == "$RSHELLOUTPUTconnector" ]
+if [ "(True)" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on test -e CMakeLists.txt."
 else
@@ -11,7 +11,7 @@ fi
 
 RSHELLOUTPUTconnector=$(./rshell test -e blorganorgnorg)
 
-if [ "(False)" == "$RSHELLOUTPUTconnector" ]
+if [ "(False)" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on test -e blorganorgnorg."
 else
@@ -20,7 +20,7 @@ fi
 
 RSHELLOUTPUTconnector=$(./rshell test -f CMakeLists.txt)
 
-if [ "(True)" == "$RSHELLOUTPUTconnector" ]
+if [ "(True)" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on test -f CMakeLists.txt."
 else
@@ -29,7 +29,7 @@ fi
 
 RSHELLOUTPUTconnector=$(./rshell test -f header)
 
-if [ "(False)" == "$RSHELLOUTPUTconnector" ]
+if [ "(False)" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on test -f header."
 else
@@ -38,7 +38,7 @@ fi
 
 RSHELLOUTPUTconnector=$(./rshell test -d header)
 
-if [ "(True)" == "$RSHELLOUTPUTconnector" ]
+if [ "(True)" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on test -d header."
 else
@@ -47,7 +47,7 @@ fi
 
 RSHELLOUTPUTconnector=$(./rshell test -d CMakeLists.txt)
 
-if [ "(False)" == "$RSHELLOUTPUTconnector" ]
+if [ "(False)" = "$RSHELLOUTPUTconnector" ]
 then
 	echo "rshell works as expected on test -d CMakeLists.txt."
 else
