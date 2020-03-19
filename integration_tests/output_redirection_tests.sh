@@ -1,8 +1,8 @@
 #!/bin/bash
 # Assignment 4 tests ">", ">>"
 
-OUTPUT_echoSingle=$(echo a > a.txt)
-RSHELLOUTPUT_echoSingle=$(./rshell echo a > b.txt)
+OUTPUT_echoSingle=$(echo a > input.txt)
+RSHELLOUTPUT_echoSingle=$(./rshell echo a > input.txt)
 
 if [ "$OUTPUT_echoSingle" = "$RSHELLOUTPUT_echoSingle" ]
 then
@@ -23,12 +23,12 @@ else
 fi
 
 
-OUTPUT_ls=$(ls > input.txt)
-RSHELLOUTPUT_ls=$(./rshell ls > input.txt)
+OUTPUT_ls=$(ls >> input.txt)
+RSHELLOUTPUT_ls=$(./rshell ls >> input.txt)
 
 if [ "$OUTPUT_ls" = "$RSHELLOUTPUT_ls" ]
 then
-	echo "rshell works as expected on ls > input.txt"
+	echo "rshell works as expected on ls >> input.txt"
 else
-	echo "rshell does not work as expected on ls > input.txt"
-
+	echo "rshell does not work as expected on ls >> input.txt"
+fi

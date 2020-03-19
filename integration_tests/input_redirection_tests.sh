@@ -11,7 +11,6 @@ else
 	echo "rshell does not work as expected on cat < input.txt"
 fi
 
-
 OUTPUT_head=$(head -n 2 < input.txt)
 RSHELLOUTPUT_head=$(./rshell head -n 2 < input.txt)
 
@@ -22,7 +21,6 @@ else
 	echo "rshell does not work as expected on head -n 2 < input.txt"
 fi
 
-
 OUTPUT_uniq=$(uniq < input.txt)
 RSHELLOUTPUT_uniq=$(./rshell uniq < input.txt)
 
@@ -32,3 +30,4 @@ then
 else
 	echo "rshell does not work as expected on uniq < input.txt"
 fi
+
